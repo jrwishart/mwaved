@@ -102,6 +102,10 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
 #' @param Y The input multichannel signal in the form of an n by m matrix to denote the m separate channels with n observations in each channel. If a vector of size n is given, it is parsed as a single channel signal with n elements.
 #' @param G The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.
 #' @param alpha A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.
+#' @param blur A character string describing which deconvolution regime is to be applied.\itemize{
+#' \item 'direct' (default): No deconvolution required and direct signal observed. This is captured when G is an n by m matrix with all entries being zero except the first row where all elements are one. 
+#' \item 'smooth': Indirect signal observed and the blurring kernel is of regular smooth blur type.
+#' \item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}
 #' @param j0 The coarsest resolution level for the wavelet expansion.
 #' @param j1 The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.
 #' @param eta The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).
@@ -126,16 +130,16 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
 #' G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
 #' G <- t(G)
 #' # Normalise the blur
-#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = T)
+#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
 #' G <- G/Gmax
-#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = T)
+#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
 #' G <- G/Gsum
 #' # Convolve the signal
 #' X <- Re(mvfft(mvfft(G) * mvfft(signal), inverse = TRUE))/n
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10,15,20)
 #' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = T)
+#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' thresh <- multiThresh(Y, G, blur = 'smooth')
@@ -145,8 +149,7 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
 #' @export
 multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), blur = "direct", j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
-  n <- dim(Y)[1]
-  jvals <- feasibleResolutions(n, j0, j1)
+  jvals <- feasibleResolutions(dim(Y)[1], j0, j1)
   
   .Call('mwaved_multiThresh', Y, G, alpha, blur, jvals$j0, jvals$j1, eta, deg)
 }
@@ -158,9 +161,21 @@ multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.
 #' @param Y The input multichannel signal in the form of an n by m matrix to denote the m separate channels with n observations in each channel. If a vector of size n is given, it is parsed as a single channel signal with n elements.
 #' @param G The input multichannel blur matrix of size n by m (needs to be the same dimensions and size as the signal input). This matrix dictates the form of blur present in each of the channels.
 #' @param alpha A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.
+#' @param blur A character string describing which deconvolution regime is to be applied.\itemize{
+#' \item 'direct' (default): No deconvolution required and direct signal observed. This is captured when G is an n by m matrix with all entries being zero except the first row where all elements are one. 
+#' \item 'smooth': Indirect signal observed and the blurring kernel is of regular smooth blur type.
+#' \item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}
+#' @param sigma A numeric vector with m elements that specifies the level of noise (standard deviation) in each channel. 
+#' The default method uses the Median Absolute Deviation of wavelet coefficients in the finest resolution (see \code{\link{multiSigma}}).
 #' @param j0 The coarsest resolution level for the wavelet expansion.
 #' @param j1 The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.
 #' @param eta The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).
+#' @param thresh A numeric vector specifying the thresholds to be used in the thresholded wavelet deconvolution estimator.
+#' @param shrinkage A character string specifying the shrinkage type to use in estimation. Available choices are\itemize{
+#' \item 'hard': Keep or kill shrinkage rule.
+#' \item 'soft': Kill coefficients smaller than a threshold but uniformly trim coefficients otherwise.
+#' \item 'garrote': Hybrid between the hard and soft regimes.
+#' } See also the documentation for \code{\link{waveletThresh}} for formulae.
 #' @param deg The degree of the auxiliary polynomial for the Meyer wavelet.
 #' 
 #' @details Function requires input of a noisy multichannel signal matrix, Y, which contains the information for each channel in each of the m columns. Optional inputs are a matrix, G, the same dimension as Y, that gives the multichannel blur information.
@@ -175,7 +190,7 @@ multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.
 #' t <- (1:n)/n
 #' signal <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
 #' signal <- signal * 2.4
-#' signalMatrix <- matrix(rep(signal,m), nrow=n, ncol=m)
+#' sigMat <- matrix(rep(signal,m), nrow=n, ncol=m)
 #' # Noise levels per channel
 #' e <- rnorm(m*n)
 #' # Create Gamma blur
@@ -184,20 +199,20 @@ multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.
 #' G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
 #' G <- t(G)
 #' # Normalise the blur
-#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = T)
+#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
 #' G <- G/Gmax
-#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = T)
+#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
 #' G <- G/Gsum
 #' # Convolve the signal
-#' X <- Re(mvfft(mvfft(G) * mvfft(signal), inverse = TRUE))/n
-#' # Create error with custom signal to noise ratio
+#' X <- Re(mvfft(mvfft(G) * mvfft(sigMat), inverse = TRUE))/n
+#' # Create error with different signal to noise ratios
 #' SNR <- c(10,15,20)
 #' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = T)
+#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Estimate the underlying doppler signal
-#' dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1,3), blur = 'smooth')
+#' dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1, m), blur = 'smooth')
 #' # Plot the result and compare with truth
 #' par(mfrow=c(2,1))
 #' matplot(t, Y, type = 'l', main = 'Noisy multichannel signal')
@@ -236,38 +251,39 @@ multiEstimate <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(a
 #' t <- (1:n)/n
 #' signal <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
 #' signal <- signal * 2.4
-#' signal <- matrix(rep(signal,m), nrow=n, ncol=m)
+#' sigMat <- matrix(rep(signal,m), nrow=n, ncol=m)
 #' # Noise levels per channel
 #' e <- rnorm(m*n)
 #' # Create Gamma blur
 #' alp <- c(0.5,0.75,1)
-#' beta <- rep(0.25,3)
+#' beta <- rep(0.25,m)
 #' G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
 #' G <- t(G)
 #' # Normalise the blur
-#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = T)
+#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
 #' G <- G/Gmax
-#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = T)
+#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
 #' G <- G/Gsum
 #' # Convolve the signal
-#' X <- Re(mvfft(mvfft(G) * mvfft(signal), inverse = TRUE))/n
-#' # Create error with custom signal to noise ratio
+#' X <- Re(mvfft(mvfft(G) * mvfft(sigMat), inverse = TRUE))/n
+#' # Create errors with different signal to noise ratios
 #' SNR <- c(10,15,20)
 #' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = T)
+#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
+#' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
+#' matlines(Y)
 #' # Estimate the wavelet coefficients
-#' dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1,3), blur = 'smooth')
-#' # Plot the result and compare with truth
-#' par(mfrow=c(2,1))
-#' matplot(t, Y, type = 'l', main = 'Noisy multichannel signal')
-#' plot(t, y, type = 'l', lty = 2, main = 'True Doppler signal and estimate', col = 'red')
-#' lines(t, dopplerEstimate)
-#' 
+#' estimatedCoefs <- multiCoef(Y, G, alpha = rep(1,m), blur = 'smooth')
+#' plot(estimatedCoefs)
+#' # Compute true wavelet coefficients
+#' trueCoefs <- multiCoef(signal)
+#' plot(trueCoefs)
 #' @export
 multiCoef <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), blur = "direct", j0 = 3L, j1 = NA_integer_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
+  n <- dim(Y)[1]
   jvals <- feasibleResolutions(n, j0, j1)
   
   .Call('mwaved_multiCoef', Y, G, alpha, blur, jvals$j0, jvals$j1, thresh, eta, deg)
@@ -305,13 +321,12 @@ multiCoef <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.ma
 #' @export 
 waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
   nthr <- length(thresh)
-  n <- length(beta$coef)
   j0 <- beta$j0
-  J <- log2(nthr) - 1
-  req <- J - j0 + 1
+  req <- log2(length(beta$coef)) - j0
+  j1 <- j0 + req
   
   if( nthr < req && thresh != 0 ){
-    if( ntrh == 1 ){
+    if( nthr == 1 ){
       warning("thresh input vector only has one element. Universal threshold applied on all resolutions.")
       thresh <- rep(thresh, req)
     } else {
@@ -319,7 +334,7 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
       thresh <- c(thresh, rep(thresh[nthr], req - nthr))
     } 
   }
-  return(.Call('mwaved_multiWaveD', beta, thresh, jvals$j0, jvals$j1))
+  return(.Call('mwaved_waveletThresh', beta, thresh, j0, j1))
 }
 
 
@@ -337,11 +352,45 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 #' @param eta The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).
 #' @param deg The degree of the auxiliary polynomial for the Meyer wavelet.
 #' 
+#' @examples
+#' #' library(mwaved)
+#' # Simulate the multichannel doppler signal.
+#' m <- 3
+#' n <- 2^10
+#' t <- (1:n)/n
+#' signal <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
+#' signal <- signal * 2.4
+#' sigMat <- matrix(rep(signal,m), nrow=n, ncol=m)
+#' # Noise levels per channel
+#' e <- rnorm(m*n)
+#' # Create Gamma blur
+#' alp <- c(0.5,0.75,1)
+#' beta <- rep(0.25,m)
+#' G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
+#' G <- t(G)
+#' # Normalise the blur
+#' Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
+#' G <- G/Gmax
+#' Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
+#' G <- G/Gsum
+#' # Convolve the signal
+#' X <- Re(mvfft(mvfft(G) * mvfft(sigMat), inverse = TRUE))/n
+#' # Create errors with different signal to noise ratios
+#' SNR <- c(10,15,20)
+#' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
+#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
+#' # Create noisy & blurred multichannel signal
+#' Y <- X + E
+#' # Compute mWaveD object
+#' multiObject <- multiWaveD(Y, G = G, alpha = rep(1, m), blur = 'smooth')
+#' plot(multiObject)
+#' summary(multiObject)
+#' 
 #' @export
 multiWaveD <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[1]), j0 = 3L, j1 = NA_integer_, blur = "direct", thresh = as.numeric(c()), eta = NA_real_, 
                    shrinkage = "Hard", deg = 3L) {
   Y <- as.matrix(Y)
-  jvals <- feasibleResolutions(n, j0, j1)
+  jvals <- feasibleResolutions(dim(Y)[1], j0, j1)
   
   return(.Call('mwaved_multiWaveD', Y, G, alpha, jvals$j0, jvals$j1, blur, thresh, eta, shrinkage, deg))
 }

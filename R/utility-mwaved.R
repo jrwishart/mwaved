@@ -71,9 +71,9 @@ summary.mWaveD <- function(object, ...){
 #' @param highest Specifies the finest resolution to display in the Multi-resolution plot 
 #' 
 #' @export
-plot.waveletCoef <- function(beta, lowest = NULL, highest = NULL, thickness = 1, coefTrim = NULL, descending = FALSE, sc = 1, ...){
-  x <- beta$coef
-  j0 <- beta$j0
+plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, thickness = 1, coefTrim = NULL, descending = FALSE, sc = 1){
+  j0 <- x$j0
+  x <- x$coef
   J <- log2(length(x))
   if((J %% 1) > 0)
     warning("Vector of wavelet coefficients has length not a power of 2\n")
@@ -172,6 +172,7 @@ plot.mWaveD <- function(x,...){
   }
   
   beta <- list(coef = x$coef, j0 = j0)
+  class(beta) <- 'waveletCoef'
   plot(beta, highest = j1, coefTrim = x$shrinkCoef)
 }
 

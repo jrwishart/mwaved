@@ -1,4 +1,6 @@
-useDynLib(mwaved, mwaved_multiSigma, mwaved_multiEstimate, mwaved_mWaveD, mwaved_multiThresh, mwaved_multiCoef, mwaved_multiProj, mwaved_waveletThresh)
+import(Rcpp)
+
+useDynLib(mwaved, mwaved_multiSigma, mwaved_multiEstimate, mwaved_multiWaveD, mwaved_multiThresh, mwaved_multiCoef, mwaved_multiProj, mwaved_waveletThresh)
 
 # Wavelet Coefficient objects and methods
 S3method(plot,waveletCoef)
@@ -9,7 +11,7 @@ S3method(plot,mWaveD)
 S3method(summary,mWaveD)
 
 # Exported functions
-export(mWaveD)
+export(multiWaveD)
 export(multiCoef)
 export(multiEstimate)
 export(multiProj)
