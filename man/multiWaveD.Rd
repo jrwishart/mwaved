@@ -1,8 +1,8 @@
-\name{mWaveD}
-\alias{mWaveD}
-\title{mWaveD}
+\name{multiWaveD}
+\alias{multiWaveD}
+\title{multiWaveD}
 \usage{
-mWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
+multiWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
   dim(as.matrix(Y))[1]), j0 = 3L, j1 = NA_integer_, blur = "direct",
   thresh = as.numeric(c()), eta = NA_real_, shrinkage = "Hard",
   deg = 3L)
