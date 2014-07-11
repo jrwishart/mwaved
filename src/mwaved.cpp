@@ -2133,7 +2133,7 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
 }
 
 // [[Rcpp::export]]
-List mWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(),
+List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(),
                     int j0 = 3, int j1 = NA_INTEGER, String blur = "direct", 
                     NumericVector thresh = NumericVector::create(),
                     double eta = NA_REAL, String shrinkage = "Hard", int deg = 3){
@@ -2644,7 +2644,7 @@ List mWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Numeric
   fftw_free(sig_real_out);
   fftw_free(sig_in);
   
-  List MultiWaveD = List::create(
+  List multiWaveD = List::create(
     _["channels"]    = m,
     _["signal"]      = signal,
     _["G"]           = G,
@@ -2665,7 +2665,7 @@ List mWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Numeric
     _["degree"]      = deg
     );
   
-  MultiWaveD.attr("class") = "mWaveD";
+  multiWaveD.attr("class") = "mWaveD";
   
-  return MultiWaveD;
+  return multiWaveD;
 }

@@ -70,7 +70,7 @@ multiSigma <- function(Y, deg = 3L){
 #' @param deg The degree of the auxiliary polynomial used in the Meyer wavelet.
 #' 
 #' @details Function that takes an input of wavelet coefficients, \emph{beta} of length n and optionally a desired coarse resolution level and maximum resolution level, \emph{j1}, to create an inhomogeneous wavelet expansion starting from resolution \emph{j0} up to resolution \emph{j1}. If the maximum resolution level \emph{j1} is not specified, the full wavelet expansion will be given. Namely, for \emph{j0} <= j <= \emph{j1} and 0 <= k <= 2^j-1, \deqn{\sum_j \sum_k beta_{j,k} \psi_{j,k}.}
-#'
+#' 
 #' @return A numeric vector of size n giving the wavelet function expansion.
 #' 
 #' @seealso multiCoef
@@ -208,7 +208,7 @@ multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.
 
 multiEstimate <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), blur = "direct", sigma = multiSigma(as.matrix(Y), deg = 3L), j0 = 3L, j1 = NA_integer_, 
                           eta = NA_real_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L) , shrinkage = "Hard", deg = 3L) {
-  Y = as.matrix(Y)
+  Y <- as.matrix(Y)
   .Call('mwaved_multiEstimate', Y, G, alpha, blur, sigma, j0, j1, eta, thresh, shrinkage, deg)
 }
 
@@ -273,9 +273,57 @@ multiCoef <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.ma
   .Call('mwaved_multiCoef', Y, G, alpha, blur, jvals$j0, jvals$j1, thresh, eta, deg)
 }
 
-#' @title 
+#' @title waveletThresh
+#' 
+#' @description Applies a resolution level thresholding technique to a set of wavelet coefficients,
+#' embedded in a wavelet coefficient object.
+#'
+#' @param beta A waveletCoef object that includes a set of n wavelet coeffients and integer 
+#' j0 specifying the coarsest resolution.
+#' @param thresh A numeric vector containing the thresholds to be applied to the coefficients 
+#' at each resolution.
+#' @param shrinkType A character string that specifies which thresholding regime to use. 
+#' Available choices are the 'hard', 'soft' or 'garrote'. 
+#' 
+#' @details Applies one of three specified wavelet thresholding regimes to a wavelet 
+#' coefficient object (list with a vector of n wavelet coefficients and an integer 
+#' specifying the coarse resolution level). If thresh is not specified, no thresholding 
+#' is applied. The formulae applied for 'hard', 'soft' or 
+#' 'garrote' are given by,\itemize{
+#'  \item Hard: \eqn{
+#'    \delta(x) = x 1(|x| > t)
+#'  }
+#'  \item Soft: \eqn{
+#'    \delta(x) = (x - t) 1(x > t) + (x + t) 1(x > -t)
+#'  }
+#'  \item Garrote: \eqn{
+#'    \delta(x) = (x - t^2/x) 1(|x| > t)
+#'  }
+#' }
+#' where 1 represents the indicator function and \emph{t > 0} represents the threshold.
+#' 
+#' @export 
+waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
+  nthr <- length(thresh)
+  n <- length(beta$coef)
+  j0 <- beta$j0
+  J <- log2(nthr) - 1
+  req <- J - j0 + 1
+  
+  if( nthr < req && thresh != 0 ){
+    if( ntrh == 1 ){
+      warning("thresh input vector only has one element. Universal threshold applied on all resolutions.")
+      thresh <- rep(thresh, req)
+    } else {
+      warning("length of thresh input too small, last element repeated in higher resolutions.")
+      thresh <- c(thresh, rep(thresh[nthr], req - nthr))
+    } 
+  }
+  return(.Call('mwaved_multiWaveD', beta, thresh, jvals$j0, jvals$j1))
+}
 
-#' @title mWaveD
+
+#' @title multiWaveD
 #' 
 #' @description Returns a mWaveD object that contains all the required information for the multichannel analysis.
 #' 
@@ -289,14 +337,11 @@ multiCoef <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.ma
 #' @param eta The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).
 #' @param deg The degree of the auxiliary polynomial for the Meyer wavelet.
 #' 
-#' @examples
-#' library(mwaved)
-#' 
 #' @export
-mWaveD <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[1]), j0 = 3L, j1 = NA_integer_, blur = "direct", thresh = as.numeric(c()), eta = NA_real_, 
+multiWaveD <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[1]), j0 = 3L, j1 = NA_integer_, blur = "direct", thresh = as.numeric(c()), eta = NA_real_, 
                    shrinkage = "Hard", deg = 3L) {
-  Y = as.matrix(Y)
+  Y <- as.matrix(Y)
   jvals <- feasibleResolutions(n, j0, j1)
   
-  return(.Call('mwaved_mWaveD', Y, G, alpha, jvals$j0, jvals$j1, blur, thresh, eta, shrinkage, deg))
+  return(.Call('mwaved_multiWaveD', Y, G, alpha, jvals$j0, jvals$j1, blur, thresh, eta, shrinkage, deg))
 }

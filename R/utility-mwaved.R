@@ -131,7 +131,6 @@ plot.waveletCoef <- function(beta, lowest = NULL, highest = NULL, thickness = 1,
 #' 
 #' @description Four plots: The input multichannel signal, the mWaveD
 #' 
-#' @details 
 #' 
 #' @export
 plot.mWaveD <- function(x,...){

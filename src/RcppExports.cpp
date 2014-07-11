@@ -126,9 +126,9 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
-// mWaveD
-List mWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, String blur = "direct", NumericVector thresh = NumericVector::create(), double eta = NA_REAL, String shrinkage = "Hard", int deg = 3);
-RcppExport SEXP mwaved_mWaveD(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP blurSEXP, SEXP threshSEXP, SEXP etaSEXP, SEXP shrinkageSEXP, SEXP degSEXP) {
+// multiWaveD
+List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, String blur = "direct", NumericVector thresh = NumericVector::create(), double eta = NA_REAL, String shrinkage = "Hard", int deg = 3);
+RcppExport SEXP mwaved_multiWaveD(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP blurSEXP, SEXP threshSEXP, SEXP etaSEXP, SEXP shrinkageSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -143,7 +143,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< double >::type eta(etaSEXP );
         Rcpp::traits::input_parameter< String >::type shrinkage(shrinkageSEXP );
         Rcpp::traits::input_parameter< int >::type deg(degSEXP );
-        List __result = mWaveD(signal, G, alpha, j0, j1, blur, thresh, eta, shrinkage, deg);
+        List __result = multiWaveD(signal, G, alpha, j0, j1, blur, thresh, eta, shrinkage, deg);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
