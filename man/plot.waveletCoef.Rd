@@ -4,12 +4,24 @@
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
 \usage{
 \method{plot}{waveletCoef}(x, ..., lowest = NULL, highest = NULL,
-  thickness = 1, coefTrim = NULL, descending = FALSE, sc = 1)
+  coefTrim = NULL, thickness = 1, descending = FALSE, scaling = 1)
 }
 \arguments{
-\item{lowest}{Specifies the coarsest resolution to display in the Multi-resolution plot}
+\item{x}{A list created by the waveletCoef.}
 
-\item{highest}{Specifies the finest resolution to display in the Multi-resolution plot}
+\item{...}{Arguments to be passed to methods.}
+
+\item{lowest}{Specifies the coarsest resolution to display in the Multi-resolution plot.}
+
+\item{highest}{Specifies the finest resolution to display in the Multi-resolution plot.}
+
+\item{coefTrim}{A numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the 'x' wavelet coefficients.}
+
+\item{thickness}{An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.}
+
+\item{descending}{A logical value to specify whether resolutions on the y-axis of the plot are increasing from top to bottom.}
+
+\item{scaling}{A numeric value that acts as a graphical scaling parameter to rescale the wavelet coefficients in the plot. A larger scaling value will reduce the size of the coefficients in the plot.}
 }
 \description{
 Plots the wavelet coefficient object in the multiresolution analysis

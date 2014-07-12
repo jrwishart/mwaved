@@ -3,9 +3,31 @@
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
 \usage{
-\method{plot}{mWaveD}(x, ...)
+\method{plot}{mWaveD}(x, ..., singlePlot = TRUE, prompt = TRUE)
+}
+\arguments{
+\item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
+
+\item{...}{Arguments to be passed to methods.}
+
+\item{singlePlot}{A logical value that controls whether all four plots appear on a single window (2 x 2 plot window) or are separated into separate plot windows.}
+
+\item{prompt}{A logical value that specifies whether the user is prompted between plot outputs.}
 }
 \description{
-Four plots: The input multichannel signal, the mWaveD
+that summarises the multichannel input, a visualisation of the severity of the channels and the output estimate.Four plots: The input multichannel signal, the mWaveD
+}
+\details{
+Four plots are output that summarise the multichannel input, a visualisation of the severity of the channels and the output estimate.\itemize{
+\item Plot 1: Multichannel input signal overlayed.
+\item Plot 2: Estimated output signal using the mWaveD approach.
+\item Plot 3:
+\item Plot 4: Multi-resolution plot of the raw wavelet coefficients (black) and the trimmed wavelet coefficients (red)}
+}
+\references{
+TBA ACHA and COMPSTAT
+}
+\seealso{
+\code{\link{multiWaveD}}
 }
 

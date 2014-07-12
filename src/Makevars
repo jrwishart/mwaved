@@ -1,0 +1,7 @@
+# set by configure
+RCPP_LDFLAGS = 
+FFTW_LIBS = -lfftw3  
+
+# combine with standard arguments for R
+PKG_LIBS += $(FFTW_LIBS) $(RCPP_LDFLAGS)
+

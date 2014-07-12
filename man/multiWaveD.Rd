@@ -4,7 +4,7 @@
 \title{multiWaveD}
 \usage{
 multiWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
-  dim(as.matrix(Y))[1]), j0 = 3L, j1 = NA_integer_, blur = "direct",
+  dim(as.matrix(Y))[2]), j0 = 3L, j1 = NA_integer_, blur = "direct",
   thresh = as.numeric(c()), eta = NA_real_, shrinkage = "Hard",
   deg = 3L)
 }
@@ -25,7 +25,14 @@ multiWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
 
 \item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).}
 
-\item{deg}{The degree of the auxiliary polynomial for the Meyer wavelet.}
+\item{shrinkage}{A character string specifying the shrinkage type to use in estimation. Available choices are\itemize{
+\item 'hard': Keep or kill shrinkage rule.
+\item 'soft': Kill coefficients smaller than a threshold but uniformly trim coefficients otherwise.
+\item 'garrote': Hybrid between the hard and soft regimes.
+} See also the documentation for \code{\link{waveletThresh}} for formulae.}
+
+\item{deg}{The degree of the auxiliary polynomial for the Meyer wavelet.
+a}
 }
 \description{
 Returns a mWaveD object that contains all the required information for the multichannel analysis.

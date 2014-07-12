@@ -1,0 +1,4 @@
+if test -z "${R_HOME}"; then
+	echo "configure: could not find R_HOME"
+	exit 1
+fi

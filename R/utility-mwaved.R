@@ -1,6 +1,18 @@
 #' @title Summary Output for the mWaveD object
 #'
-#' @description Summarises the mWaveD object
+#' @param object A mWaveD object which is a list containing all the information for a multichannel 
+#' deconvolution analysis produced by the \code{\link{multiWaveD}} function.
+#' @param ... Arguments to be passed to methods.
+#' @description Summarises the mWaveD object by giving
+#' @return Text output given summary information of the input and output analysis including, \itemize{
+#' \item Degree of Meyer wavelet used.
+#' \item Number of observations, within each channel and number of channels present.
+#' \item Resolution levels used (j0 to j1)
+#' \item Blur type assumed in the analysis (direct, smooth or box.car)
+#' \item Matrix summarising the noise levels in each channel (and Fourier decay information for the smooth case)
+#' \item Summaries of the thresholding,
+#' }
+#' @seealso \code{\link{multiWaveD}}
 #' @export
 summary.mWaveD <- function(object, ...){
   n = length(object$estimate)
@@ -67,11 +79,16 @@ summary.mWaveD <- function(object, ...){
 #'
 #' @description Plots the wavelet coefficient object in the multiresolution analysis
 #' 
-#' @param lowest Specifies the coarsest resolution to display in the Multi-resolution plot
-#' @param highest Specifies the finest resolution to display in the Multi-resolution plot 
-#' 
+#' @param x A list created by the waveletCoef.
+#' @param ... Arguments to be passed to methods.
+#' @param lowest Specifies the coarsest resolution to display in the Multi-resolution plot.
+#' @param highest Specifies the finest resolution to display in the Multi-resolution plot.
+#' @param coefTrim A numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the 'x' wavelet coefficients. 
+#' @param thickness An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.
+#' @param descending A logical value to specify whether resolutions on the y-axis of the plot are increasing from top to bottom.
+#' @param scaling A numeric value that acts as a graphical scaling parameter to rescale the wavelet coefficients in the plot. A larger scaling value will reduce the size of the coefficients in the plot.
 #' @export
-plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, thickness = 1, coefTrim = NULL, descending = FALSE, sc = 1){
+plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, coefTrim = NULL, thickness = 1, descending = FALSE, scaling = 1){
   j0 <- x$j0
   x <- x$coef
   J <- log2(length(x))
@@ -90,7 +107,7 @@ plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, thickness = 
   for (i in (min(reslev):max(reslev))) {
     num <- c(num, 2*(1:(2^i)) - 1)
   }
-  M <- 2 * max(abs(wc))/sc
+  M <- 2 * max(abs(wc))/scaling
   den <- 2^(reslev + 1)
   ind <- (reslev >= lowest) & (reslev <= highest)
   x <- (num/den)[ind]
@@ -109,7 +126,7 @@ plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, thickness = 
   }
   if( !is.null(coefTrim) ){
     wc <-  coefTrim[-(1:2^j0)]
-    M <- 2 * max(abs(wc))/sc
+    M <- 2 * max(abs(wc))/scaling
     den <- 2^(reslev + 1)
     ind <- (reslev >= lowest) & (reslev <= highest)
     x <- (num/den)[ind]
@@ -129,17 +146,32 @@ plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, thickness = 
 
 #' @title Plot Output for the mWaveD object
 #' 
-#' @description Four plots: The input multichannel signal, the mWaveD
+#' @description  that summarises the multichannel input, a visualisation of the severity of the channels and the output estimate.Four plots: The input multichannel signal, the mWaveD
 #' 
+#' @param x A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})
+#' @param ... Arguments to be passed to methods.
+#' @param singlePlot A logical value that controls whether all four plots appear on a single window (2 x 2 plot window) or are separated into separate plot windows.
+#' @param prompt A logical value that specifies whether the user is prompted between plot outputs.
 #' 
+#' @details Four plots are output that summarise the multichannel input, a visualisation of the severity of the channels and the output estimate.\itemize{
+#' \item Plot 1: Multichannel input signal overlayed.
+#' \item Plot 2: Estimated output signal using the mWaveD approach.
+#' \item Plot 3: 
+#' \item Plot 4: Multi-resolution plot of the raw wavelet coefficients (black) and the trimmed wavelet coefficients (red)}
+#' @references TBA ACHA and COMPSTAT
+#' @seealso \code{\link{multiWaveD}}
 #' @export
-plot.mWaveD <- function(x,...){
+plot.mWaveD <- function(x, ..., singlePlot = TRUE, prompt = TRUE){
   n = length(x$estimate)
   t = (1:n)/n
-  
-  par(mfrow=c(2,2))
-  
+  if( singlePlot ){
+    par(mfrow=c(2,2))
+  }
+
   matplot(t,x$signal,type='l',main="Input Signal",ylab='Signal',xlab='t',lty=1,cex=0.8)
+  if( !singlePlot && prompt ){
+    readline('Press any key to see the next plot.')
+  }
   plot(t,x$estimate,type='l',main='mWaveD estimate',ylab='mWaveD Estimate',xlab='t')
   blurInfo = x$blurInfo
   blur = x$blurType
@@ -157,6 +189,9 @@ plot.mWaveD <- function(x,...){
     ylim = c(min(cutf[2,]),0)
     blur = rbind(revblur,blurf)
     cut = rbind(revcut,cutf)
+    if( !singlePlot && prompt ){
+      readline('Press any key to see the next plot.')
+    }
     matplot(tS,blur,type='l',lty=1,xlim=xlim,ylim=ylim,main="Fourier decay and cutoffs",xlab="Frequency", ylab="Fourier decay")
     matlines(tS,cut,lty=2)
   } else {
@@ -165,6 +200,9 @@ plot.mWaveD <- function(x,...){
     blkV <- blurInfo$blockVar[1:length(j)]
     blkc <- blurInfo$blockCutoff[1:length(j)]
     ylim <- range(c(blurInfo$blockVar, blurInfo$blockCutoff))
+    if( !singlePlot && prompt ){
+      readline('Press any key to see the next plot.')
+    }
     plot(j,blkV,type='b',xlab='j',ylab='',main='Block wise resolution selection')
     lines(j,blkc,col=2)
     points(j1,blurInfo$blockVar[j == j1],col='blue')
@@ -173,6 +211,9 @@ plot.mWaveD <- function(x,...){
   
   beta <- list(coef = x$coef, j0 = j0)
   class(beta) <- 'waveletCoef'
+  if( !singlePlot && prompt ){
+    readline('Press any key to see the next plot.')
+  }
   plot(beta, highest = j1, coefTrim = x$shrinkCoef)
 }
 
