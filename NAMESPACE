@@ -18,3 +18,11 @@ export(multiProj)
 export(multiSigma)
 export(multiThresh)
 
+# Functions for simulation
+export(makeBumps)
+export(makeCusp)
+export(makeBlocks)
+export(makeDoppler)
+export(makeLIDAR)
+export(gammaBlur)
+export(blurSignal)

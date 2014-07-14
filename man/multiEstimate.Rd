@@ -4,10 +4,10 @@
 \title{multiEstimate}
 \usage{
 multiEstimate(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
-  dim(as.matrix(Y))[2]), blur = "direct", sigma = multiSigma(as.matrix(Y),
-  deg = 3L), j0 = 3L, j1 = NA_integer_, eta = NA_real_,
+  dim(as.matrix(Y))[2]), blur = "direct", sigma = as.numeric(c()),
+  j0 = 3L, j1 = NA_integer_, eta = NA_real_,
   thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 =
-  j0, j1 = j1, eta = eta, deg = 3L), shrinkage = "Hard", deg = 3L)
+  j0, j1 = j1, eta = eta, deg = 3L), shrinkType = "hard", deg = 3L)
 }
 \arguments{
 \item{Y}{The input multichannel signal in the form of an n by m matrix to denote the m separate channels with n observations in each channel. If a vector of size n is given, it is parsed as a single channel signal with n elements.}
@@ -32,7 +32,7 @@ The default method uses the Median Absolute Deviation of wavelet coefficients in
 
 \item{thresh}{A numeric vector specifying the thresholds to be used in the thresholded wavelet deconvolution estimator.}
 
-\item{shrinkage}{A character string specifying the shrinkage type to use in estimation. Available choices are\itemize{
+\item{shrinkType}{A character string specifying the shrinkage type to use in estimation. Available choices are\itemize{
 \item 'hard': Keep or kill shrinkage rule.
 \item 'soft': Kill coefficients smaller than a threshold but uniformly trim coefficients otherwise.
 \item 'garrote': Hybrid between the hard and soft regimes.
@@ -55,24 +55,16 @@ library(mwaved)
 m <- 3
 n <- 2^10
 t <- (1:n)/n
-signal <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
-signal <- signal * 2.4
-sigMat <- matrix(rep(signal,m), nrow=n, ncol=m)
+signal <- makeDoppler(n)
 # Noise levels per channel
 e <- rnorm(m*n)
 # Create Gamma blur
-alp <- c(0.5,0.75,1)
-beta <- rep(0.25,3)
-G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
-G <- t(G)
-# Normalise the blur
-Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
-G <- G/Gmax
-Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
-G <- G/Gsum
+shape <- seq(from = 0.5, to = 1, length = m)
+scale <- rep(0.25,m)
+G <- gammaBlur(n, shape = shape, scale = scale)
 # Convolve the signal
-X <- Re(mvfft(mvfft(G) * mvfft(sigMat), inverse = TRUE))/n
-# Create error with different signal to noise ratios
+X <- blurSignal(signal, G)
+# Create error with custom signal to noise ratio
 SNR <- c(10,15,20)
 sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
 E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)

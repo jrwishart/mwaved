@@ -5,62 +5,53 @@
 \usage{
 multiWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
   dim(as.matrix(Y))[2]), j0 = 3L, j1 = NA_integer_, blur = "direct",
-  thresh = as.numeric(c()), eta = NA_real_, shrinkage = "Hard",
+  thresh = as.numeric(c()), eta = NA_real_, shrinkType = "hard",
   deg = 3L)
 }
 \arguments{
-\item{Y}{The input multichannel signal in the form of an n by m matrix to denote the m separate channels with n observations in each channel. If a vector of size n is given, it is parsed as a single channel signal with n elements.}
+\item{shrinkType}{A character string that specifies which thresholding regime to use.
+Available choices are the 'hard', 'soft' or 'garrote'.}
+
+\item{Y}{An input signal either an n by M matrix containing the multichannel signal to be analysed (or single vector of n elements). Each of the M columns represents a channel of n observations.}
 
 \item{G}{The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.}
 
-\item{alpha}{A vector of length m that specifies the level of long memory in each of the m channels.}
-
-\item{blur}{A string that specifies the blurring regime across all channels. Choices include: "direct", "smooth" and "box.car".}
+\item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
 
 \item{j0}{The coarsest resolution level for the wavelet expansion.}
 
 \item{j1}{The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.}
 
+\item{blur}{A character string describing which deconvolution regime is to be applied.\itemize{
+\item 'direct' (default): No deconvolution required and direct signal observed. This is captured when G is an n by m matrix with all entries being zero except the first row where all elements are one.
+\item 'smooth': Indirect signal observed and the blurring kernel is of regular smooth blur type.
+\item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}}
+
 \item{thresh}{A vector of scale level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. Namely, have j1 - j0 + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
 \item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).}
 
-\item{shrinkage}{A character string specifying the shrinkage type to use in estimation. Available choices are\itemize{
-\item 'hard': Keep or kill shrinkage rule.
-\item 'soft': Kill coefficients smaller than a threshold but uniformly trim coefficients otherwise.
-\item 'garrote': Hybrid between the hard and soft regimes.
-} See also the documentation for \code{\link{waveletThresh}} for formulae.}
-
-\item{deg}{The degree of the auxiliary polynomial for the Meyer wavelet.
-a}
+\item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
 \description{
 Returns a mWaveD object that contains all the required information for the multichannel analysis.
 }
 \examples{
-#' library(mwaved)
+library(mwaved)
 # Simulate the multichannel doppler signal.
 m <- 3
 n <- 2^10
 t <- (1:n)/n
-signal <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
-signal <- signal * 2.4
-sigMat <- matrix(rep(signal,m), nrow=n, ncol=m)
+signal <- makeDoppler(n)
 # Noise levels per channel
 e <- rnorm(m*n)
 # Create Gamma blur
-alp <- c(0.5,0.75,1)
-beta <- rep(0.25,m)
-G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
-G <- t(G)
-# Normalise the blur
-Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
-G <- G/Gmax
-Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
-G <- G/Gsum
+shape <- seq(from = 0.5, to = 1, length = m)
+scale <- rep(0.25,m)
+G <- gammaBlur(n, shape = shape, scale = scale)
 # Convolve the signal
-X <- Re(mvfft(mvfft(G) * mvfft(sigMat), inverse = TRUE))/n
-# Create errors with different signal to noise ratios
+X <- blurSignal(signal, G)
+# Create error with custom signal to noise ratio
 SNR <- c(10,15,20)
 sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
 E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)

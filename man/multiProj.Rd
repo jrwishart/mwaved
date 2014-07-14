@@ -28,8 +28,7 @@ library(mwaved)
 # Make a noiseless doppler function
 n <- 2^8
 t <- (1:n)/n
-y <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
-y <- y * 2.4
+y <- makeDoppler(n)
 # Determine the wavelet coefficients
 beta <- multiCoef(y)
 # plot the Multi-Resolution Analysis from j0 = 3 to j1 = 5

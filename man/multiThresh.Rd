@@ -8,8 +8,6 @@ multiThresh(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
   eta = NA_real_, deg = 3L)
 }
 \arguments{
-\item{Y}{The input multichannel signal in the form of an n by m matrix to denote the m separate channels with n observations in each channel. If a vector of size n is given, it is parsed as a single channel signal with n elements.}
-
 \item{G}{The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.}
 
 \item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
@@ -25,7 +23,9 @@ multiThresh(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
 
 \item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).}
 
-\item{deg}{The degree of the auxiliary polynomial for the Meyer wavelet.}
+\item{Y}{An input signal either an n by M matrix containing the multichannel signal to be analysed (or single vector of n elements). Each of the M columns represents a channel of n observations.}
+
+\item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
 \value{
 A numeric vector of the resolution level thresholds for the hard-thresholding nonlinear wavelet estimator from the multichannel model.
@@ -42,29 +42,22 @@ library(mwaved)
 m <- 3
 n <- 2^10
 t <- (1:n)/n
-signal <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
-signal <- signal * 2.4
-signal <- matrix(rep(signal,m), nrow=n, ncol=m)
+signal <- makeDoppler(n)
 # Noise levels per channel
 e <- rnorm(m*n)
 # Create Gamma blur
-alp <- c(0.5,0.75,1)
-beta <- rep(0.25,3)
-G <- sapply((1:n)/n, dgamma, shape = alp, scale = beta)
-G <- t(G)
-# Normalise the blur
-Gmax <- matrix(rep(apply(G, 2, max), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
-G <- G/Gmax
-Gsum <- matrix(rep(apply(G, 2, sum), dim(G)[1]), ncol = m, nrow = n, byrow = TRUE)
-G <- G/Gsum
+shape <- seq(from = 0.5, to = 1, length = m)
+scale <- rep(0.25,m)
+G <- gammaBlur(n, shape = shape, scale = scale)
 # Convolve the signal
-X <- Re(mvfft(mvfft(G) * mvfft(signal), inverse = TRUE))/n
+X <- blurSignal(signal, G)
 # Create error with custom signal to noise ratio
 SNR <- c(10,15,20)
 sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
 E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
 # Create noisy & blurred multichannel signal
 Y <- X + E
+# Determine thresholds
 thresh <- multiThresh(Y, G, blur = 'smooth')
 }
 

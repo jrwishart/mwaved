@@ -144,7 +144,7 @@ NumericVector multiSigma(NumericMatrix signal, int deg = 3){
   p  = 1.0/pow(n,1.0/2)/pow(2,j/2.0);
   
   memset(x_m_in, 0, sizeof(fftw_complex) * n * m);
-  
+  memset(x_m_real, 0, sizeof(double) * n * m);
   // Input convolution matrix to compute FFT, also 
   for ( j = 0; j < m; ++j ){
     for( i = w1; i < w2; ++i ){
@@ -274,7 +274,7 @@ void mlwavedxfft(fftw_complex * x_fft, unsigned int m, unsigned int n,
 }
 
 // Function that computes the Hard thresholding given fftw input and threshold level
-void HardThreshFFTW(double * in, double * out, int n, double thr){
+void hardThreshFFTW(double * in, double * out, int n, double thr){
     unsigned int i;
     double x;
     // Hard-Threshold the fft inversion
@@ -289,7 +289,7 @@ void HardThreshFFTW(double * in, double * out, int n, double thr){
 }
 
 // Function that computes the Soft thresholding given fftw input and threshold level
-void SoftThreshFFTW(double * in, double * out, int n, double thr){
+void softThreshFFTW(double * in, double * out, int n, double thr){
     unsigned int i;
     double x;
     // Soft-threshold the fft inversion
@@ -308,7 +308,7 @@ void SoftThreshFFTW(double * in, double * out, int n, double thr){
 }
 
 // Function that computes the Soft thresholding given fftw input and threshold level
-void GarroteThreshFFTW(double * in, double * out, int n, double thr){
+void garroteThreshFFTW(double * in, double * out, int n, double thr){
     unsigned int i;
     double x, thr2;
     
@@ -324,18 +324,18 @@ void GarroteThreshFFTW(double * in, double * out, int n, double thr){
     }
 }
 
-void ThresholdFFTW(double * in, double * out, int n, double thr, String shrinkage_type){
+void ThresholdFFTW(double * in, double * out, int n, double thr, String shrinkType){
   
-  if(shrinkage_type == "Hard"){
-    HardThreshFFTW(in, out, n, thr);
+  if(shrinkType == "hard"){
+    hardThreshFFTW(in, out, n, thr);
   } else {
-    if(shrinkage_type == "Soft"){
-      SoftThreshFFTW(in, out, n, thr);
+    if(shrinkType == "soft"){
+      softThreshFFTW(in, out, n, thr);
     } else {
-      if(shrinkage_type == "Garrote"){
-        GarroteThreshFFTW(in, out, n, thr);
+      if(shrinkType == "garrote"){
+        garroteThreshFFTW(in, out, n, thr);
       } else{
-        stop("Unexpected input: shrinkage");
+        stop("Unexpected input: shrinkType");
       }
     }
   }
@@ -497,21 +497,21 @@ List GarroteThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
 }
 
 // Function that dispatches the wavelet coefficient shrinkage type 
-List ThresholdCoef(NumericVector beta, int j0, int j1, NumericVector thr, String shrinkage_type){
+List ThresholdCoef(NumericVector beta, int j0, int j1, NumericVector thr, String shrinkType){
 
   List beta_shrink(beta.size());
 
-  if(shrinkage_type == "Hard"){
+  if(shrinkType == "hard"){
     beta_shrink = HardThreshCoef(beta, j0, j1, thr);
   } else {
-    if(shrinkage_type == "Soft"){
+    if(shrinkType == "soft"){
       beta_shrink = SoftThreshCoef(beta, j0, j1, thr);
     } else {
-      if(shrinkage_type == "Garrote"){
+      if(shrinkType == "garrote"){
         beta_shrink = GarroteThreshCoef(beta, j0, j1, thr);
       } else {
-      Rcout << "Warning: Specified shrinkage type not recognised, default Hard thresholding used.";
-      beta_shrink = HardThreshCoef(beta, j0, j1, thr);
+        Rf_warning("Specified shrinkType not recognised, default Hard thresholding used.");
+        beta_shrink = HardThreshCoef(beta, j0, j1, thr);
       }
     }
   }
@@ -1451,7 +1451,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
                             NumericVector alpha = NumericVector::create(), 
                             String blur = "direct", NumericVector sigma = NumericVector::create(),
                             int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, 
-                            NumericVector thresh = NumericVector::create(), String shrinkage = "Hard", int deg = 3){
+                            NumericVector thresh = NumericVector::create(), String shrinkType = "hard", int deg = 3){
 
   // Regular definitions
   unsigned int i, j, J, k, bk, n2, w1, w2, w3, nn, jmax, m, nj;
@@ -1501,6 +1501,20 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   // Need an appropriate c2r multi plan for scale estimation;
   sigma_back_p = fftw_plan_many_dft_c2r(1, &n, m, sig_in, NULL, 1, n, sig_real_out , NULL, 1, n, FFTW_ESTIMATE);
 
+  // Initialise all to zero
+  memset(x_m_real_in, 0, sizeof(double) * n * m);
+  memset(sig_real_out, 0, sizeof(double) * n * m);
+  memset(g_m_real_in, 0, sizeof(double) * n * m);
+  memset(real_in, 0, sizeof(double) * n);
+  memset(real_out, 0, sizeof(double) * n);
+  memset(in, 0, sizeof(fftw_complex) * n);
+  memset(x_multi_out, 0, sizeof(fftw_complex) * n2 * m);
+  memset(sig_in, 0, sizeof(fftw_complex) * n * m);
+  memset(g_multi_out, 0, sizeof(fftw_complex) * n2 * m);
+  memset(out, 0, sizeof(fftw_complex) * n2);
+  memset(x_fft, 0, sizeof(fftw_complex) * n);
+  memset(conj, 0, sizeof(fftw_complex) * n);
+  
   for ( j = 0; j < m; ++j ){
     for ( i = 0; i < n; ++i ){
       x_m_real_in[i + j * n] = signal(i,j);
@@ -1559,8 +1573,6 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   
   // Coarse scale approximation (no thresholding)
   j = j0;
-  
-  memset(in, 0, sizeof (fftw_complex) * n);
   
   x  = 1.0/n;
   nj = pow(2,j);
@@ -1659,7 +1671,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
     fftw_execute(backward_p);
 
     // Threshold the fft inversion
-    HardThreshFFTW(real_out, real_in, n, thresh[j1 - j0]);
+    hardThreshFFTW(real_out, real_in, n, thresh[j1 - j0]);
     
     // fft forward
     fftw_execute(real_p);
@@ -1738,8 +1750,8 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
     fftw_execute(backward_p);
 
     // Threshold the fft inversion
-//    HardThreshFFTW(real_out, real_in, n, thresh[j - j0]);
-    ThresholdFFTW(real_out, real_in, n, thresh[j - j0], shrinkage);
+//    hardThreshFFTW(real_out, real_in, n, thresh[j - j0]);
+    ThresholdFFTW(real_out, real_in, n, thresh[j - j0], shrinkType);
     
     // fft forward
     fftw_execute(real_p);
@@ -1823,7 +1835,13 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   
   // Need an appropriate c2r multi plan for scale estimation;
   sigma_back_p = fftw_plan_many_dft_c2r(1, &n, m, sig_in, NULL, 1, n, sig_real_out , NULL, 1, n, FFTW_ESTIMATE);
-
+  
+  memset(sig_real_out, 0, sizeof(double) * n * m);
+  memset(g_m_real_in, 0, sizeof(double) * n * m);
+  memset(x_multi_out, 0, sizeof(fftw_complex) * n2 * m);
+  memset(sig_in, 0, sizeof(fftw_complex) * n * m);
+  memset(g_multi_out, 0, sizeof(fftw_complex) * n2 * m);
+  
   for ( j = 0; j < m; ++j ){
     for ( i = 0; i < n; ++i ){
       x_m_real_in[i + j * n] = signal(i,j);
@@ -2136,7 +2154,7 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
 List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(),
                     int j0 = 3, int j1 = NA_INTEGER, String blur = "direct", 
                     NumericVector thresh = NumericVector::create(),
-                    double eta = NA_REAL, String shrinkage = "Hard", int deg = 3){
+                    double eta = NA_REAL, String shrinkType = "hard", int deg = 3){
 
   // Regular definitions
   unsigned int i, j, J, k, bk, n2, w1, w2, w3, nn, jmax, m, nj;
@@ -2188,7 +2206,20 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   
   // Need an appropriate c2r multi plan for scale estimation;
   sigma_back_p = fftw_plan_many_dft_c2r(1, &n, m, sig_in, NULL, 1, n, sig_real_out , NULL, 1, n, FFTW_ESTIMATE);
-
+  
+  memset(sig_real_out, 0, sizeof(double) * n * m);
+  memset(g_m_real_in, 0, sizeof(double) * n * m);
+  memset(real_in, 0, sizeof(double) * n);
+  memset(real_out, 0, sizeof(double) * n);
+  memset(in, 0, sizeof(fftw_complex) * n);
+  memset(x_multi_out, 0, sizeof(fftw_complex) * n2 * m);
+  memset(sig_in, 0, sizeof(fftw_complex) * n * m);
+  memset(g_multi_out, 0, sizeof(fftw_complex) * n2 * m);
+  memset(out, 0, sizeof(fftw_complex) * n2);
+  memset(x_fft, 0, sizeof(fftw_complex) * n);
+  memset(conj, 0, sizeof(fftw_complex) * n);
+  
+  
   for ( j = 0; j < m; ++j ){
     for ( i = 0; i < n; ++i ){
       x_m_real_in[i + j * n] = signal(i,j);
@@ -2486,7 +2517,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     fftw_execute(backward_p);
 
     // Threshold the fft inversion
-    ThresholdFFTW(real_out, real_in, n, thresh[j1 - j0], shrinkage);
+    ThresholdFFTW(real_out, real_in, n, thresh[j1 - j0], shrinkType);
     
     // fft forward
     fftw_execute(real_p);
@@ -2596,7 +2627,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     fftw_execute(backward_p);
 
     // Threshold the fft inversion
-    ThresholdFFTW(real_out, real_in, n, thresh[j - j0], shrinkage);
+    ThresholdFFTW(real_out, real_in, n, thresh[j - j0], shrinkType);
     
     // fft forward
     fftw_execute(real_p);
@@ -2620,7 +2651,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   }
   
   // Determine Thresholded wavelet coefficients
-  List shrunk_coefs            = ThresholdCoef(beta, j0, j1, thresh, shrinkage);
+  List shrunk_coefs            = ThresholdCoef(beta, j0, j1, thresh, shrinkType);
   NumericVector beta_shrink    = shrunk_coefs["coef"];
   NumericVector percent_shrunk = shrunk_coefs["percent"];
   NumericVector level_max      = shrunk_coefs["max"];
@@ -2659,7 +2690,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     _["shrinkCoef"]  = beta_shrink,
     _["percent"]     = percent_shrunk,
     _["levelMax"]    = level_max,
-    _["shrinkType"]  = shrinkage,
+    _["shrinkType"]  = shrinkType,
     _["projections"] = proj,
     _["noise"]       = noise,
     _["degree"]      = deg
