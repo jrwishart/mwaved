@@ -128,8 +128,9 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
 #' X <- blurSignal(signal, G)
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10,15,20)
-#' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
+#' sigma <- sigmaSNR(X, SNR)
+#' alpha <- c(0.75, 0.8, 1)
+#' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Determine thresholds
@@ -191,8 +192,9 @@ multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.
 #' X <- blurSignal(signal, G)
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10,15,20)
-#' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
+#' sigma <- sigmaSNR(X, SNR)
+#' alpha <- c(0.75, 0.8, 1)
+#' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Estimate the underlying doppler signal
@@ -242,11 +244,11 @@ multiEstimate <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(a
 #' X <- blurSignal(signal, G)
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10,15,20)
-#' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
+#' sigma <- sigmaSNR(X, SNR)
+#' alpha <- c(0.75, 0.8, 1)
+#' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
-#' Y <- X + E
-#' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
+#' Y <- X + E#' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 #' matlines(Y)
 #' # Estimate the wavelet coefficients
 #' estimatedCoefs <- multiCoef(Y, G, alpha = rep(1,m), blur = 'smooth')
@@ -342,8 +344,9 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 #' X <- blurSignal(signal, G)
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10,15,20)
-#' sigma <- sqrt(mean(X^2)) * 10^( -SNR/20 )
-#' E <- matrix(rnorm(n*m, sd = sigma), ncol = m, nrow = n, byrow = TRUE)
+#' sigma <- sigmaSNR(X, SNR)
+#' alpha <- c(0.75, 0.8, 1)
+#' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Compute mWaveD object
