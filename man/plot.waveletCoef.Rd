@@ -4,10 +4,10 @@
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
 \usage{
 \method{plot}{waveletCoef}(x, ..., lowest = NULL, highest = NULL,
-  coefTrim = NULL, thickness = 1, descending = FALSE, scaling = 1)
+  coefTrim = NULL, thickness = 2, descending = FALSE, scaling = 1)
 }
 \arguments{
-\item{x}{A list created by the waveletCoef.}
+\item{x}{A list of class waveletCoef.}
 
 \item{...}{Arguments to be passed to methods.}
 
@@ -25,5 +25,8 @@
 }
 \description{
 Plots the wavelet coefficient object in the multiresolution analysis
+}
+\seealso{
+\code{\link{multiCoef}} for generating a list of class `waveletCoef`
 }
 

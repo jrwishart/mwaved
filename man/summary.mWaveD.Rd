@@ -12,13 +12,13 @@ deconvolution analysis produced by the \code{\link{multiWaveD}} function.}
 \item{...}{Arguments to be passed to methods.}
 }
 \value{
-Text output given summary information of the input and output analysis including, \itemize{
+Text output giving summary information of the input and output analysis including, \itemize{
 \item Degree of Meyer wavelet used.
 \item Number of observations, within each channel and number of channels present.
 \item Resolution levels used (j0 to j1)
 \item Blur type assumed in the analysis (direct, smooth or box.car)
 \item Matrix summarising the noise levels in each channel (and Fourier decay information for the smooth case)
-\item Summaries of the thresholding,
+\item Summaries of the severity of the thresholding applied amongst the resolutions.
 }
 }
 \description{

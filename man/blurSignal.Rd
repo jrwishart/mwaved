@@ -27,4 +27,7 @@ plot(t, signal, type = 'l', main = 'Direct LIDAR signal')
 indirectSignal <- blurSignal(signal, blur)
 matplot(t, indirectSignal, type = 'l', main = 'Set of blurred LIDAR signals')
 }
+\seealso{
+\code{\link{gammaBlur}}, \code{\link{boxcarBlur}}
+}
 

@@ -3,7 +3,8 @@
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
 \usage{
-\method{plot}{mWaveD}(x, ..., singlePlot = TRUE, prompt = TRUE)
+\method{plot}{mWaveD}(x, ..., singlePlot = TRUE, prompt = TRUE,
+  thickness = 2)
 }
 \arguments{
 \item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
@@ -13,6 +14,8 @@
 \item{singlePlot}{A logical value that controls whether all four plots appear on a single window (2 x 2 plot window) or are separated into separate plot windows.}
 
 \item{prompt}{A logical value that specifies whether the user is prompted between plot outputs.}
+
+\item{thickness}{An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.}
 }
 \description{
 that summarises the multichannel input, a visualisation of the severity of the channels and the output estimate.Four plots: The input multichannel signal, the mWaveD
@@ -21,11 +24,14 @@ that summarises the multichannel input, a visualisation of the severity of the c
 Four plots are output that summarise the multichannel input, a visualisation of the severity of the channels and the output estimate.\itemize{
 \item Plot 1: Multichannel input signal overlayed.
 \item Plot 2: Estimated output signal using the mWaveD approach.
-\item Plot 3:
+\item Plot 3: Plot of the log decay of Fourier coefficients against the log bounds (smooth case) or the blockwise resolution levels against their limit (box car case)
 \item Plot 4: Multi-resolution plot of the raw wavelet coefficients (black) and the trimmed wavelet coefficients (red)}
 }
 \references{
-TBA ACHA and COMPSTAT
+Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
+\url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+
+Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 }
 \seealso{
 \code{\link{multiWaveD}}

@@ -1,5 +1,6 @@
 import(Rcpp)
 
+# Called C code
 useDynLib(mwaved, mwaved_multiSigma, mwaved_multiEstimate, mwaved_multiWaveD, mwaved_multiThresh, mwaved_multiCoef, mwaved_multiProj, mwaved_waveletThresh)
 
 # Wavelet Coefficient objects and methods
@@ -10,7 +11,7 @@ export(waveletThresh)
 S3method(plot,mWaveD)
 S3method(summary,mWaveD)
 
-# Exported functions
+# Exported base multichannel functions
 export(multiWaveD)
 export(multiCoef)
 export(multiEstimate)
@@ -24,6 +25,7 @@ export(makeCusp)
 export(makeBlocks)
 export(makeDoppler)
 export(makeLIDAR)
+export(boxcarBlur)
 export(gammaBlur)
 export(blurSignal)
 export(sigmaSNR)

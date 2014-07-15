@@ -1,3 +1,8 @@
+mwaved 0.1.1
+============
+
+* Proof read and updated documentation and added references.
+
 mwaved 0.1
 ===========
 

@@ -35,7 +35,20 @@ feasibleResolutions <- function(n, j0, j1){
   return(list(j0 = j0,j1 = j1))
 }
 
-#' @title multiSigma
+feasibleAlpha <- function(m, alpha){
+  ma <- length(alpha)
+  if (m != ma){
+    if( ma == 1){
+      alpha <- rep(alpha, m)
+    } else {
+      warning("Dimension mismatch: Length of alpha is not the same as the number of columns of Y. Last element of alpha repeated for the rest.")
+      alpha <- c(alpha, rep(rev(alpha)[1], m - ma))
+    }
+  }
+  return(alpha)
+}
+
+#' @title Noise level estimation among multichannel signal
 #' 
 #' @description Estimates the level of noise (standard deviation of noise) in each channel.
 #' 
@@ -60,7 +73,7 @@ multiSigma <- function(Y, deg = 3L){
   .Call(mwaved_multiSigma, Y, deg)
 }
 
-#' @title multiProj
+#' @title Meyer wavelet projection given a set of wavelet coefficients
 #' 
 #' @description Reconstructs a function using wavelet coefficients as input.
 #' 
@@ -73,7 +86,7 @@ multiSigma <- function(Y, deg = 3L){
 #' 
 #' @return A numeric vector of size n giving the wavelet function expansion.
 #' 
-#' @seealso multiCoef
+#' @seealso \code{\link{multiCoef}}
 #' 
 #' @examples
 #' library(mwaved)
@@ -94,9 +107,9 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
   .Call('mwaved_multiProj', beta, jvals$j0, jvals$j1, deg)
 }
 
-#' @title multiThresh
+#' @title Resolution level thresholds for hard thresholded wavelet deconvolution estimator
 #' 
-#' @description Computes the resolution level thresholds for the hard-thresholding estimate of the desired funnction f.
+#' @description Computes the estimated resolution level thresholds for the hard-thresholding wavelet deconvolution estimate of the desired signal in the multichannel signals.
 #' 
 #' @inheritParams multiSigma
 #' @param G The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.
@@ -107,7 +120,7 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
 #' \item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}
 #' @param j0 The coarsest resolution level for the wavelet expansion.
 #' @param j1 The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.
-#' @param eta The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).
+#' @param eta The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)
 #' 
 #' @details Given an input matrix of a multichannel signal (n rows and n columns) with m channels and n observations per channel, the function returns the required thresholds for the hard-thresholding estimator of the underlying function, f.
 #' 
@@ -137,17 +150,21 @@ multiProj <- function(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L) {
 #' thresh <- multiThresh(Y, G, blur = 'smooth')
 #' 
 #' @return A numeric vector of the resolution level thresholds for the hard-thresholding nonlinear wavelet estimator from the multichannel model.
-#' 
+#' @references
+#' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
+#' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
 #' @export
 multiThresh <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
                         blur = "direct", j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
+  m <- dim(Y)[2]
   jvals <- feasibleResolutions(dim(Y)[1], j0, j1)
+  alpha <- feasibleAlpha(dim(Y)[2], alpha)
   
   .Call('mwaved_multiThresh', Y, G, alpha, blur, jvals$j0, jvals$j1, eta, deg)
 }
 
-#' @title multiEstimate
+#' @title Wavelet deconvolution signal estimate from the noisy multichannel convoluted signal
 #' 
 #' @description Estimates the underlying signal of interest from a multichannel noisy deconvolution model.
 #' 
@@ -218,7 +235,7 @@ multiEstimate <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(a
   .Call('mwaved_multiEstimate', Y, G, alpha, blur, sigma, j0, j1, eta, thresh, shrinkType, deg)
 }
 
-#' @title multiCoef
+#' @title Wavelet coefficient estimation from a multichannel signal
 #' 
 #' @description Estimates the wavelet coefficiets for the underlying signal of interest embedded in the noisy multichannel deconvolution model. 
 #' 
@@ -270,7 +287,7 @@ multiCoef <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.ma
   .Call('mwaved_multiCoef', Y, G, alpha, blur, jvals$j0, jvals$j1, thresh, eta, deg)
 }
 
-#' @title waveletThresh
+#' @title Apply thresholding regime to a set of wavelet coefficients
 #' 
 #' @description Applies a resolution level thresholding technique to a set of wavelet coefficients,
 #' embedded in a wavelet coefficient object.
@@ -321,7 +338,7 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 }
 
 
-#' @title multiWaveD
+#' @title Full mWaveD analysis
 #' 
 #' @description Returns a mWaveD object that contains all the required information for the multichannel analysis.
 #' @inheritParams multiCoef
@@ -354,6 +371,8 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 #' plot(multiObject)
 #' summary(multiObject)
 #' 
+#' @seealso \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
+#' 
 #' @export
 multiWaveD <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
                        j0 = 3L, j1 = NA_integer_, blur = "direct", thresh = as.numeric(c()), 
@@ -370,12 +389,21 @@ multiWaveD <- function(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,dim(as.m
 
 
 #' @name mwaved
-#' @title Multichannel wavelet deconvolution with long memory with mwaved.
+#' @title Multichannel wavelet deconvolution with long memory using mwaved.
 #'
-#' @description mwaved Computes the Wavelet deconvolution estimate of a common signal present in multiple channels that have possible different levels of blur and additive error. More information about each function can be found in its help documentation.
+#' @description \code{mwaved} computes the Wavelet deconvolution estimate of a common signal present in multiple channels that have possible different levels of blur and additive error. More information about each function can be found in its help documentation.
 #'
-#' @details mwaved using the WaveD wavelet deconvolution paradigm and is based on the waved package. It generalises the approach by allowing a multichannel signal instead of a single channel signal and allows long memory errors within each channel (independent of each channel). The package also uses the external C FFTW library 
+#' @details \code{mwaved} uses the WaveD wavelet deconvolution paradigm and is based on the \code{waved} R-package given by Raimondo and Stewart (2007). It generalises the approach by allowing a multichannel signal instead of a single channel signal and allows long memory errors within each channel (independent of each channel). See Kulik, Sapatinas and Wishart (2014) for theoretical results and a short numerical investigation. The \code{mwaved} package also uses the external C FFTW library described in Frigo and Johnson, (2005) to dramatically increase the speed of the computations.
 #' 
 #' @import Rcpp
+#' @references 
+#' Frigo, M and Johnson, S.G. (2005) \emph{The design and implementation of FFTW3}, Proceedings of the IEEE \bold{93}, 216--231.
+#' \url{http://dx.doi.org/10.1109/JPROC.2004.840301}
+#' 
+#' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
+#' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+#' 
+#' Raimondo, M. and Stewart, M. (2007) \emph{The WaveD Transform in R: Performs Fast Translation-Invariant Wavelet Deconvolution}, Journal of Statistical Software \bold{21}, 1--28
+#' \url{http://www.jstatsoft.org/v21/i02}
 #' @docType package
 NULL

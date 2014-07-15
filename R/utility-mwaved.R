@@ -4,13 +4,13 @@
 #' deconvolution analysis produced by the \code{\link{multiWaveD}} function.
 #' @param ... Arguments to be passed to methods.
 #' @description Summarises the mWaveD object by giving
-#' @return Text output given summary information of the input and output analysis including, \itemize{
+#' @return Text output giving summary information of the input and output analysis including, \itemize{
 #' \item Degree of Meyer wavelet used.
 #' \item Number of observations, within each channel and number of channels present.
 #' \item Resolution levels used (j0 to j1)
 #' \item Blur type assumed in the analysis (direct, smooth or box.car)
 #' \item Matrix summarising the noise levels in each channel (and Fourier decay information for the smooth case)
-#' \item Summaries of the thresholding,
+#' \item Summaries of the severity of the thresholding applied amongst the resolutions.
 #' }
 #' @seealso \code{\link{multiWaveD}}
 #' @export
@@ -79,7 +79,7 @@ summary.mWaveD <- function(object, ...){
 #'
 #' @description Plots the wavelet coefficient object in the multiresolution analysis
 #' 
-#' @param x A list created by the waveletCoef.
+#' @param x A list of class waveletCoef.
 #' @param ... Arguments to be passed to methods.
 #' @param lowest Specifies the coarsest resolution to display in the Multi-resolution plot.
 #' @param highest Specifies the finest resolution to display in the Multi-resolution plot.
@@ -87,8 +87,11 @@ summary.mWaveD <- function(object, ...){
 #' @param thickness An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.
 #' @param descending A logical value to specify whether resolutions on the y-axis of the plot are increasing from top to bottom.
 #' @param scaling A numeric value that acts as a graphical scaling parameter to rescale the wavelet coefficients in the plot. A larger scaling value will reduce the size of the coefficients in the plot.
+#' 
+#' @seealso \code{\link{multiCoef}} for generating a list of class `waveletCoef`
+#' 
 #' @export
-plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, coefTrim = NULL, thickness = 1, descending = FALSE, scaling = 1){
+plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, coefTrim = NULL, thickness = 2, descending = FALSE, scaling = 1){
   j0 <- x$j0
   x <- x$coef
   J <- log2(length(x))
@@ -152,20 +155,27 @@ plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, coefTrim = N
 #' @param ... Arguments to be passed to methods.
 #' @param singlePlot A logical value that controls whether all four plots appear on a single window (2 x 2 plot window) or are separated into separate plot windows.
 #' @param prompt A logical value that specifies whether the user is prompted between plot outputs.
+#' @param thickness An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.
 #' 
 #' @details Four plots are output that summarise the multichannel input, a visualisation of the severity of the channels and the output estimate.\itemize{
 #' \item Plot 1: Multichannel input signal overlayed.
 #' \item Plot 2: Estimated output signal using the mWaveD approach.
-#' \item Plot 3: 
+#' \item Plot 3: Plot of the log decay of Fourier coefficients against the log bounds (smooth case) or the blockwise resolution levels against their limit (box car case)
 #' \item Plot 4: Multi-resolution plot of the raw wavelet coefficients (black) and the trimmed wavelet coefficients (red)}
-#' @references TBA ACHA and COMPSTAT
+#' @references
+#' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
+#' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+#' 
+#' Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 #' @seealso \code{\link{multiWaveD}}
 #' @export
-plot.mWaveD <- function(x, ..., singlePlot = TRUE, prompt = TRUE){
+plot.mWaveD <- function(x, ..., singlePlot = TRUE, prompt = TRUE, thickness = 2){
   n = length(x$estimate)
   t = (1:n)/n
-  if( singlePlot ){
-    par(mfrow=c(2,2))
+  if (singlePlot){
+    par(mfrow = c(2,2))
+  } else {
+    par(mfrow = c(1,1))
   }
 
   matplot(t,x$signal,type='l',main="Input Signal",ylab='Signal',xlab='t',lty=1,cex=0.8)
@@ -214,6 +224,6 @@ plot.mWaveD <- function(x, ..., singlePlot = TRUE, prompt = TRUE){
   if( !singlePlot && prompt ){
     readline('Press any key to see the next plot.')
   }
-  plot(beta, highest = j1, coefTrim = x$shrinkCoef)
+  plot(beta, highest = j1, coefTrim = x$shrinkCoef, thickness = thickness)
 }
 
