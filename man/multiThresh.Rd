@@ -3,12 +3,12 @@
 \alias{multiThresh}
 \title{Resolution level thresholds for hard thresholded wavelet deconvolution estimator}
 \usage{
-multiThresh(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
+multiThresh(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
   dim(as.matrix(Y))[2]), blur = "direct", j0 = 3L, j1 = NA_integer_,
   eta = NA_real_, deg = 3L)
 }
 \arguments{
-\item{G}{The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.}
+\item{G}{The input multichannel blur matrix/vector (needs to be the same dimension/length as the signal input which is a matrix or vector for the multichannel or single channel case respectively). This argument dictates the form of blur present in each of the channels.}
 
 \item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
 
@@ -23,7 +23,7 @@ multiThresh(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
 
 \item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
-\item{Y}{An input signal either an n by M matrix containing the multichannel signal to be analysed (or single vector of n elements). Each of the M columns represents a channel of n observations.}
+\item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
 
 \item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }

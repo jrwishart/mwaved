@@ -18,10 +18,10 @@
 \item{thickness}{An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.}
 }
 \description{
-that summarises the multichannel input, a visualisation of the severity of the channels and the output estimate.Four plots: The input multichannel signal, the mWaveD
+Creates plot output that summarises the \code{mWaveD} object produced by the \code{\link{multiWaveD}} function.
 }
 \details{
-Four plots are output that summarise the multichannel input, a visualisation of the severity of the channels and the output estimate.\itemize{
+Four plots are output that summarise the multichannel input, a visualisation of the characteristics of the channels and the output estimate and a multi-resolution analysis plot.\itemize{
 \item Plot 1: Multichannel input signal overlayed.
 \item Plot 2: Estimated output signal using the mWaveD approach.
 \item Plot 3: Plot of the log decay of Fourier coefficients against the log bounds (smooth case) or the blockwise resolution levels against their limit (box car case)

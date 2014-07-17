@@ -3,25 +3,24 @@
 \alias{multiProj}
 \title{Meyer wavelet projection given a set of wavelet coefficients}
 \usage{
-multiProj(beta, j0 = 3L, j1 = log2(length(beta)) - 1, deg = 3L)
+multiProj(beta, j1 = log2(length(beta$coef)) - 1)
 }
 \arguments{
-\item{beta}{A vector of wavelet coefficients to be projected to create the required output function expansion.}
-
-\item{j0}{The coarsest resolution to be used in the projection. The first 2^{j0} elements in the beta vector are used as the coarse expansion.}
+\item{beta}{A \code{waveletCoef} object that contains a vector of wavelet coefficients and the coarsest resolution level, \code{j0} to create the required output function expansion.}
 
 \item{j1}{The finest resolution to be used in the projection (specifies which resolution that the wavelet expansion is truncated).}
-
-\item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
 \value{
 A numeric vector of size n giving the wavelet function expansion.
 }
 \description{
-Reconstructs a function using wavelet coefficients as input.
+Reconstructs a function using wavelet coefficients (\code{waveletCoef} object) as input.
 }
 \details{
-Function that takes an input of wavelet coefficients, \emph{beta} of length n and optionally a desired coarse resolution level and maximum resolution level, \emph{j1}, to create an inhomogeneous wavelet expansion starting from resolution \emph{j0} up to resolution \emph{j1}. If the maximum resolution level \emph{j1} is not specified, the full wavelet expansion will be given. Namely, for \emph{j0} <= j <= \emph{j1} and 0 <= k <= 2^j-1, \deqn{\sum_j \sum_k beta_{j,k} \psi_{j,k}.}
+Function that takes an input of wavelet coefficients in the form of a \code{waveletCoef} object (see \code{\link{multiCoef}} for details) and optionally a desired maximum resolution level, \code{j1}, to create an inhomogeneous wavelet expansion starting from resolution \code{j0} up to resolution \code{j1}.
+Namely, it creates the wavelet expansion, \deqn{\sum_{k = 0}^{2^{j_0} - 1} \beta_k \phi_{j_0,k} + \sum_{j = j_0}^{j_1} \sum_{k = 0}^{2^j - 1} \beta_{j,k} \psi_{j,k}.}
+where \eqn{(\phi,\psi)} denote the father and mother periodised Meyer wavelet functions and \eqn{\beta_{j,k}} denotes the mother wavelet coefficient at resolution j and location k and \eqn{\beta_{k}} denotes the father wavelet coefficients at resolution \eqn{j=j0} and location \eqn{k}.
+The coefficients \code{beta} need to be ordered so that the first \eqn{2^\code{j0}} elements correspond to father wavelet coefficients at resolution \eqn{j=\code{j0}} and the remaining elements correspond to the mother wavelet coefficients from resolution \eqn{j=\code{j0}} to \eqn{j = log_2 n - 1}. If the maximum resolution level \emph{j1} is not specified, the full wavelet expansion will be given.
 }
 \examples{
 library(mwaved)
@@ -31,8 +30,10 @@ t <- (1:n)/n
 y <- makeDoppler(n)
 # Determine the wavelet coefficients
 beta <- multiCoef(y)
-# plot the Multi-Resolution Analysis from j0 = 3 to j1 = 5
-plot(beta, lowest = 3, highest = 5)
+# plot three raw wavelet expansions truncating in each case at j1 = 3, 4 and 5 respectively
+plot(t, y, type = 'l', main = 'Doppler and wavelet projections at three different truncations')
+matlines(t,sapply(3:5, function(i) multiProj(beta,j1 = i)),type = 'l', col = 2:4)
+legend("bottomright", legend = c("Signal", paste('j1 =', 3:5)), col = 1:4, lty = c(1,1:4))
 }
 \seealso{
 \code{\link{multiCoef}}

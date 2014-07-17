@@ -1,3 +1,9 @@
+mwaved 0.2.0
+============
+
+* Standardised the mWaveD object to contain wavelet coefficients for the empirical and hard-shrinked coefficients both in the format of `waveletCoef` objects. Standardises the plotting of such coefficients using the `plot.waveletCoef` method.
+* Defensively programmed input arguments to avoid infeasible input being processed (throws warnings or errors)
+
 mwaved 0.1.1
 ============
 

@@ -8,7 +8,7 @@ boxcarBlur(n, BA)
 \arguments{
 \item{n}{An integer specifying the number of observations in each channel}
 
-\item{BA}{A numeric vector specifying box car widths for each channel.}
+\item{BA}{A numeric vector of length m where each element specifies the box car widths to blur in each channel.}
 }
 \value{
 A n by m matrix of normalised box car blur.
@@ -17,21 +17,21 @@ A n by m matrix of normalised box car blur.
 Create blur of the box car type.
 }
 \details{
-Creates a matrix of dimension n by m which contains a normalised (unit energy in each column) set of box car blur functions. The generated box-car functions are governed by an input vector \code{BA} which specifies the box car width.
+Creates a matrix of dimension n by m which contains a normalised (unit energy in each column) set of box car blur functions. The generated box-car functions are governed by an input vector \code{BA} which specifies the box car width. For the method to adhere to the theory described in Wishart (2014), the box car widths should be a Badly Approximable (BA) number.
 }
 \examples{
-n <- 128
-m <- 3
-BA <- 1/sqrt(c(89,121,87))
+n <- 1024
+BA <- 1/sqrt(c(89,353))
 
+# Plot the box car blur
 blurMat <- boxcarBlur(n, BA)
-matplot(blurMat, type = 'l', main = paste('Set of box car blur functions'))
-
-signal = makeLIDAR(n)
 t = (1:n)/n
+matplot(t, blurMat, type = 'l', main = paste('Set of box car blur functions'))
+
+# Plot a LIDAR signal and its multichannel box car blurred version
+signal = makeLIDAR(n)
 matplot(t, signal, type = 'l', main = 'LIDAR test signal')
 blurredSignal <- blurSignal(signal, blurMat)
-
 matplot(t, blurredSignal, type = 'l', main = 'Box car blurred LIDAR test signals')
 }
 \seealso{

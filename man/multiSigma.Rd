@@ -6,18 +6,18 @@
 multiSigma(Y, deg = 3L)
 }
 \arguments{
-\item{Y}{An input signal either an n by M matrix containing the multichannel signal to be analysed (or single vector of n elements). Each of the M columns represents a channel of n observations.}
+\item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
 
 \item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
 \value{
-a vector of estimates containing the level of sigma in each of the M channels.
+A numeric vector of estimates of the standard deviation of the noise in each of the m channels.
 }
 \description{
 Estimates the level of noise (standard deviation of noise) in each channel.
 }
 \details{
-This function estimates the noise present in each channel by computing the Meyer wavelet transform of each channel of the multichannel signal. In particular, the noise level is computed by using the Median Absolute Deviation (MAD) of the wavelet coefficients at the highest possible scale at J = floor(log2(n) - 1).
+This function estimates the noise present in each channel by computing the Meyer wavelet transform of each channel of the multichannel signal. In particular, the noise level is computed by using the Median Absolute Deviation (MAD) of the wavelet coefficients at the highest possible resolution at J = floor(log2(n) - 1).
 }
 \examples{
 library(mwaved)

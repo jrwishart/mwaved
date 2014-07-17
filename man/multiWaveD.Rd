@@ -3,7 +3,7 @@
 \alias{multiWaveD}
 \title{Full mWaveD analysis}
 \usage{
-multiWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
+multiWaveD(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
   dim(as.matrix(Y))[2]), j0 = 3L, j1 = NA_integer_, blur = "direct",
   thresh = as.numeric(c()), eta = NA_real_, shrinkType = "hard",
   deg = 3L)
@@ -12,9 +12,9 @@ multiWaveD(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
 \item{shrinkType}{A character string that specifies which thresholding regime to use.
 Available choices are the 'hard', 'soft' or 'garrote'.}
 
-\item{Y}{An input signal either an n by M matrix containing the multichannel signal to be analysed (or single vector of n elements). Each of the M columns represents a channel of n observations.}
+\item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
 
-\item{G}{The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.}
+\item{G}{The input multichannel blur matrix/vector (needs to be the same dimension/length as the signal input which is a matrix or vector for the multichannel or single channel case respectively). This argument dictates the form of blur present in each of the channels.}
 
 \item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
 
@@ -27,7 +27,7 @@ Available choices are the 'hard', 'soft' or 'garrote'.}
 \item 'smooth': Indirect signal observed and the blurring kernel is of regular smooth blur type.
 \item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}}
 
-\item{thresh}{A vector of scale level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. Namely, have j1 - j0 + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
+\item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
 \item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 

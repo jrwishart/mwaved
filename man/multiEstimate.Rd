@@ -3,16 +3,18 @@
 \alias{multiEstimate}
 \title{Wavelet deconvolution signal estimate from the noisy multichannel convoluted signal}
 \usage{
-multiEstimate(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
+multiEstimate(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
   dim(as.matrix(Y))[2]), blur = "direct", sigma = as.numeric(c()),
   j0 = 3L, j1 = NA_integer_, eta = NA_real_,
   thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 =
   j0, j1 = j1, eta = eta, deg = 3L), shrinkType = "hard", deg = 3L)
 }
 \arguments{
-\item{Y}{The input multichannel signal in the form of an n by m matrix to denote the m separate channels with n observations in each channel. If a vector of size n is given, it is parsed as a single channel signal with n elements.}
+\item{sigma}{A numeric vector with m elements that specifies the level of noise (standard deviation) in each channel. The default method uses the Median Absolute Deviation of wavelet coefficients in the finest resolution (see \code{\link{multiSigma}}) for details.}
 
-\item{G}{The input multichannel blur matrix of size n by m (needs to be the same dimensions and size as the signal input). This matrix dictates the form of blur present in each of the channels.}
+\item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
+
+\item{G}{The input multichannel blur matrix/vector (needs to be the same dimension/length as the signal input which is a matrix or vector for the multichannel or single channel case respectively). This argument dictates the form of blur present in each of the channels.}
 
 \item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
 
@@ -21,24 +23,18 @@ multiEstimate(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
 \item 'smooth': Indirect signal observed and the blurring kernel is of regular smooth blur type.
 \item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}}
 
-\item{sigma}{A numeric vector with m elements that specifies the level of noise (standard deviation) in each channel.
-The default method uses the Median Absolute Deviation of wavelet coefficients in the finest resolution (see \code{\link{multiSigma}}).}
-
 \item{j0}{The coarsest resolution level for the wavelet expansion.}
 
 \item{j1}{The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.}
 
-\item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}).}
+\item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
-\item{thresh}{A numeric vector specifying the thresholds to be used in the thresholded wavelet deconvolution estimator.}
+\item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
-\item{shrinkType}{A character string specifying the shrinkage type to use in estimation. Available choices are\itemize{
-\item 'hard': Keep or kill shrinkage rule.
-\item 'soft': Kill coefficients smaller than a threshold but uniformly trim coefficients otherwise.
-\item 'garrote': Hybrid between the hard and soft regimes.
-} See also the documentation for \code{\link{waveletThresh}} for formulae.}
+\item{shrinkType}{A character string that specifies which thresholding regime to use.
+Available choices are the 'hard', 'soft' or 'garrote'.}
 
-\item{deg}{The degree of the auxiliary polynomial for the Meyer wavelet.}
+\item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
 \value{
 A numeric vector of the estimate of the underlying signal of interest.

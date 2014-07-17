@@ -25,28 +25,20 @@ makeBlocks(n)
 A numeric vector of length n giving the desired test signal.
 }
 \description{
-Generates test signals used the standard literature.
+Generates some of the test signals used the standard nonparametric deconvolution literature.
 }
 \examples{
 n <- 1024
+t <- (1:n)/n
 signal <- makeLIDAR(n)
-t = (1:n)/n
 plot(t, signal, main = 'LIDAR test signal', type = 'l')
-n <- 1024
 signal <- makeLIDAR(n)
-t = (1:n)/n
 plot(t, signal, main = 'LIDAR test signal', type = 'l')
-n <- 1024
 signal <- makeDoppler(n)
-t = (1:n)/n
 plot(t, signal, main = 'Doppler test signal', type = 'l')
-n <- 1024
 signal <- makeCusp(n)
-t = (1:n)/n
 plot(t, signal, main = 'Cusp test signal', type = 'l')
-n <- 1024
 signal <- makeBlocks(n)
-t = (1:n)/n
 plot(t, signal, main = 'Blocks test signal', type = 'l')
 }
 

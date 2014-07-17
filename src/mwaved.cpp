@@ -49,8 +49,8 @@ double mad_rcpp(NumericVector x, double scale_factor = 1.4826) {
    return median_rcpp(abs(x - median_rcpp(x))) * scale_factor;
 }
 
-NumericVector est_sigma_fftw(double * real_out, unsigned int n, unsigned int m){
-  unsigned int i, j;
+NumericVector est_sigma_fftw(double * real_out, int n, int m){
+  int i, j;
   NumericVector final_out(m);
   NumericVector tmp(n);
   for ( j = 0; j < m; ++j ){
@@ -63,7 +63,7 @@ NumericVector est_sigma_fftw(double * real_out, unsigned int n, unsigned int m){
 }
 
 NumericVector est_sigma(NumericMatrix noise){
-  unsigned int j, m;
+  int j, m;
   m = noise.ncol();
   NumericVector final_out(m);
   for ( j = 0; j < m; ++j ){
@@ -72,9 +72,9 @@ NumericVector est_sigma(NumericMatrix noise){
   return final_out;
 }
 
-NumericVector est_sigma_from_mat(double * real_out, unsigned int n, unsigned int m){
+NumericVector est_sigma_from_mat(double * real_out, int n, int m){
   
-  unsigned int i, j;
+  int i, j;
   
   NumericVector tmp(n);
   NumericVector final_out(m);
@@ -89,9 +89,9 @@ NumericVector est_sigma_from_mat(double * real_out, unsigned int n, unsigned int
   return final_out;
 }
 
-NumericMatrix est_noise(double * real_out, unsigned int n, unsigned int m){
+NumericMatrix est_noise(double * real_out, int n, int m){
   
-  unsigned int i, j;
+  int i, j;
   
   NumericMatrix noiseMat(n,m);
   
@@ -107,8 +107,8 @@ NumericMatrix est_noise(double * real_out, unsigned int n, unsigned int m){
 //[[Rcpp::export]]
 NumericVector multiSigma(NumericMatrix signal, int deg = 3){
   
-  unsigned int i, m, n2, j, J, nj, jmax, w1, w2, w3;
-  int n;
+  int i, j, m, n, n2, J, nj, w1, w2, w3;
+  
   double x, xi;
   
   // FFTW specific definitions
@@ -201,13 +201,13 @@ NumericVector multiSigma(NumericMatrix signal, int deg = 3){
 }
 
 // Function that computes the x_fft for the multichannel method
-void mlwavedxfft(fftw_complex * x_fft, unsigned int m, unsigned int n, 
+void mlwavedxfft(fftw_complex * x_fft, int m, int n, 
                 fftw_complex * x_multi_out, fftw_complex * g_multi_out,
                 NumericVector sigma, NumericVector alpha){
   
   memset(x_fft, 0, sizeof(fftw_complex) * n);
   
-  unsigned int i, j, n2, k;
+  int i, j, n2, k;
   
   double  tmp, denom, c, s, eps, powj, x;
 
@@ -275,7 +275,7 @@ void mlwavedxfft(fftw_complex * x_fft, unsigned int m, unsigned int n,
 
 // Function that computes the Hard thresholding given fftw input and threshold level
 void hardThreshFFTW(double * in, double * out, int n, double thr){
-    unsigned int i;
+    int i;
     double x;
     // Hard-Threshold the fft inversion
     for(i = 0; i < n; ++i){
@@ -290,7 +290,7 @@ void hardThreshFFTW(double * in, double * out, int n, double thr){
 
 // Function that computes the Soft thresholding given fftw input and threshold level
 void softThreshFFTW(double * in, double * out, int n, double thr){
-    unsigned int i;
+    int i;
     double x;
     // Soft-threshold the fft inversion
     for(i = 0; i < n; ++i){
@@ -309,7 +309,7 @@ void softThreshFFTW(double * in, double * out, int n, double thr){
 
 // Function that computes the Soft thresholding given fftw input and threshold level
 void garroteThreshFFTW(double * in, double * out, int n, double thr){
-    unsigned int i;
+    int i;
     double x, thr2;
     
     thr2 = pow(thr,2);
@@ -344,7 +344,7 @@ void ThresholdFFTW(double * in, double * out, int n, double thr, String shrinkTy
 // Function that computes the Hard thresholded version of wavelet coefficients
 List HardThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
 
-  unsigned int i, nj, j, k, n, ti, per;
+  int i, nj, j, k, n, ti, per;
   double x, ax, cur;
   
   n  = beta.size();
@@ -394,7 +394,7 @@ List HardThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
 // Function that computes the Soft thresholded version of wavelet coefficients
 List SoftThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
 
-  unsigned int i, nj, j, k, n, ti, per;
+  int i, nj, j, k, n, ti, per;
   double x, ax, cur;
   
   n  = beta.size();
@@ -448,7 +448,7 @@ List SoftThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
 // Function that computes the Garrote thresholded version of wavelet coefficients
 List GarroteThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
 
-  unsigned int i, nj, j, k, n, ti, per;
+  int i, nj, j, k, n, ti, per;
   double x, ax, thr2, cur;
   
   n = beta.size();
@@ -520,7 +520,7 @@ List ThresholdCoef(NumericVector beta, int j0, int j1, NumericVector thr, String
 
 // Exported wavelet thresholding functions below
 NumericVector hardThresh(NumericVector in, NumericVector thr, int j0, int j1){
-    unsigned int i, j, k, n, l;
+    int i, j, k, n, l;
     double x, thr1;
     
     NumericVector out(in.size());
@@ -554,7 +554,7 @@ NumericVector hardThresh(NumericVector in, NumericVector thr, int j0, int j1){
 
 // Function that computes the Soft thresholding given coefficients and threshold level
 NumericVector softThresh(NumericVector in, NumericVector thr, int j0, int j1){
-    unsigned int i, j, k, n, l;
+    int i, j, k, n, l;
     double x, thr1;
     
     NumericVector out(in.size());
@@ -592,7 +592,7 @@ NumericVector softThresh(NumericVector in, NumericVector thr, int j0, int j1){
 
 // Function that computes the Garrote thresholding given coefficients and threshold level
 NumericVector garroteThresh(NumericVector in, NumericVector thr, int j0, int j1){
-    unsigned int i, j, k, n, l;
+    int i, j, k, n, l;
     double x, thr1, thr2;
     
     NumericVector out(in.size());
@@ -625,19 +625,18 @@ NumericVector garroteThresh(NumericVector in, NumericVector thr, int j0, int j1)
     return out;
 }
 
-// Exported C --> R function that will threshold a wavelet coefficient object
 //[[Rcpp::export]]
 List waveletThresh(List betaList, NumericVector thr, String shrinkType = "hard"){
   
   NumericVector beta = betaList["coef"];
 
-  int j0 = betaList["j0"];
-  int n  = beta.size();
-  int nt = thr.size();
-  int j1 = j0 + nt - 1;
+  int j0  = betaList["j0"];
+  int deg = betaList["deg"];
+  int n   = beta.size();
+  int nt  = thr.size();
+  int j1  = j0 + nt - 1;
   
   NumericVector betaShrink(n);
-  unsigned int j;
   
   if(shrinkType == "hard"){
     betaShrink = hardThresh(beta, thr, j0, j1);
@@ -655,20 +654,20 @@ List waveletThresh(List betaList, NumericVector thr, String shrinkType = "hard")
     
   List betaThresh =  List::create(
     _["coef"] = betaShrink,
-    _["j0"]   = j0
+    _["j0"]   = j0,
+    _["deg"]  = deg
     );
   
   return betaThresh;
 }
 
-
 // Function that computes the boxcar feasible level information from fft knowledge
-List BoxCarChanInfo(unsigned int m, unsigned int n, fftw_complex * g_fft, NumericVector sigma, NumericVector alpha, int j0, int deg){
+List BoxCarChanInfo(int m, int n, fftw_complex * g_fft, NumericVector sigma, NumericVector alpha, int j0, int deg){
 
-  unsigned int i, n2, w1, w2, w3, J, nj, k;
-  int j, j1;
+  int i, j, j1, n2, w1, w2, w3, J, nj, k;
   
-  double tmp, eps_cut, x, xi;
+  double x, xi;
+  double eps_cut = 0;
 
   n2     = n/2 + 1;
   J      = log2(n2);
@@ -736,18 +735,18 @@ List BoxCarChanInfo(unsigned int m, unsigned int n, fftw_complex * g_fft, Numeri
 }
 
 // Function that computes the blur info for Direct case
-List DirectChanInfo(unsigned int m, unsigned int n, NumericVector sigma, NumericVector alpha){
+List DirectChanInfo(int m, int n, NumericVector sigma, NumericVector alpha){
 
-  unsigned int i, j, n2, n3, best;
+  int i, j, n2;
   
-  double tmp, nsqrt, powj, tmp2;
+  double tmp, nsqrt, tmp2;
   
   NumericVector threshfft(m);
   NumericVector level(m);
   IntegerVector freq(m, NA_INTEGER);
   
   n2  = n/2 + 1;
-  unsigned int J = log2(n);
+  int J = log2(n);
   
   NumericMatrix finfo(n2, m);
   NumericMatrix fcut(n2, m);
@@ -778,11 +777,11 @@ List DirectChanInfo(unsigned int m, unsigned int n, NumericVector sigma, Numeric
 }
 
 // Function that computes the feasible levels from fft knowledge
-List SmoothChanInfo(unsigned int m, unsigned int n, fftw_complex * g_fft, NumericVector sigma, NumericVector alpha){
+List SmoothChanInfo(int m, int n, fftw_complex * g_fft, NumericVector sigma, NumericVector alpha){
 
-  unsigned int i, j, n2, n3, best;
+  int i, j, n2, best;
   
-  double tmp, nsqrt, powj, tmp2;
+  double tmp, nsqrt, tmp2;
   
   NumericVector threshfft(m);
   NumericVector level(m);
@@ -846,11 +845,11 @@ List SmoothChanInfo(unsigned int m, unsigned int n, fftw_complex * g_fft, Numeri
 }
 
 // Function that computes the feasible levels from fft knowledge
-int FindBestChannel(unsigned int m, unsigned int n, fftw_complex * g_fft, NumericVector sigma, NumericVector alpha){
+int FindBestChannel(int m, int n, fftw_complex * g_fft, NumericVector sigma, NumericVector alpha){
 
-  unsigned int i, j, n2, best;
+  int i, j, n2, best;
   
-  double tmp, nsqrt, powj;
+  double tmp, nsqrt;
   
   NumericVector threshfft(m);
   NumericVector level(m);
@@ -901,7 +900,7 @@ double TheoreticalEta(NumericVector alpha, String blur, int m, int n,
   
   double eta;
 
-  int best_chan;
+  int best_chan = 1;
   if( blur == "smooth" || blur == "direct") {
     best_chan = FindBestChannel(m, n, g_multi_out, sigma, alpha);
     eta = 2 * sqrt(alpha[best_chan - 1]);
@@ -919,106 +918,107 @@ double TheoreticalEta(NumericVector alpha, String blur, int m, int n,
 }
 
 // Function that only computes the highest scale level
-int HighestScale(unsigned int m, int n, fftw_complex * g_fft, NumericVector sigma,
-                NumericVector alpha, String blur = "direct" ){
+int HighestScale(int m, int n, fftw_complex * g_fft, NumericVector sigma,
+                NumericVector alpha, String blur = "smooth", int j0 = 3, int deg = 3){
 
-  unsigned int i, j, n2, best, J;
-  double tmp, nsqrt, powj;
-  
-  // FFTW specific definitions
-  double p, c, s;
+  int i, j, n2, j1;
+  double tmp, nsqrt;
+  int best = 1;
   
   n2 = n/2 + 1;
   
-  NumericVector threshfft(m);
-  NumericVector level(m);
-  IntegerVector freq(m, NA_INTEGER);
-  n2    = n/2 + 1;
-  nsqrt = pow(n,1.0/2);  
   
-  if( blur == "direct"){
-    best     = 1;
-    level[0] = J - 1;
-  } else {
-    if( blur == "box.car"){
-      
-      double eps_cut;
-      NumericVector eps(m);
-      best = 1;
-      // Compute multi-channel threshold
-      for( j = 0; j < m; ++j ){
-        eps[j]   = pow(n,alpha[j])/pow(sigma[j],2);
-        eps_cut += pow(log(eps[j]),2);
-      }
-      
-      freq[0] = NA_INTEGER;
-      // Compute the normalised Fourier decay levels.
+  if (blur == "smooth"){
+    NumericVector threshfft(m);
+    NumericVector level(m);
+    IntegerVector freq(m, NA_INTEGER);
+    nsqrt = pow(n,1.0/2); 
+    // Compute channel level thresholds
+    for( j = 0; j < m; ++j ){
+      tmp   = log(sigma[j]);
+      threshfft[j] = tmp - log(pow(n,alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
+    }
+    // Compute the normalised Fourier decay levels.
+    for( j = 0; j < m; ++j ){
+      // Skip first level since Inf always > threshfft
       for( i = 1; i < n2; ++i ){
-        // Check when level drops below eps_cut
-        tmp     = 0;
-        for( j = 0; j < m; ++j )
-          tmp += (pow(g_fft[i + j * n2][0],2) + pow(g_fft[i + j * n2][1],2)) * eps[j] * pow(i,1 - alpha[j]);
-        if( tmp < eps_cut ){
-          freq[0] = i;
-          level   = floor(log2(i)) - 1;
+        tmp  = log(sqrt(pow(g_fft[i + j * n2][0],2) + pow(g_fft[i + j * n2][1],2))) - 0.5 * alpha[j] * log(i);
+        if( tmp < threshfft[j] ){
+          freq[j]  = i + 1;
+          level[j] = floor(log2(i + 1)) - 1;
           break;
         }
       }
-      
-      // Threshold never met case (direct convolution case)
-      if( freq[0] == NA_INTEGER ){
-        freq[0]  = n2 - 1;
-        level    = log2(freq[0]);
-        Rcout << "Warning: Unexpected high frequency level for Box car case, did you input a direct convolution?";
+      // Threshold never met (direct convolution case)
+      if( freq[j] == NA_INTEGER ){
+        freq[j]  = n2 - 1;
+        level[j] = log2(freq[j]);
       }
       
-    } else {  
-      if (blur == "smooth"){
-        // Compute channel level thresholds
-        for( j = 0; j < m; ++j ){
-          tmp   = log(sigma[j]);
-          threshfft[j] = tmp - log(pow(n,alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
-        }
-        // Compute the normalised Fourier decay levels.
-        for( j = 0; j < m; ++j ){
-          // Skip first level since Inf always > threshfft
-          for( i = 1; i < n2; ++i ){
-            tmp  = log(sqrt(pow(g_fft[i + j * n2][0],2) + pow(g_fft[i + j * n2][1],2))) - 0.5 * alpha[j] * log(i);
-            if( tmp < threshfft[j] ){
-              freq[j]  = i + 1;
-              level[j] = floor(log2(i + 1)) - 1;
-              break;
-            }
-          }
-          // Threshold never met (direct convolution case)
-          if( freq[j] == NA_INTEGER ){
-            freq[j]  = n2 - 1;
-            level[j] = log2(freq[j]);
-          }
-          
-        }
-        best = 1;
-        int current = freq[0];
-        for( j = 1; j < m; ++j ){
-          if( freq[j] > current ){
-            current = freq[j];
-            best    = j + 1;
-          } 
-        }
-      } else {
-        stop("SmoothHighestScale called with unrecognised blur type, please choose smooth or box.car.");
+    }
+    int current = freq[0];
+    for( j = 1; j < m; ++j ){
+      if( freq[j] > current ){
+        current = freq[j];
+        best    = j + 1;
+      } 
+    }
+    j1 = level[best - 1];
+  } else {
+    int J = log2(n2);
+    NumericVector eps(m);
+    NumericVector finfo(n2);
+    double x, xi;
+    double eps_cut = 0;
+    double tmp     = 0;
+    int w1, w2, w3, nj;
+    nj = pow(2,j0 - 1);
+    
+    for( j = 0; j < m; ++j ){
+      eps[j]   = pow(n,alpha[j])/pow(sigma[j],2);
+      eps_cut += log(eps[j]);
+    }
+    
+    // Compute the normalised Fourier decay levels.
+    for( i = 1; i < n2; ++i ){
+        for( j = 0; j < m; ++j )
+          finfo[i] += (pow(g_fft[i + j * n2][0],2) + pow(g_fft[i + j * n2][1],2)) * eps[j] * pow(i,1 - alpha[j]);
+    }
+    
+    nj = pow(2,j0 - 1); 
+    for(j = j0; j < J; ++j){
+      nj *= 2;
+      w1 = ceil(nj/3.0);
+      w2 = 2 * w1 + j % 2 -1;
+      w3 = w1 + nj;
+      
+      for(i = w1; i < w2; ++i){
+        xi           = (double)i/nj;
+        x            = 3 * xi - 1;
+        xi           = sin(M_PI_2 * MeyerPol(x,deg));
+        tmp += xi * xi / finfo[i];
+      }
+      for(i = w2; i < w3; ++i){
+        xi           = (double)i/nj;
+        x            = 3 * xi/2 - 1;
+        xi           = cos(M_PI_2 * MeyerPol(x,deg));
+        tmp += xi * xi / finfo[i];
+      }
+      if( tmp > 1/( eps_cut ) ){
+        break;
       }
     }
+    j1 = j - 1;
   }
   
-  return level[best - 1];
+  return j1;
 }
 
 // Returns the Wavelet projection using the coefficients and scales as inputs.
 // [[Rcpp::export]]
 NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int deg = 3){
   
-  unsigned int n, n2, nj, J, i, j, jmax, k, ks, kj, w1, w2, w3;
+  int n, n2, nj, J, i, j, jmax, k, ks, kj, w1, w2, w3;
   double x, xi, cx, sx, p;
 
   n  = beta.size();
@@ -1031,7 +1031,7 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
   jmax = j1;
   
    // FFTW specific definitions
-  double *real_in, *real_out, tmp;
+  double *real_in, *real_out;
   fftw_complex *in, *out;
   fftw_plan real_p, back_p;
 
@@ -1223,9 +1223,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
 NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(),
                           String blur = "direct", int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, int deg = 3) {
   
-  unsigned int i, m, n2, j, J, nj, jmax, w1, w2, w3;
-  int n;
-  double tmpd, x, xi, eta2;
+  int i, m, n, n2, j, J, nj, jmax, w1, w2, w3;
+  double tmpd, x, xi;
   
     // FFTW specific definitions
   double       *g_m_real_in;
@@ -1340,28 +1339,21 @@ NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector a
 }
 
 
-// Helper function to compute thresholds fast
+// Helper function to compute thresholds fast (n, sigma, g_multi_out, alpha, j0, j1, eta, deg)
 NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, NumericVector alpha,
                           int j0, int j1, double eta , int deg = 3) {
   
-  unsigned int i, m, n2, j, J, nj, jmax, w1, w2, w3;
-  double tmpd, x, xi, eta2 = pow(eta,2);
-  
-  n2 = n/2 + 1;
-  m  = sigma.size();
-  
-  // If alpha is not specified, assume alpha is 1 uniformly
-  if( alpha.size() == 0 ){
-    alpha = rep(1.0,m);
-  }
+  int i, m, n2, j, J, nj, jmax, w1, w2, w3;
+  double tmpd, x, xi;
   
   J = log2(n);
-  
+  n2 = n/2 + 1;
+  m  = sigma.size();
   // Power factors n^alpha/sigma^2
   NumericVector thrMat(n);
   
   // compute smallest required values
-  nj = pow(2,j0);
+  nj = pow(2, j0);
   w1 = ceil((double)nj/3.0);
   w3 = n - w1;
   
@@ -1414,7 +1406,7 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
       x            = 1.0/nj * xi * xi;
       thr[j - j0] += x * thrMat[i] + x * thrMat[n - i];
     }
-    thr[j - j0] *= log(n) * eta2;
+    thr[j - j0] *= log(n) * eta;
   }
 
   std::transform(thr.begin(), thr.end(), thr.begin(), ::sqrt);
@@ -1431,7 +1423,7 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
 // Helper function for scale estimation using multi FFTW
 NumericMatrix execute_multi_back_fft(fftw_plan back_p, double * real_out, int n, int m, int deg = 3){
   
-  unsigned int i, j;
+  int i, j;
   
   fftw_execute(back_p);
   
@@ -1454,8 +1446,8 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
                             NumericVector thresh = NumericVector::create(), String shrinkType = "hard", int deg = 3){
 
   // Regular definitions
-  unsigned int i, j, J, k, bk, n2, w1, w2, w3, nn, jmax, m, nj;
-  int n;
+  int i, j, J, n2, w1, w2, w3, n, jmax, m, nj;
+  
   n  = signal.nrow();
   m  = signal.ncol();
   n2 = n/2 + 1;
@@ -1468,15 +1460,15 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   if( !( m == alpha.size() && m == G.ncol() && n == G.nrow() ) )
     stop("Dimension mismatch; sigma, alpha and G");
     
-  double xi, x, c, s, p, denom, eps, powj, bp, cx, sx;
+  double xi, x, p, bp, cx, sx;
   
   // R objects
   NumericVector final_out(n);
   
   // FFTW specific definitions
-  double *x_m_real_in, *g_m_real_in, *real_in, *real_out, *sig_real_out, tmp;
+  double *x_m_real_in, *g_m_real_in, *real_in, *real_out, *sig_real_out;
   fftw_complex *in, *out, *x_fft, *conj, *x_multi_out, *g_multi_out, *sig_in;
-  fftw_plan x_m_real_p, g_m_real_p, real_p, backward_p, back_scal_p, sigma_back_p;
+  fftw_plan x_m_real_p, g_m_real_p, real_p, backward_p, sigma_back_p;
 
   x_m_real_in  = (double*)fftw_malloc(sizeof(double) * n * m);
   sig_real_out = (double*)fftw_malloc(sizeof(double) * n * m);
@@ -1553,7 +1545,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
     j1 = J - 1;
   
   if( j1 == NA_INTEGER)
-    j1 = HighestScale(m, n, g_multi_out, sigma, alpha, blur);
+    j1 = HighestScale(m, n, g_multi_out, sigma, alpha, blur, j0, deg);
   
   if( j1 < j0 ){
     j0 = j1;
@@ -1800,8 +1792,8 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
                           double eta = NA_REAL, int deg = 3){
 
   // Regular definitions
-  unsigned int i, j, J, k, bk, n2, w1, w2, w3, jmax, m, nj;
-  int n;
+  int i, j, J, k, bk, n, n2, w1, w2, w3, jmax, m, nj;
+  
   n  = signal.nrow();
   m  = signal.ncol();
   n2 = n/2 + 1;
@@ -1810,15 +1802,15 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   if( alpha.size() == 0)
     alpha = rep(1.0,m);
   
-  double xi, x, c, s, p, denom, eps, powj, nsq, bp, nf, cx, sx;
+  double xi, x, c, s, p, bp, nf, cx, sx;
   
   // R objects
   NumericVector sigma(m);
   
   // FFTW specific definitions
-  double *x_m_real_in, *g_m_real_in, *sig_real_out, tmp;
-  fftw_complex *x_fft, *conj, *x_multi_out, *g_multi_out, *sig_in;
-  fftw_plan x_m_real_p, g_m_real_p, back_scal_p, sigma_back_p;
+  double *x_m_real_in, *g_m_real_in, *sig_real_out;
+  fftw_complex *x_fft, *x_multi_out, *g_multi_out, *sig_in;
+  fftw_plan x_m_real_p, g_m_real_p, sigma_back_p;
 
   x_m_real_in  = (double*)fftw_malloc(sizeof(double) * n * m);
   sig_real_out = (double*)fftw_malloc(sizeof(double) * n * m);
@@ -2142,7 +2134,8 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
 
   List betaList = List::create(
     _["coef"] = beta,
-    _["j0"]   = j0
+    _["j0"]   = j0,
+    _["deg"]  = deg
   );
   
   betaList.attr("class") = "waveletCoef";
@@ -2157,8 +2150,8 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
                     double eta = NA_REAL, String shrinkType = "hard", int deg = 3){
 
   // Regular definitions
-  unsigned int i, j, J, k, bk, n2, w1, w2, w3, nn, jmax, m, nj;
-  int n;
+  int i, j, J, k, bk, n, n2, w1, w2, w3, jmax, m, nj;
+  
   n  = signal.nrow();
   m  = signal.ncol();
   n2 = n/2 + 1;
@@ -2170,7 +2163,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   if( !( m == alpha.size() && m == G.ncol() ) )
     stop("Dimension mismatch; sigma, alpha and G");
   
-  double xi, x, c, s, p, denom, eps, powj, nsq, bp, cx, sx;
+  double xi, x, c, s, p, bp, cx, sx;
   
   // R objects
   NumericVector final_out(n);
@@ -2180,9 +2173,9 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   List channel;
   
   // FFTW specific definitions
-  double *x_m_real_in, *g_m_real_in, *real_in, *real_out, *sig_real_out, tmp;
+  double *x_m_real_in, *g_m_real_in, *real_in, *real_out, *sig_real_out;
   fftw_complex *in, *out, *x_fft, *conj, *x_multi_out, *g_multi_out, *sig_in;
-  fftw_plan x_m_real_p, g_m_real_p, real_p, backward_p, back_scal_p, sigma_back_p;
+  fftw_plan x_m_real_p, g_m_real_p, real_p, backward_p, sigma_back_p;
 
   x_m_real_in  = (double*)fftw_malloc(sizeof(double) * n * m);
   sig_real_out = (double*)fftw_malloc(sizeof(double) * n * m);
@@ -2305,7 +2298,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
       if( blur == "box.car" ){
         channel = BoxCarChanInfo(m, n, g_multi_out, sigma, alpha, j0, deg);
       } else {
-        Rcout << "Blur input type not recognised, assumed regular smooth blur.";
+        Rf_warning("Blur input type not recognised, assumed regular smooth blur.");
         channel = SmoothChanInfo(m, n,  g_multi_out, sigma, alpha);
         channel["j0"] = j0;
       }
@@ -2331,7 +2324,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   }
 
   if( thresh.size() == 0 )
-    thresh = MaxiThreshFFTW(n, sigma, g_multi_out ,alpha ,j0 ,j1 ,eta , deg);
+    thresh = MaxiThreshFFTW(n, sigma, g_multi_out, alpha, j0, j1, eta, deg);
   
   NumericMatrix proj(n, j1 - j0 + 2);
   
@@ -2675,10 +2668,26 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   fftw_free(sig_real_out);
   fftw_free(sig_in);
   
+  List betaList = List::create(
+    _["coef"] = beta,
+    _["j0"]   = j0,
+    _["deg"]  = deg
+    );
+  betaList.attr("class") = "waveletCoef";
+  
+  List shrunkBetaList = List::create(
+    _["coef"] = beta_shrink,
+    _["j0"]   = j0,
+    _["deg"]  = deg
+    );
+  shrunkBetaList.attr("class") = "waveletCoef";
+  
   List multiWaveD = List::create(
     _["channels"]    = m,
     _["signal"]      = signal,
     _["G"]           = G,
+    _["j0"]          = j0,
+    _["j1"]          = j1,
     _["blurType"]    = blur,
     _["alpha"]       = alpha,
     _["sigmaEst"]    = sigma,
@@ -2686,8 +2695,8 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     _["eta"]         = eta,
     _["thresholds"]  = thresh,
     _["estimate"]    = final_out,
-    _["coef"]        = beta,
-    _["shrinkCoef"]  = beta_shrink,
+    _["coef"]        = betaList,
+    _["shrinkCoef"]  = shrunkBetaList,
     _["percent"]     = percent_shrunk,
     _["levelMax"]    = level_max,
     _["shrinkType"]  = shrinkType,

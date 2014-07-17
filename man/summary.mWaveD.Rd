@@ -13,7 +13,7 @@ deconvolution analysis produced by the \code{\link{multiWaveD}} function.}
 }
 \value{
 Text output giving summary information of the input and output analysis including, \itemize{
-\item Degree of Meyer wavelet used.
+\item Degree of Meyer wavelet used in the analysis.
 \item Number of observations, within each channel and number of channels present.
 \item Resolution levels used (j0 to j1)
 \item Blur type assumed in the analysis (direct, smooth or box.car)
@@ -22,7 +22,7 @@ Text output giving summary information of the input and output analysis includin
 }
 }
 \description{
-Summarises the mWaveD object by giving
+Gives some numerical summaries of a \code{mWaveD} object.
 }
 \seealso{
 \code{\link{multiWaveD}}

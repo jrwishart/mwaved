@@ -8,7 +8,7 @@
 \code{mwaved} computes the Wavelet deconvolution estimate of a common signal present in multiple channels that have possible different levels of blur and additive error. More information about each function can be found in its help documentation.
 }
 \details{
-\code{mwaved} uses the WaveD wavelet deconvolution paradigm and is based on the \code{waved} R-package given by Raimondo and Stewart (2007). It generalises the approach by allowing a multichannel signal instead of a single channel signal and allows long memory errors within each channel (independent of each channel). See Kulik, Sapatinas and Wishart (2014) for theoretical results and a short numerical investigation. The \code{mwaved} package also uses the external C FFTW library described in Frigo and Johnson, (2005) to dramatically increase the speed of the computations.
+\code{mwaved} uses the WaveD wavelet deconvolution paradigm and is based on the \code{waved} R-package given by Raimondo and Stewart (2007). It generalises the approach by allowing a multichannel signal instead of a single channel signal and allows long memory errors within each channel (independent of each channel). See Kulik, Sapatinas and Wishart (2014) for theoretical results and a short numerical investigation. The \code{mwaved} package also uses the external C FFTW library described in Frigo and Johnson, (2005) to dramatically increase the speed of the computations. Detailed information and instructions for implementation are available at \url{http://www.fftw.org}.
 }
 \references{
 Frigo, M and Johnson, S.G. (2005) \emph{The design and implementation of FFTW3}, Proceedings of the IEEE \bold{93}, 216--231.

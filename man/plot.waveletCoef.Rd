@@ -4,7 +4,7 @@
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
 \usage{
 \method{plot}{waveletCoef}(x, ..., lowest = NULL, highest = NULL,
-  coefTrim = NULL, thickness = 2, descending = FALSE, scaling = 1)
+  shrinkCoef = NULL, thickness = 3, descending = FALSE, scaling = 1)
 }
 \arguments{
 \item{x}{A list of class waveletCoef.}
@@ -15,7 +15,7 @@
 
 \item{highest}{Specifies the finest resolution to display in the Multi-resolution plot.}
 
-\item{coefTrim}{A numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the 'x' wavelet coefficients.}
+\item{shrinkCoef}{A numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the 'x' wavelet coefficients.}
 
 \item{thickness}{An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.}
 

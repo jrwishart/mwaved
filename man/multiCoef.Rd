@@ -3,17 +3,17 @@
 \alias{multiCoef}
 \title{Wavelet coefficient estimation from a multichannel signal}
 \usage{
-multiCoef(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
+multiCoef(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
   dim(as.matrix(Y))[2]), blur = "direct", j0 = 3L, j1 = NA_integer_,
   thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 =
   j0, j1 = j1, eta = eta, deg = 3L), eta = NA_real_, deg = 3L)
 }
 \arguments{
-\item{thresh}{A vector of scale level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. Namely, have j1 - j0 + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
+\item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
-\item{Y}{An input signal either an n by M matrix containing the multichannel signal to be analysed (or single vector of n elements). Each of the M columns represents a channel of n observations.}
+\item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
 
-\item{G}{The input multichannel blur matrix of size n by m (needs to be the same size as the signal input). This matrix dictates the form of blur present in each of the channels.}
+\item{G}{The input multichannel blur matrix/vector (needs to be the same dimension/length as the signal input which is a matrix or vector for the multichannel or single channel case respectively). This argument dictates the form of blur present in each of the channels.}
 
 \item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
 
@@ -34,7 +34,11 @@ multiCoef(Y, G = directG(dim(as.matrix(Y))), alpha = rep(1,
 Estimates the wavelet coefficiets for the underlying signal of interest embedded in the noisy multichannel deconvolution model.
 }
 \details{
-Returns an object of type \emph{waveletCoef} including a numeric vector of size n the estimated wavelet coefficients for the signal of interest embedded in the noisy multichannel deconvolution model and an integer, \emph{j0}, that specifies the initial resolution for the coarse expansion.
+Returns an object of type \emph{waveletCoef} which is a list including the following three objects \itemize{
+\item \code{coef} a numeric vector of size n giving the estimated wavelet coefficients for the signal of interest
+\item \code{j0} an integer that specifies the initial coarse resolution for the inhomogeneous wavelet expansion.
+\item \code{deg} an integer that specifies the degree of the Meyer wavelet used in the estimation of the wavelet coefficients.
+}
 }
 \examples{
 library(mwaved)

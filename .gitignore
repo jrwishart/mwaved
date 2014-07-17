@@ -1,6 +1,9 @@
 .Rproj.user
 .Rhistory
 .RData
+config.log
+config.status
+src/Makevars
 src/*.o
 src/*.so
 src/*.dll

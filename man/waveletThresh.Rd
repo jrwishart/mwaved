@@ -6,8 +6,7 @@
 waveletThresh(beta, thresh = 0, shrinkType = "hard")
 }
 \arguments{
-\item{beta}{A waveletCoef object that includes a set of n wavelet coeffients and integer
-j0 specifying the coarsest resolution.}
+\item{beta}{A \code{waveletCoef} object.}
 
 \item{thresh}{A numeric vector containing the thresholds to be applied to the coefficients
 at each resolution.}
@@ -20,9 +19,8 @@ Applies a resolution level thresholding technique to a set of wavelet coefficien
 embedded in a wavelet coefficient object.
 }
 \details{
-Applies one of three specified wavelet thresholding regimes to a wavelet
-coefficient object (list with a vector of n wavelet coefficients and an integer
-specifying the coarse resolution level). If thresh is not specified, no thresholding
+Applies one of three specified wavelet thresholding regimes to a \code{waveletCoef} object (wavelet
+coefficient object created by \code{\link{multiCoef}}). If \code{thresh} is not specified, no thresholding
 is applied. The formulae applied for 'hard', 'soft' or
 'garrote' are given by,\itemize{
  \item Hard: \eqn{
@@ -36,5 +34,32 @@ is applied. The formulae applied for 'hard', 'soft' or
  }
 }
 where 1 represents the indicator function and \emph{t > 0} represents the threshold.
+}
+\examples{
+library(mwaved)
+# Simulate the multichannel doppler signal.
+m <- 3
+n <- 2^10
+t <- (1:n)/n
+signal <- makeDoppler(n)
+# Noise levels per channel
+e <- rnorm(m*n)
+# Create Gamma blur
+shape <- seq(from = 0.5, to = 1, length = m)
+scale <- rep(0.25,m)
+G <- gammaBlur(n, shape = shape, scale = scale)
+# Convolve the signal
+X <- blurSignal(signal, G)
+# Create error with custom signal to noise ratio
+SNR <- c(10,15,20)
+sigma <- sigmaSNR(X, SNR)
+alpha <- c(0.75, 0.8, 1)
+E <- multiNoise(n, sigma, alpha)
+# Create noisy & blurred multichannel signal
+Y <- X + E
+# Determine thresholds
+thresh <- multiThresh(Y, G, blur = 'smooth')
+beta <- multiCoef(Y, G)
+plot(beta, coefTrim = waveletThresh(beta, thresh))
 }
 
