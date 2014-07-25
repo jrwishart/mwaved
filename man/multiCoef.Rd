@@ -61,7 +61,8 @@ sigma <- sigmaSNR(X, SNR)
 alpha <- c(0.75, 0.8, 1)
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
-Y <- X + E#' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
+Y <- X + E
+plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 matlines(Y)
 # Estimate the wavelet coefficients
 estimatedCoefs <- multiCoef(Y, G, alpha = rep(1,m), blur = 'smooth')

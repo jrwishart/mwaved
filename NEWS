@@ -1,3 +1,9 @@
+mwaved 1.0
+============
+
+* Added ggplot2 support as a suggested package (also included a suggestion of gridExtra to help facilitate multiple ggplot outputs on same window)
+* Added Shiny applet to showcase the method, can run by calling mWaveDDemo()
+
 mwaved 0.2.0
 ============
 

@@ -2,10 +2,6 @@
 \name{plot.mWaveD}
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
-\usage{
-\method{plot}{mWaveD}(x, ..., singlePlot = TRUE, prompt = TRUE,
-  thickness = 2)
-}
 \arguments{
 \item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
 
@@ -13,9 +9,11 @@
 
 \item{singlePlot}{A logical value that controls whether all four plots appear on a single window (2 x 2 plot window) or are separated into separate plot windows.}
 
-\item{prompt}{A logical value that specifies whether the user is prompted between plot outputs.}
+\item{ask}{A logical value that specifies whether the user is \emph{ask}ed before each plot output.}
 
-\item{thickness}{An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.}
+\item{thickness}{An integer that specifies the thickness of the overlayed coefficients (shrinkCoef values) in the plot. Larger values increase the thickness.}
+
+\item{ggplot}{A logical value to specify if the user wants to use base graphics or ggplot2 graphics.}
 }
 \description{
 Creates plot output that summarises the \code{mWaveD} object produced by the \code{\link{multiWaveD}} function.

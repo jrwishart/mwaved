@@ -2,10 +2,6 @@
 \name{plot.waveletCoef}
 \alias{plot.waveletCoef}
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
-\usage{
-\method{plot}{waveletCoef}(x, ..., lowest = NULL, highest = NULL,
-  shrinkCoef = NULL, thickness = 3, descending = FALSE, scaling = 1)
-}
 \arguments{
 \item{x}{A list of class waveletCoef.}
 
@@ -17,7 +13,7 @@
 
 \item{shrinkCoef}{A numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the 'x' wavelet coefficients.}
 
-\item{thickness}{An integer that specifies the thickness of the overlayed coefficients (coefTrim values) in the plot. Larger values increase the thickness.}
+\item{thickness}{An integer that specifies the thickness of the overlayed coefficients (shrinkCoef values) in the plot. Larger values increase the thickness.}
 
 \item{descending}{A logical value to specify whether resolutions on the y-axis of the plot are increasing from top to bottom.}
 

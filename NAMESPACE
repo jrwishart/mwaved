@@ -26,7 +26,12 @@ export(makeBlocks)
 export(makeDoppler)
 export(makeLIDAR)
 export(boxcarBlur)
+export(directBlur)
 export(gammaBlur)
 export(blurSignal)
 export(sigmaSNR)
 export(multiNoise)
+
+# Shiny interactive applet demo
+export(mWaveDDemo)
+import(shiny)

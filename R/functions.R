@@ -3,7 +3,6 @@
 # Copyright Justin R Wishart 2014
 # Questions or comments?
 # email: j.wishart@unsw.edu.au
-#
 
 #' @name mwaved
 #' @title Multichannel wavelet deconvolution with long memory using mwaved.
@@ -31,7 +30,7 @@ NULL
 #' @param G.dim A numeric vector with two elements specifying the values of n and m respectively
 #' @export
 directBlur <- function(G.dim){
-  y <- matrix(0,G.dim[1],G.dim[2])
+  y <- matrix(0, G.dim[1], G.dim[2])
   y[1,] <- 1 
   y
 }
@@ -63,16 +62,22 @@ feasibleResolutions <- function(n, j0, j1){
 feasibleAlpha <- function(m, alpha){
   ma <- length(alpha)
   if (m != ma){
-    if( ma == 1){
+    if ( ma == 1){
       alpha <- rep(alpha, m)
     } else {
-      warning("Dimension mismatch: Length of alpha is not the same as the number of columns of Y. Last element of alpha repeated for the rest.")
-      alpha <- c(alpha, rep(rev(alpha)[1], m - ma))
+      if ( m > ma ){
+        warning("Dimension mismatch: Length of alpha too short (not the same as the number of columns of Y). Last element of alpha repeated for the remaining channels.")
+        alpha <- c(alpha, rep(rev(alpha)[1], m - ma))  
+      } else {
+        warning("Dimension mismatch: Length of alpha too long (longer than the number of columns of Y). Extra values of alpha ignored.")
+        alpha <- alpha[1:m]
+      }
     }
   }
   return(alpha)
 }
 
+# Check signal length is long enough to avoid computation errors in C code
 feasibleLength <- function(n){
   if (n < 16){
     stop("Signal length too small. Need at least 16 observations.")
@@ -83,6 +88,7 @@ feasibleLength <- function(n){
   }
 }
 
+# Check blur identification string 
 feasibleBlur <- function(blur){
     if(blur != 'direct'){
       if(blur != 'smooth'){
@@ -219,11 +225,14 @@ multiProj <- function(beta, j1 = log2(length(beta$coef)) - 1) {
 multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
                         blur = "direct", j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
-  m <- dim(Y)[2]
-  n <- dim(Y)[1]
-  feasibleLength(n)
-  jvals <- feasibleResolutions(n, j0, j1)
-  alpha <- feasibleAlpha(m, alpha)
+  G <- as.matrix(G)
+  dimY <- dim(Y)
+  if ( any(dimY != dim(G)) ){
+    stop('Dimensions of Y and G do not match')
+  }
+  feasibleLength(dimY[1])
+  jvals <- feasibleResolutions(dimY[1], j0, j1)
+  alpha <- feasibleAlpha(dimY[2], alpha)
   feasibleBlur(blur)
   .Call('mwaved_multiThresh', Y, G, alpha, blur, jvals$j0, jvals$j1, eta, deg)
 }
@@ -262,7 +271,8 @@ multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(
 #' alpha <- c(0.75, 0.8, 1)
 #' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
-#' Y <- X + E#' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
+#' Y <- X + E
+#' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 #' matlines(Y)
 #' # Estimate the wavelet coefficients
 #' estimatedCoefs <- multiCoef(Y, G, alpha = rep(1,m), blur = 'smooth')
@@ -276,11 +286,14 @@ multiCoef <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as
                       G = G, alpha = alpha, blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), 
                       eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
-  n <- dim(Y)[1]
-  m <- dim(Y)[2]
-  feasibleLength(n)
-  jvals <- feasibleResolutions(n, j0, j1)
-  alpha <- feasibleAlpha(m, alpha)
+  G <- as.matrix(G)
+  dimY <- dim(Y)
+  if ( any(dimY != dim(G)) ){
+    stop('Dimensions of Y and G do not match')
+  }
+  feasibleLength(dimY[1])
+  jvals <- feasibleResolutions(dimY[1], j0, j1)
+  alpha <- feasibleAlpha(dimY[2], alpha)
   
   blur <- tolower(blur)
   feasibleBlur(blur)
@@ -401,9 +414,9 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Compute mWaveD object
-#' multiObject <- multiWaveD(Y, G = G, alpha = rep(1, m), blur = 'smooth')
-#' plot(multiObject)
-#' summary(multiObject)
+#' mWaveDObj <- multiWaveD(Y, G = G, alpha = rep(1, m), blur = 'smooth')
+#' plot(mWaveDObj)
+#' summary(mWaveDObj)
 #' 
 #' @seealso \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
 #' 
@@ -412,11 +425,14 @@ multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(a
                        j0 = 3L, j1 = NA_integer_, blur = "direct", thresh = as.numeric(c()), 
                        eta = NA_real_, shrinkType = "hard", deg = 3L) {
   Y <- as.matrix(Y)
-  m <- dim(Y)[2]
-  n <- dim(Y)[1]
-  feasibleLength(n)
-  jvals <- feasibleResolutions(n, j0, j1)
-  alpha <- feasibleAlpha(m, alpha)
+  G <- as.matrix(G)
+  dimY <- dim(Y)
+  if ( any(dimY != dim(G)) ){
+    stop('Dimensions of Y and G do not match')
+  }
+  feasibleLength(dimY[1])
+  jvals <- feasibleResolutions(dimY[1], j0, j1)
+  alpha <- feasibleAlpha(dimY[2], alpha)
   blur <- tolower(blur)
   feasibleBlur(blur)
   shrinkType <- tolower(shrinkType)
@@ -471,11 +487,15 @@ multiEstimate <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,di
                           blur = "direct", sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, 
                           eta = NA_real_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha,
                           blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L) , shrinkType = "hard", deg = 3L) {
-  m <- dim(Y)[2]
-  n <- dim(Y)[1]
-  feasibleLength(n)
-  jvals <- feasibleResolutions(n, j0, j1)
-  alpha <- feasibleAlpha(m, alpha)
+  Y <- as.matrix(Y)
+  G <- as.matrix(G)
+  dimY <- dim(Y)
+  if ( any(dimY != dim(G)) ){
+    stop('Dimensions of Y and G do not match')
+  }
+  feasibleLength(dimY[1])
+  jvals <- feasibleResolutions(dimY[1], j0, j1)
+  alpha <- feasibleAlpha(dimY[2], alpha)
   blur <- tolower(blur)
   feasibleBlur(blur)
   shrinkType <- tolower(shrinkType)

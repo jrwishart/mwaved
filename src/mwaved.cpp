@@ -903,10 +903,10 @@ double TheoreticalEta(NumericVector alpha, String blur, int m, int n,
   int best_chan = 1;
   if( blur == "smooth" || blur == "direct") {
     best_chan = FindBestChannel(m, n, g_multi_out, sigma, alpha);
-    eta = 2 * sqrt(alpha[best_chan - 1]);
+    eta = 4 * sqrt(alpha[best_chan - 1]);
   } else {
     if( blur == "box.car" ){
-      eta = 2 * sqrt(min(alpha));
+      eta = 4 * sqrt(min(alpha));
     } else {
       Rcout << "Unrecognised blur type and eta not specified.";
       Rcout << "Default regular smooth eta parameter assumed.";

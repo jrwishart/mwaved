@@ -59,9 +59,9 @@ E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
 # Compute mWaveD object
-multiObject <- multiWaveD(Y, G = G, alpha = rep(1, m), blur = 'smooth')
-plot(multiObject)
-summary(multiObject)
+mWaveDObj <- multiWaveD(Y, G = G, alpha = rep(1, m), blur = 'smooth')
+plot(mWaveDObj)
+summary(mWaveDObj)
 }
 \seealso{
 \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
