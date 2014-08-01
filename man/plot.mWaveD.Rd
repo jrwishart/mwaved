@@ -2,18 +2,24 @@
 \name{plot.mWaveD}
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
+\usage{
+\method{plot}{mWaveD}(x, ..., which = 1L:4L, singlePlot = TRUE,
+  ask = !singlePlot, thickness = 3, ggplot = TRUE)
+}
 \arguments{
 \item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
 
 \item{...}{Arguments to be passed to methods.}
 
-\item{singlePlot}{A logical value that controls whether all four plots appear on a single window (2 x 2 plot window) or are separated into separate plot windows.}
+\item{which}{A numeric vector that specifies which plots to output. Default value is \code{1:4} which  specifies that all four plots are to be displayed.}
 
 \item{ask}{A logical value that specifies whether the user is \emph{ask}ed before each plot output.}
 
+\item{singlePlot}{A logical value that controls whether all plots should appear on a single window. The plot window is resized depending the value of \code{which}.}
+
 \item{thickness}{An integer that specifies the thickness of the overlayed coefficients (shrinkCoef values) in the plot. Larger values increase the thickness.}
 
-\item{ggplot}{A logical value to specify if the user wants to use base graphics or ggplot2 graphics.}
+\item{ggplot}{A logical value to specify if the user wants to use base graphics (FALSE) or ggplot2 (TRUE) graphics.}
 }
 \description{
 Creates plot output that summarises the \code{mWaveD} object produced by the \code{\link{multiWaveD}} function.
@@ -22,8 +28,8 @@ Creates plot output that summarises the \code{mWaveD} object produced by the \co
 Four plots are output that summarise the multichannel input, a visualisation of the characteristics of the channels and the output estimate and a multi-resolution analysis plot.\itemize{
 \item Plot 1: Multichannel input signal overlayed.
 \item Plot 2: Estimated output signal using the mWaveD approach.
-\item Plot 3: Plot of the log decay of Fourier coefficients against the log bounds (smooth case) or the blockwise resolution levels against their limit (box car case)
-\item Plot 4: Multi-resolution plot of the raw wavelet coefficients (black) and the trimmed wavelet coefficients (red)}
+\item Plot 3: Plot of the log decay of Fourier coefficients against the log bounds (direct and smooth case) or the blockwise resolution levels against their limit (box car case)
+\item Plot 4: Multi-resolution plot of the raw wavelet coefficients and the trimmed wavelet coefficients}
 }
 \references{
 Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
