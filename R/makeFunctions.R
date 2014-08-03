@@ -145,7 +145,7 @@ makeBumps <- function(n) {
 #' @export
 makeDoppler <- function(n) {
     x <- (1:n)/n
-    y <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
+    y <- (sqrt(x * (1 - x))) * sin((2 * pi * 1.05)/(x + 0.05))
     y <- y * 2.4
     return(y)
 }

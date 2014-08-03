@@ -2,6 +2,10 @@
 \name{plot.mWaveD}
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
+\usage{
+\method{plot}{mWaveD}(x, ..., which = 1L:4L, singlePlot = TRUE,
+  ask = !singlePlot, thickness = 3, ggplot = TRUE)
+}
 \arguments{
 \item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
 
