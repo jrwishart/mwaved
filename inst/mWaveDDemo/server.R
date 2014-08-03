@@ -1,4 +1,5 @@
 library(shiny)
+library(mwaved)
 # Check if ggplot2 is available and use it
 ggplot2Avail <- 'ggplot2' %in% .packages(all.available = TRUE)
 # Graphical settings
@@ -546,16 +547,20 @@ output$wvdPlot <- renderPlot({
     
     wList <- mWaveDList()
     cat("mWaveD.output <- multiWaveD(Y, G = G, alpha = alpha, blur = '",wList$mWaveD$blurType,"', shrinkType = '",wList$mWaveD$shrinkType,"', deg = ",wList$mWaveD$degree,')\n', sep = '')
-    cat('plot(mWaveD.output)')
+    cat('plot(mWaveD.output, which = 3)')
   })
 
   output$mWaveDCalls <- renderPrint({
     cat('Base R Function calls:\n\n')
 
     wList <- mWaveDList()
-
+    cat('# Note the following commands just give the mWaveD estimate only.\n')
     cat("mWaveD.output <- multiWaveD(Y, G = G, alpha = alpha, blur = '",wList$mWaveD$blurType,"', shrinkType = '",wList$mWaveD$shrinkType,"', deg = ",wList$mWaveD$degree,')\n', sep = '')
-    cat('plot(mWaveD.output)')
+    cat('plot(mWaveD.output, which = 2)\n')
+    cat('## Or alternatively\n')
+    cat('x = (0:(n-1))/n\n')
+    cat("estimate <- multiEstimate(Y, G = G, alpha = alpha, blur = '",wList$mWaveD$blurType,"', shrinkType = '",wList$mWaveD$shrinkType,"', deg = ",wList$mWaveD$degree,')\n', sep = '')
+    cat("plot(x, estimate, type = 'l')")
   })
 
   output$mraCalls <- renderPrint({
@@ -564,8 +569,10 @@ output$wvdPlot <- renderPlot({
     wList <- mWaveDList()
     cat('j1 <- mWaveD.output$j1\n')
     cat("rawOutputCoefs <- mWaveD.output$coef\n")
-    cat("shrinkCoefs <- mWaveD.output$shrinkCoefs\n")
-    cat('plot(rawOutputCoefs, shrinkCoef = shrinkCoefs, highest = j1)')
+    cat("shrinkCoefs <- mWaveD.output$shrinkCoef\n")
+    cat('plot(rawOutputCoefs, shrinkCoef = shrinkCoefs, highest = j1)\n')
+    cat('## Or alternatively\n')
+    cat('plot(mWaveD.output, which = 4)')
   })
 
   observe({

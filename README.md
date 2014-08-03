@@ -7,6 +7,8 @@ mwaved is a set of functions that generalise the waved package for wavelet decon
 * Allow additive long memory errors to be present in the multichannel signals (independent between signals but exhibit long memory within each signal)
 * Allow a data-driven resolution choice in the presence of box car blur (waved does not have this feature)
 
+The user is encouraged to view the embedded Shiny applet that showcases the mwaved pacakge and importantly lists the appropriate R commands to recreate the output given by Shiny applet. The embedded Shiny applet can be viewed as long as the user has the [shiny](http://cran.r-project.org/package=shiny) package installed on their machine and then using R command `> mwaved::mWaveDDemo()`. 
+
 The code is also written with the use of the Rcpp package to help use the external C FFTW library to achieve speeds around 8-15 times faster than the usual WaveD package (comparing the performance of a single channel waved code to the same code in the mwaved package with various sample sizes). The relative performance improves as the sample size increases. 
 
 The package is being developed at http://github.com/justinrwishart/mwaved and any bug reports, comments or suggestions are welcomed at http://github.com/justinrwishart/issues

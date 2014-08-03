@@ -2,10 +2,6 @@
 \name{plot.waveletCoef}
 \alias{plot.waveletCoef}
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
-\usage{
-\method{plot}{waveletCoef}(x, ..., lowest = NULL, highest = NULL,
-  shrinkCoef = NULL, thickness = 3, descending = FALSE, scaling = 1)
-}
 \arguments{
 \item{x}{A list of class waveletCoef.}
 

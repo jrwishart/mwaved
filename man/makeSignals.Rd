@@ -29,16 +29,16 @@ Generates some of the test signals used the standard nonparametric deconvolution
 }
 \examples{
 n <- 1024
-t <- (1:n)/n
+x <- (1:n)/n
 signal <- makeLIDAR(n)
-plot(t, signal, main = 'LIDAR test signal', type = 'l')
+plot(x, signal, main = 'LIDAR test signal', type = 'l')
 signal <- makeLIDAR(n)
-plot(t, signal, main = 'LIDAR test signal', type = 'l')
+plot(x, signal, main = 'LIDAR test signal', type = 'l')
 signal <- makeDoppler(n)
-plot(t, signal, main = 'Doppler test signal', type = 'l')
+plot(x, signal, main = 'Doppler test signal', type = 'l')
 signal <- makeCusp(n)
-plot(t, signal, main = 'Cusp test signal', type = 'l')
+plot(x, signal, main = 'Cusp test signal', type = 'l')
 signal <- makeBlocks(n)
-plot(t, signal, main = 'Blocks test signal', type = 'l')
+plot(x, signal, main = 'Blocks test signal', type = 'l')
 }
 

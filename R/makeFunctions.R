@@ -20,15 +20,15 @@
 #' scale <- rep(0.25,m)
 #' 
 #' # Plot the smooth (gamma) blur
-#' t = (1:n)/n
+#' x <- (1:n)/n
 #' blurMat <- gammaBlur(n, shape, scale)
-#' matplot(t, blurMat, type = 'l', main = paste('Set of Gamma', m,'Gamma blur densities.'))
+#' matplot(x, blurMat, type = 'l', main = paste('Set of Gamma', m,'Gamma blur densities.'))
 #' 
 #' # Plot a LIDAR signal and its multichannel smooth blurred version
-#' signal = makeLIDAR(n)
-#' matplot(t, signal, type = 'l', main = 'LIDAR test signal')
+#' signal <- makeLIDAR(n)
+#' matplot(x, signal, type = 'l', main = 'LIDAR test signal')
 #' blurredSignal <- blurSignal(signal, blurMat)
-#' matplot(t, blurredSignal, type = 'l', main = 'Smooth blurred LIDAR test signals')
+#' matplot(x, blurredSignal, type = 'l', main = 'Smooth blurred LIDAR test signals')
 #' @seealso \code{\link{boxcarBlur}}, \code{\link{blurSignal}}
 #' @export
 gammaBlur <- function(n, shape, scale) {
@@ -67,14 +67,14 @@ gammaBlur <- function(n, shape, scale) {
 #' 
 #' # Plot the box car blur
 #' blurMat <- boxcarBlur(n, BA)
-#' t = (1:n)/n
-#' matplot(t, blurMat, type = 'l', main = paste('Set of box car blur functions'))
+#' x <- (1:n)/n
+#' matplot(x, blurMat, type = 'l', main = paste('Set of box car blur functions'))
 #' 
 #' # Plot a LIDAR signal and its multichannel box car blurred version
-#' signal = makeLIDAR(n)
-#' matplot(t, signal, type = 'l', main = 'LIDAR test signal')
+#' signal <- makeLIDAR(n)
+#' matplot(x, signal, type = 'l', main = 'LIDAR test signal')
 #' blurredSignal <- blurSignal(signal, blurMat)
-#' matplot(t, blurredSignal, type = 'l', main = 'Box car blurred LIDAR test signals')
+#' matplot(x, blurredSignal, type = 'l', main = 'Box car blurred LIDAR test signals')
 #' @seealso \code{\link{gammaBlur}}, \code{\link{blurSignal}}
 #' 
 #' @export
@@ -82,7 +82,7 @@ boxcarBlur <- function(n, BA) {
   m <- length(BA)
   
   box.car <- function(n, a) {
-    left <- seq(from=0,to=1-1/n,le=n)
+    left <- seq(from = 0, to = 1 - 1/n, length = n)
     left <- (left < a/2) * 1/(a*n)
     aux <- c(0,rev(left[-1]))
     y <- left + aux
@@ -102,37 +102,37 @@ boxcarBlur <- function(n, BA) {
 #' @return A numeric vector of length n giving the desired test signal.
 #' @examples
 #' n <- 1024
-#' t <- (1:n)/n
+#' x <- (1:n)/n
 NULL
 
 #' @rdname makeSignals
 #' @examples
 #' signal <- makeLIDAR(n)
-#' plot(t, signal, main = 'LIDAR test signal', type = 'l')
+#' plot(x, signal, main = 'LIDAR test signal', type = 'l')
 #' @export
 makeLIDAR <- function(n) {
-  t <- (1:n)/n
-  y <- 0.7 * (1 * (t > 0.15) * (t < 0.65) + 1 * (t > 0.28) * (t < 0.48) + (133.33 * 
-    t - 106.66) * (t > 0.8) * (t < 0.815) + (-133.33 * t + 110.6639) * (t > 
-    0.815) * (t < 0.83) + (133.33 * t - 119.997) * (t > 0.9) * (t < 0.915) + 
-    (-133.33 * t + 123.9969) * (t > 0.915) * (t < 0.93))
+  x <- (1:n)/n
+  y <- 0.7 * (1 * (x > 0.15) * (x < 0.65) + 1 * (x > 0.28) * (x < 0.48) + (133.33 * 
+    x - 106.66) * (x > 0.8) * (x < 0.815) + (-133.33 * x + 110.6639) * (x > 
+    0.815) * (x < 0.83) + (133.33 * x - 119.997) * (x > 0.9) * (x < 0.915) + 
+    (-133.33 * x + 123.9969) * (x > 0.915) * (x < 0.93))
   return(y)
 }
 
 #' @rdname makeSignals
 #' @examples
 #' signal <- makeLIDAR(n)
-#' plot(t, signal, main = 'LIDAR test signal', type = 'l')
+#' plot(x, signal, main = 'LIDAR test signal', type = 'l')
 #' @export
 makeBumps <- function(n) {
-    t <- 1:n/n
+    x <- 1:n/n
     pos <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
     hgt <- c(4, 5, 3, 4, 5, 4.2, 2.1, 4.3, 3.1, 5.1, 4.2)
     wth <- c(0.005, 0.005, 0.006, 0.01, 0.01, 0.03, 0.01, 0.01, 0.005, 0.008, 
         0.005)
     y <- rep(0, n)
     for (j in 1:length(pos)) {
-        y <- y + hgt[j]/(1 + abs((t - pos[j])/wth[j]))^4
+        y <- y + hgt[j]/(1 + abs((x - pos[j])/wth[j]))^4
     }
     y <- y * 1.8
   return(y)
@@ -141,10 +141,10 @@ makeBumps <- function(n) {
 #' @rdname makeSignals
 #' @examples
 #' signal <- makeDoppler(n)
-#' plot(t, signal, main = 'Doppler test signal', type = 'l')
+#' plot(x, signal, main = 'Doppler test signal', type = 'l')
 #' @export
 makeDoppler <- function(n) {
-    t <- (1:n)/n
+    x <- (1:n)/n
     y <- (sqrt(t * (1 - t))) * sin((2 * pi * 1.05)/(t + 0.05))
     y <- y * 2.4
     return(y)
@@ -153,26 +153,26 @@ makeDoppler <- function(n) {
 #' @rdname makeSignals
 #' @examples
 #' signal <- makeCusp(n)
-#' plot(t, signal, main = 'Cusp test signal', type = 'l')
+#' plot(x, signal, main = 'Cusp test signal', type = 'l')
 #' @export
 makeCusp <- function(n) {
-  t <- (1:n)/n
-  y <- 2.4 * sqrt(abs(t - 0.37))
+  x <- (1:n)/n
+  y <- 2.4 * sqrt(abs(x - 0.37))
   return(y)
 }
 
 #' @rdname makeSignals
 #' @examples
 #' signal <- makeBlocks(n)
-#' plot(t, signal, main = 'Blocks test signal', type = 'l')
+#' plot(x, signal, main = 'Blocks test signal', type = 'l')
 #' @export
 makeBlocks <- function(n) {
-    t <- (1:n)/n
-    pos = c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
-    hgt = c(4, (-5), 3, (-4), 5, (-4.2), 2.1, 4.3, (-3.1), 2.1, (-4.2))
+    x <- (1:n)/n
+    pos <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
+    hgt <- c(4, (-5), 3, (-4), 5, (-4.2), 2.1, 4.3, (-3.1), 2.1, (-4.2))
     y <- rep(0, n)
     for (j in 1:length(pos)) {
-        y = y + (1 + sign(t - pos[j])) * (hgt[j]/2)
+        y <- y + (1 + sign(x - pos[j])) * (hgt[j]/2)
     }
     return(y)
 }
@@ -189,12 +189,12 @@ makeBlocks <- function(n) {
 #' n <- 1024
 #' m <- 3
 #' blur <- gammaBlur(n, shape = seq(from = 0.5, to = 1, length = m), scale = rep(0.25, m))
-#' t = (1:n)/n
+#' x <- (1:n)/n
 #' signal <- makeLIDAR(n)
 #' par(mfrow = c(2,1))
-#' plot(t, signal, type = 'l', main = 'Direct LIDAR signal')
+#' plot(x, signal, type = 'l', main = 'Direct LIDAR signal')
 #' indirectSignal <- blurSignal(signal, blur)
-#' matplot(t, indirectSignal, type = 'l', main = 'Set of blurred LIDAR signals')
+#' matplot(x, indirectSignal, type = 'l', main = 'Set of blurred LIDAR signals')
 #' 
 #' @seealso \code{\link{gammaBlur}}, \code{\link{boxcarBlur}}
 #' 

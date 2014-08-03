@@ -28,15 +28,15 @@ shape <- seq(from = 0.5, to = 1, length = m)
 scale <- rep(0.25,m)
 
 # Plot the smooth (gamma) blur
-t = (1:n)/n
+x <- (1:n)/n
 blurMat <- gammaBlur(n, shape, scale)
-matplot(t, blurMat, type = 'l', main = paste('Set of Gamma', m,'Gamma blur densities.'))
+matplot(x, blurMat, type = 'l', main = paste('Set of Gamma', m,'Gamma blur densities.'))
 
 # Plot a LIDAR signal and its multichannel smooth blurred version
-signal = makeLIDAR(n)
-matplot(t, signal, type = 'l', main = 'LIDAR test signal')
+signal <- makeLIDAR(n)
+matplot(x, signal, type = 'l', main = 'LIDAR test signal')
 blurredSignal <- blurSignal(signal, blurMat)
-matplot(t, blurredSignal, type = 'l', main = 'Smooth blurred LIDAR test signals')
+matplot(x, blurredSignal, type = 'l', main = 'Smooth blurred LIDAR test signals')
 }
 \seealso{
 \code{\link{dgamma}} for details of the Gamma density

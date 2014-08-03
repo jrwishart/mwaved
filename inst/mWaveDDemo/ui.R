@@ -44,7 +44,7 @@ shinyUI(navbarPage(
                            radioButtons("zoom", "Zoom in Fourier:",
                       list("Yes" = TRUE,"No" = FALSE), selected=TRUE)),
         verbatimTextOutput("summaryResolution"),
-        verbatimTextOutput("mWaveDCalls")),
+        verbatimTextOutput("resolutionCalls")),
       mainPanel(
         plotOutput("resolutionPlot", height = "auto"))), icon = icon("check-square-o")),
   # Third tab panel
@@ -59,7 +59,7 @@ shinyUI(navbarPage(
             list("Using only best channel" = 1,
                   "Using naive mean" = 2,
                   "No alternatives" = 3), selected = 3)),
-        verbatimTextOutput("resolutionCalls")),
+        verbatimTextOutput("mWaveDCalls")),
       mainPanel(
         plotOutput("wvdPlot", height = "auto"))), icon = icon("pencil-square-o")),
   # Fourth tab panel
