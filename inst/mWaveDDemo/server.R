@@ -1,5 +1,4 @@
 library(shiny)
-library(mwaved)
 # Check if ggplot2 is available and use it
 ggplot2Avail <- 'ggplot2' %in% .packages(all.available = TRUE)
 # Graphical settings
@@ -10,6 +9,7 @@ outline.col <- 'blue'
 density.col <- 'dark grey'
 highlight.col <- 'red'
 if (ggplot2Avail){
+  library(ggplot2)
   blanklabs <- labs(x = '', y = '')  
 }
 primenum <- c(83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199)
@@ -170,7 +170,7 @@ shinyServer(function(input, output, session) {
       jss <- js[survived]
       wss <- wc[survived] + jss
       segments(ks, js, ks, ws, lwd = thickness, col = 'red')
-      segments(kss, jss, kss, wss, lwd = thickness + 2, col = 'blue')
+      segments(kss, jss, kss, wss, lwd = thickness, col = 'blue')
       par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
       legend("bottom", c('Raw',paste(mList$mWaveD$shrinkType,' Thresholding',sep='')), xpd = TRUE, horiz = TRUE, 
              inset = -0.1, bty = "n", lty = rep(1,2), col = c('red','blue'), cex = 1)

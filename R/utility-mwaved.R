@@ -424,5 +424,5 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
 #' 
 #' @export
 mWaveDDemo <- function (){
-  runApp(system.file('mWaveDDemo',package='mwaved'))
+  runApp(system.file('mWaveDDemo', package = 'mwaved'))
 }
