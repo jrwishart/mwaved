@@ -11,7 +11,7 @@ The user is encouraged to view the embedded Shiny applet that showcases the mwav
 
 The code is also written with the use of the Rcpp package to help use the external C FFTW library to achieve speeds around 8-15 times faster than the usual WaveD package (comparing the performance of a single channel waved code to the same code in the mwaved package with various sample sizes). The relative performance improves as the sample size increases. 
 
-The package is being developed at http://github.com/justinrwishart/mwaved and any bug reports, comments or suggestions are welcomed at http://github.com/justinrwishart/issues
+The package is being developed at http://github.com/jrwishart/mwaved and any bug reports, comments or suggestions are welcomed at http://github.com/jrwishart/issues
 
 Optional source compilation instructions (currently only tested in Ubuntu and Slackware Linux)
 
