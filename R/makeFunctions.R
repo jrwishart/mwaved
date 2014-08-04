@@ -121,7 +121,7 @@ makeLIDAR <- function(n) {
 
 #' @rdname makeSignals
 #' @examples
-#' signal <- makeLIDAR(n)
+#' signal <- makeBumps(n)
 #' plot(x, signal, main = 'LIDAR test signal', type = 'l')
 #' @export
 makeBumps <- function(n) {
@@ -201,6 +201,7 @@ makeBlocks <- function(n) {
 #' @export
 blurSignal <- function(signal, G) {
   n <- length(signal)
+  G <- as.matrix(G)
   if( dim(G)[1] != n){
     stop("Dimension mismatch: Number of rows in G needs to match length of signal")
   }
