@@ -32,7 +32,7 @@ n <- 1024
 x <- (1:n)/n
 signal <- makeLIDAR(n)
 plot(x, signal, main = 'LIDAR test signal', type = 'l')
-signal <- makeLIDAR(n)
+signal <- makeBumps(n)
 plot(x, signal, main = 'LIDAR test signal', type = 'l')
 signal <- makeDoppler(n)
 plot(x, signal, main = 'Doppler test signal', type = 'l')
