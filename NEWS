@@ -3,24 +3,24 @@ mwaved 1.0.0
 
 * Added `which` argument to plot.mWaveD method to specify certain plots to be output.
 
-mwaved 0.9.0
+mwaved 0.9.0 (development)
 ============
 
 * Added ggplot2 support as a suggested package (also included a suggestion of gridExtra to help facilitate multiple ggplot outputs on same window)
 * Added interactive Shiny applet to showcase the method, can run by calling mWaveDDemo() at R prompt
 
-mwaved 0.2.0
+mwaved 0.2.0 (development)
 ============
 
 * Standardised the mWaveD object to contain wavelet coefficients for the empirical and hard-shrinked coefficients both in the format of `waveletCoef` objects. Standardises the plotting of such coefficients using the `plot.waveletCoef` method.
 * Defensively programmed input arguments to avoid infeasible input being processed (throws warnings or errors)
 
-mwaved 0.1.1
+mwaved 0.1.1 (development)
 ============
 
 * Proof read and updated documentation and added references.
 
-mwaved 0.1
+mwaved 0.1 (development)
 ===========
 
 * new set of functions included with a `multi` prefix that handle Multichannel deconvolution using the WaveD paradigm.
