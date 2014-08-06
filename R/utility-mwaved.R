@@ -105,6 +105,7 @@ plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, shrinkCoef =
   if ( !is.null(shrinkCoef) && class(shrinkCoef) != "waveletCoef" ){
     stop('shrinkCoef must be a waveletCoef object')
   }
+  def.par <- par(no.readonly = TRUE)
   
   J <- floor(log2(length(x$coef)))  
   fine <- ceiling(J) - 1
@@ -163,6 +164,8 @@ plot.waveletCoef <- function(x, ..., lowest = NULL, highest = NULL, shrinkCoef =
   if( !is.null(shrinkCoef)){
     segments(kss, jss, kss, wss, lwd = thickness + 2, col = 'blue')
   }
+  # return to default layout
+  par(def.par)
 }
 
 #' @name plot.mWaveD

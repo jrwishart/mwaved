@@ -1215,15 +1215,7 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
       final_out[i] += real_out[i];
     }
   }
-  
-  fftw_free(in);
-  fftw_free(out);
-  fftw_free(real_in);
-  fftw_free(real_out);
-  
-  fftw_destroy_plan(real_p);
-  fftw_destroy_plan(back_p);
-
+    
   return final_out;
 }
 
@@ -1332,8 +1324,10 @@ NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector a
       x            = 1.0/nj * xi * xi;
       thr[j - j0] += x * thrMat[i] + x * thrMat[n - i];
     }
-    thr[j - j0] = sqrt(log(n) * eta * thr[j - j0]);
+    thr[j - j0] *= log(n) * eta;
   }
+
+  std::transform(thr.begin(), thr.end(), thr.begin(), ::sqrt);
   
   // Linear extrapolate the finest level if required
   if(j1 == J - 1){
@@ -1401,19 +1395,21 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
     for(i = w1; i < w2; ++i){
       xi           = (double)i/nj;
       x            = 3 * xi - 1;
-      xi           = sin(M_PI_2 * MeyerPol(x, deg));
+      xi           = sin(M_PI_2 * MeyerPol(x,deg));
       x            = 1.0/nj * xi * xi;
       thr[j - j0] += x * thrMat[i] + x * thrMat[n - i];
     }
     for(i = w2; i < w3; ++i){
       xi           = (double)i/nj;
       x            = 3 * xi/2 - 1;
-      xi           = cos(M_PI_2 * MeyerPol(x, deg));
+      xi           = cos(M_PI_2 * MeyerPol(x,deg));
       x            = 1.0/nj * xi * xi;
       thr[j - j0] += x * thrMat[i] + x * thrMat[n - i];
     }
-    thr[j - j0] = sqrt(log(n) * eta * thr[j - j0]);
+    thr[j - j0] *= log(n) * eta;
   }
+
+  std::transform(thr.begin(), thr.end(), thr.begin(), ::sqrt);
   
   // Linear extrapolate the finest level if required
   if(j1 == J - 1){
@@ -1964,16 +1960,16 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   }
  
   // Check j1 values are feasible
-  if (j1 >= J) {
+  if( j1 >= J){
     Rf_warning("j1 too large, set to maximum feasible  j1 = log2(n) - 1");
     j1 = J - 1;
   }
-  if (j1 < j0 ) {
+  if( j1 < j0 ){
     Rf_warning("j1 too small (must be larger than j0), j1 set equal to j0");
     j1 = j0;
   }
   // Check if final J-1 level needed then add it.
-  if (j1 == J - 1) {
+  if(j1 == J - 1){
     jmax = j1;
     j    = J - 1;
     
@@ -2291,15 +2287,15 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   sigma = est_sigma(noise);
   // Compute feasible levels
   
-  if (blur == "direct") {
+  if( blur == "direct" ){
     channel       = DirectChanInfo(m, n, sigma, alpha);
     channel["j0"] = j0;
   } else {
-    if (blur == "smooth") {
+    if( blur == "smooth" ){
       channel       = SmoothChanInfo(m, n,  g_multi_out, sigma, alpha);
       channel["j0"] = j0;
     } else {
-      if (blur == "box.car") {
+      if( blur == "box.car" ){
         channel = BoxCarChanInfo(m, n, g_multi_out, sigma, alpha, j0, deg);
       } else {
         Rf_warning("Blur input type not recognised, assumed regular smooth blur.");
@@ -2309,16 +2305,15 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     }
   }
   
-  // Check j1 value is feasible
-  if (j1 == NA_INTEGER) {
+  // Check j1 values are feasible
+  if( j1 == NA_INTEGER )
     j1 = channel["j1"];
-  }
   
-  if (j1 >= J) {
+  if( j1 >= J){
     Rf_warning("j1 too large, set to maximum feasible  j1 = log2(n) - 1");
     j1 = J - 1;
   }
-  if ( j1 < j0) {
+  if( j1 < j0 ){
     Rf_warning("j1 too small (must be at least j0), j1 set equal to j0");
     j1 = j0;
   }

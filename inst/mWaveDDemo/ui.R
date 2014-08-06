@@ -1,7 +1,7 @@
 library(shiny)
 shrinkLabel <- "Shrinkage Type:"
 shrinkChoices <- list("Hard" = "Hard", "Soft" = "Soft", "Garrote" = "Garrote")
-# Define UI
+# Define UI for miles per gallon application
 shinyUI(navbarPage(
   # Application title
   "mWaveD Interactive Demo",

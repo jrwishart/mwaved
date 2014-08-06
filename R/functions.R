@@ -38,17 +38,17 @@ directBlur <- function(G.dim){
 # Function to check resolution levels are sane
 feasibleResolutions <- function(n, j0, j1){
   J <- log2(n) - 1
-  if ( j0 < 1 ){
+  if (j0 < 1) {
     warning("j0 must be a positive integer, setting to default j0 = 3.")
     j0 <- 3
   }
   
-  if ( !is.na(j1) ){
-    if( j1 > J ){
+  if (!is.na(j1)) {
+    if (j1 > J ) {
       warning(paste('Specified j1 = ', j1, ' is too large. j1 set to ', J, sep = ""))
       j1 <- J
     } else {
-      if( j1 < j0){
+      if (j1 < j0) {
         warning(paste('j1 cannot be smaller than j0 = ', j0,'. j1 set to ', j0, sep = ""))
         j1 <- j0
       }
@@ -61,11 +61,11 @@ feasibleResolutions <- function(n, j0, j1){
 # Check the dimensions of alpha are sane
 feasibleAlpha <- function(m, alpha){
   ma <- length(alpha)
-  if (m != ma){
-    if ( ma == 1){
+  if (m != ma) {
+    if ( ma == 1) {
       alpha <- rep(alpha, m)
     } else {
-      if ( m > ma ){
+      if ( m > ma ) {
         warning("Dimension mismatch: Length of alpha too short (not the same as the number of columns of Y). Last element of alpha repeated for the remaining channels.")
         alpha <- c(alpha, rep(rev(alpha)[1], m - ma))  
       } else {
@@ -79,30 +79,30 @@ feasibleAlpha <- function(m, alpha){
 
 # Check signal length is long enough to avoid computation errors in C code
 feasibleLength <- function(n){
-  if (n < 16){
+  if (n < 16) {
     stop("Signal length too small. Need at least 16 observations.")
   }
   J <- log2(n)
-  if( (J %% 1) > 0){
+  if ((J %% 1) > 0) {
     warning("Input signal has length, n, which is not a power of 2.")
   }
 }
 
 # Check blur identification string 
 feasibleBlur <- function(blur){
-    if(blur != 'direct'){
-      if(blur != 'smooth'){
-        if(blur != 'box.car'){
-          stop("unrecognised blur input. Please choose 'direct', 'smooth' or 'box.car'.")
-        }
+  if (blur != 'direct') {
+    if (blur != 'smooth') {
+      if (blur != 'box.car') {
+        stop("unrecognised blur input. Please choose 'direct', 'smooth' or 'box.car'.")
       }
     }
+  }
 }
 
 feasibleShrinkage <- function(shrinkType){
-  if(shrinkType != 'hard'){
-    if(shrinkType != 'soft'){
-      if(shrinkType != 'garrote'){
+  if (shrinkType != 'hard') {
+    if (shrinkType != 'soft') {
+      if (shrinkType != 'garrote') {
         stop("unrecognised shrinkType input. Please choose 'soft', 'hard' or 'garrote'.")
       }
     }
@@ -227,7 +227,7 @@ multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(
   Y <- as.matrix(Y)
   G <- as.matrix(G)
   dimY <- dim(Y)
-  if ( any(dimY != dim(G)) ){
+  if (any(dimY != dim(G))) {
     stop('Dimensions of Y and G do not match')
   }
   feasibleLength(dimY[1])
@@ -283,12 +283,12 @@ multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(
 #' @export
 multiCoef <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
                       blur = "direct", j0 = 3L, j1 = NA_integer_, thresh = multiThresh(as.matrix(Y),
-                      G = G, alpha = alpha, blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), 
+                                                                                       G = G, alpha = alpha, blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), 
                       eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
   G <- as.matrix(G)
   dimY <- dim(Y)
-  if ( any(dimY != dim(G)) ){
+  if (any(dimY != dim(G))) {
     stop('Dimensions of Y and G do not match')
   }
   feasibleLength(dimY[1])
@@ -362,12 +362,12 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
   # convert to lower case to avoid trivial issues
   shrinkType <- tolower(shrinkType)
   feasibleShrinkage(shrinkType)
-  if ( any(thresh < 0) ){
+  if (any(thresh < 0)) {
     stop("Input thresholds must all be non-negative.")
   }
   
-  if ( nthr == 1 ){
-    if( thresh == 0 ){
+  if (nthr == 1 ) {
+    if (thresh == 0) {
       thresh <- rep(0, req)  
     } else {
       warning("thresh input vector only has one element. Universal threshold applied on all resolutions.")
@@ -376,11 +376,11 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
     
   }
   
-  if ( nthr < req ){
+  if (nthr < req ){
     warning("Thresh input length too small, last element repeated in higher resolutions.")
     thresh <- c(thresh, rep(thresh[nthr], req - nthr))
   }
-
+  
   return(.Call('mwaved_waveletThresh', beta, thresh, shrinkType))
 }
 
@@ -427,7 +427,7 @@ multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(a
   Y <- as.matrix(Y)
   G <- as.matrix(G)
   dimY <- dim(Y)
-  if ( any(dimY != dim(G)) ){
+  if (any(dimY != dim(G))) {
     stop('Dimensions of Y and G do not match')
   }
   feasibleLength(dimY[1])
@@ -486,11 +486,11 @@ multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(a
 multiEstimate <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
                           blur = "direct", sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, 
                           eta = NA_real_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha,
-                          blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L) , shrinkType = "hard", deg = 3L) {
+                                                               blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L) , shrinkType = "hard", deg = 3L) {
   Y <- as.matrix(Y)
   G <- as.matrix(G)
   dimY <- dim(Y)
-  if ( any(dimY != dim(G)) ){
+  if (any(dimY != dim(G))) {
     stop('Dimensions of Y and G do not match')
   }
   feasibleLength(dimY[1])
