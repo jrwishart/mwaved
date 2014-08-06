@@ -1,3 +1,10 @@
+mwaved 1.0.1
+============
+
+* Fixed memory leak in multiProj
+* Fixed code to ensure windows binary computes j1 correctly
+* Changed C code to allow compilation on OSX Snow Leopard (avoid overloaded int in pow statements)
+
 mwaved 1.0.0
 ============
 
