@@ -22,16 +22,18 @@ BEGIN_RCPP
 END_RCPP
 }
 // waveletThresh
-List waveletThresh(List betaList, NumericVector thr, String shrinkType = "hard");
-RcppExport SEXP mwaved_waveletThresh(SEXP betaListSEXP, SEXP thrSEXP, SEXP shrinkTypeSEXP) {
+List waveletThresh(NumericVector beta, NumericVector thr, String shrinkType = "hard", int j0 = 3, int deg = 3);
+RcppExport SEXP mwaved_waveletThresh(SEXP betaSEXP, SEXP thrSEXP, SEXP shrinkTypeSEXP, SEXP j0SEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        Rcpp::traits::input_parameter< List >::type betaList(betaListSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type beta(betaSEXP );
         Rcpp::traits::input_parameter< NumericVector >::type thr(thrSEXP );
         Rcpp::traits::input_parameter< String >::type shrinkType(shrinkTypeSEXP );
-        List __result = waveletThresh(betaList, thr, shrinkType);
+        Rcpp::traits::input_parameter< int >::type j0(j0SEXP );
+        Rcpp::traits::input_parameter< int >::type deg(degSEXP );
+        List __result = waveletThresh(beta, thr, shrinkType, j0, deg);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -104,8 +106,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // multiCoef
-List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String blur = "direct", int j0 = 3, int j1 = NA_INTEGER, NumericVector thresh = NumericVector::create(), double eta = NA_REAL, int deg = 3);
-RcppExport SEXP mwaved_multiCoef(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP blurSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP threshSEXP, SEXP etaSEXP, SEXP degSEXP) {
+List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, NumericVector thresh = NumericVector::create(), int deg = 3);
+RcppExport SEXP mwaved_multiCoef(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP threshSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -113,13 +115,11 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< NumericMatrix >::type signal(signalSEXP );
         Rcpp::traits::input_parameter< NumericMatrix >::type G(GSEXP );
         Rcpp::traits::input_parameter< NumericVector >::type alpha(alphaSEXP );
-        Rcpp::traits::input_parameter< String >::type blur(blurSEXP );
         Rcpp::traits::input_parameter< int >::type j0(j0SEXP );
         Rcpp::traits::input_parameter< int >::type j1(j1SEXP );
         Rcpp::traits::input_parameter< NumericVector >::type thresh(threshSEXP );
-        Rcpp::traits::input_parameter< double >::type eta(etaSEXP );
         Rcpp::traits::input_parameter< int >::type deg(degSEXP );
-        List __result = multiCoef(signal, G, alpha, blur, j0, j1, thresh, eta, deg);
+        List __result = multiCoef(signal, G, alpha, j0, j1, thresh, deg);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
