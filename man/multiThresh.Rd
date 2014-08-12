@@ -21,7 +21,7 @@ multiThresh(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
 
 \item{j1}{The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.}
 
-\item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
+\item{eta}{The smoothing parameter. The default level is \eqn{2\sqrt(\alpha^*)} where \eqn{\alpha^*} is an optimal level depending on the type of blur. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
 \item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
 
@@ -41,7 +41,6 @@ library(mwaved)
 # Simulate the multichannel doppler signal.
 m <- 3
 n <- 2^10
-t <- (1:n)/n
 signal <- makeDoppler(n)
 # Noise levels per channel
 e <- rnorm(m*n)

@@ -26,12 +26,12 @@ multiCoef(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
 
 \item{j1}{The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.}
 
-\item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
+\item{eta}{The smoothing parameter. The default level is \eqn{2\sqrt(\alpha^*)} where \eqn{\alpha^*} is an optimal level depending on the type of blur. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
 \item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
 \description{
-Estimates the wavelet coefficiets for the underlying signal of interest embedded in the noisy multichannel deconvolution model.
+Estimates the wavelet coefficients for the underlying signal of interest embedded in the noisy multichannel deconvolution model.
 }
 \details{
 Returns an object of type \emph{waveletCoef} which is a list including the following three objects \itemize{
@@ -45,7 +45,6 @@ library(mwaved)
 # Simulate the multichannel doppler signal.
 m <- 3
 n <- 2^10
-t <- (1:n)/n
 signal <- makeDoppler(n)
 # Noise levels per channel
 e <- rnorm(m*n)
@@ -58,14 +57,18 @@ X <- blurSignal(signal, G)
 # Create error with custom signal to noise ratio
 SNR <- c(10,15,20)
 sigma <- sigmaSNR(X, SNR)
-alpha <- c(0.75, 0.8, 1)
+if (require(fracdiff)) {
+  alpha <- c(0.75, 0.8, 1)
+} else {
+  alpha <- rep(1, m)
+}
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
 plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 matlines(Y)
 # Estimate the wavelet coefficients
-estimatedCoefs <- multiCoef(Y, G, alpha = rep(1,m), blur = 'smooth')
+estimatedCoefs <- multiCoef(Y, G, alpha = alpha, blur = 'smooth')
 plot(estimatedCoefs)
 # Compute true wavelet coefficients
 trueCoefs <- multiCoef(signal)

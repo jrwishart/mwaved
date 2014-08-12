@@ -26,14 +26,19 @@ The coefficients \code{beta} need to be ordered so that the first \eqn{2^\code{j
 library(mwaved)
 # Make a noiseless doppler function
 n <- 2^8
-t <- (1:n)/n
+x <- (1:n)/n
 y <- makeDoppler(n)
 # Determine the wavelet coefficients
 beta <- multiCoef(y)
 # plot three raw wavelet expansions truncating in each case at j1 = 3, 4 and 5 respectively
-plot(t, y, type = 'l', main = 'Doppler and wavelet projections at three different truncations')
-matlines(t,sapply(3:5, function(i) multiProj(beta,j1 = i)),type = 'l', col = 2:4)
-legend("bottomright", legend = c("Signal", paste('j1 =', 3:5)), col = 1:4, lty = c(1,1:4))
+plot(x, y, type = 'l', main = 'Doppler and wavelet projections at three different truncations')
+j0 <- 3
+j1 <- 5
+j <- j0:j1
+lcols <- c(1, j - j0 + 2)
+ltys <-  c(1, 1:length(j))
+matlines(x, sapply(j, function(i) multiProj(beta, j1 = i)), type = 'l', col = lcols[-1])
+legend("bottomright", legend = c("Signal", paste('j1 =', j)), col = lcols, lty =ltys)
 }
 \seealso{
 \code{\link{multiCoef}}

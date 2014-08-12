@@ -29,7 +29,7 @@ Available choices are the 'hard', 'soft' or 'garrote'.}
 
 \item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
-\item{eta}{The smoothing parameter. The default level is 2*sqrt(alpha_{l_*}) or 2*sqrt(alpha_*) for the smooth and box car case respetively. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
+\item{eta}{The smoothing parameter. The default level is \eqn{2\sqrt(\alpha^*)} where \eqn{\alpha^*} is an optimal level depending on the type of blur. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
 \item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}
 }
@@ -41,25 +41,28 @@ library(mwaved)
 # Simulate the multichannel doppler signal.
 m <- 3
 n <- 2^10
-t <- (1:n)/n
 signal <- makeDoppler(n)
 # Noise levels per channel
-e <- rnorm(m*n)
+e <- rnorm(m * n)
 # Create Gamma blur
 shape <- seq(from = 0.5, to = 1, length = m)
-scale <- rep(0.25,m)
+scale <- rep(0.25, m)
 G <- gammaBlur(n, shape = shape, scale = scale)
 # Convolve the signal
 X <- blurSignal(signal, G)
 # Create error with custom signal to noise ratio
-SNR <- c(10,15,20)
+SNR <- c(10, 15, 20)
 sigma <- sigmaSNR(X, SNR)
-alpha <- c(0.75, 0.8, 1)
+if (require(fracdiff)) {
+  alpha <- c(0.75, 0.8, 1)
+} else {
+  alpha <- rep(1, m)
+}
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
 # Compute mWaveD object
-mWaveDObj <- multiWaveD(Y, G = G, alpha = rep(1, m), blur = 'smooth')
+mWaveDObj <- multiWaveD(Y, G = G, alpha = alpha, blur = 'smooth')
 plot(mWaveDObj)
 summary(mWaveDObj)
 }

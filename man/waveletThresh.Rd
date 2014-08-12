@@ -40,26 +40,30 @@ library(mwaved)
 # Simulate the multichannel doppler signal.
 m <- 3
 n <- 2^10
-t <- (1:n)/n
 signal <- makeDoppler(n)
 # Noise levels per channel
-e <- rnorm(m*n)
+e <- rnorm(m * n)
 # Create Gamma blur
 shape <- seq(from = 0.5, to = 1, length = m)
-scale <- rep(0.25,m)
+scale <- rep(0.25, m)
 G <- gammaBlur(n, shape = shape, scale = scale)
 # Convolve the signal
 X <- blurSignal(signal, G)
 # Create error with custom signal to noise ratio
-SNR <- c(10,15,20)
+SNR <- c(10, 15, 20)
 sigma <- sigmaSNR(X, SNR)
-alpha <- c(0.75, 0.8, 1)
+if (require(fracdiff)){
+  alpha <- c(0.75, 0.8, 1)
+} else {
+  alpha <- rep(1, m)
+}
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
 # Determine thresholds
 thresh <- multiThresh(Y, G, blur = 'smooth')
 beta <- multiCoef(Y, G)
-plot(beta, coefTrim = waveletThresh(beta, thresh))
+betaShrunk <- waveletThresh(beta, thresh)
+plot(beta, betaShrunk)
 }
 

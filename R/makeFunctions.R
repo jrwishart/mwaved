@@ -122,7 +122,7 @@ makeLIDAR <- function(n) {
 #' @rdname makeSignals
 #' @examples
 #' signal <- makeBumps(n)
-#' plot(x, signal, main = 'LIDAR test signal', type = 'l')
+#' plot(x, signal, main = 'Bumps test signal', type = 'l')
 #' @export
 makeBumps <- function(n) {
     x <- 1:n/n
@@ -213,7 +213,7 @@ blurSignal <- function(signal, G) {
 
 #' @title Generate multichannel noise
 #' @description Generate a matrix of multichannel (possibly long memory) noise variables
-#' @param n An integer specifying the number of obsevations per channel.
+#' @param n An integer specifying the number of observations per channel.
 #' @param alpha A vector specifying the dependence level in each channel.  
 #' @param sigma A vector giving the noise levels (standard deviation) for each channel in the multichannel model (see details).
 #' @param ... Additional arguments to pass to the \code{fracdiff} package to tightly control the long memory noise.

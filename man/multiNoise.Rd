@@ -6,7 +6,7 @@
 multiNoise(n, sigma = 1, alpha = length(sigma), ...)
 }
 \arguments{
-\item{n}{An integer specifying the number of obsevations per channel.}
+\item{n}{An integer specifying the number of observations per channel.}
 
 \item{alpha}{A vector specifying the dependence level in each channel.}
 
