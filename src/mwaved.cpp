@@ -49,18 +49,6 @@ double mad_rcpp(NumericVector x, double scale_factor = 1.4826) {
    return median_rcpp(abs(x - median_rcpp(x))) * scale_factor;
 }
 
-NumericVector est_sigma_fftw(double * real_out, int n, int m){
-  int i, j;
-  NumericVector final_out(m);
-  NumericVector tmp(n);
-  for ( j = 0; j < m; ++j ){
-    for ( i = 0; i < n; ++i ){
-      tmp[i] = real_out[i + j * n];
-    }
-    final_out[j] = mad_rcpp(tmp);
-  }
-  return final_out;
-}
 
 NumericVector est_sigma(NumericMatrix noise){
   int j, m;
@@ -119,7 +107,7 @@ NumericVector multiSigma(NumericMatrix signal, int deg = 3){
   n  = signal.nrow();
   m  = signal.ncol();  
   n2 = n/2 + 1;
-  J  = log2(n);
+  J  = log2((double)n);
   
   x_m_real   = (double*)fftw_malloc(sizeof(double) * n * m);
   x_m_out    = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * n2 * m);
@@ -138,10 +126,10 @@ NumericVector multiSigma(NumericMatrix signal, int deg = 3){
   // Compute fine levels for scale estimation
   j  = J - 1;
   nj = 1 << j;
-  w1 = ceil(nj/3);
-  w2 = ceil(2*nj/3);
+  w1 = ceil(nj/3.0);
+  w2 = ceil(2.0*nj/3.0);
   w3 = n2 - pow(2.0, j - 3) - 1;
-  p  = 1.0/pow(n,1.0/2)/pow(2,j/2.0);
+  p  = 1.0/pow((double)n, 1.0/2)/pow(2.0, j/2.0);
   
   memset(x_m_in, 0, sizeof(fftw_complex) * n * m);
   memset(x_m_real, 0, sizeof(double) * n * m);
@@ -183,8 +171,8 @@ NumericVector multiSigma(NumericMatrix signal, int deg = 3){
   
   NumericVector tmp(n);
   
-  for ( j = 0; j < m; ++j ){
-    for ( i = 0; i < n; ++i ){
+  for (j = 0; j < m; ++j) {
+    for (i = 0; i < n; ++i) {
       tmp[i] = x_m_real[i + j * n];
     }
     final_out[j] = mad_rcpp(tmp);
@@ -233,8 +221,8 @@ void mlwavedxfft(fftw_complex * x_fft, int m, int n,
     for (j = 0; j < m; ++j) {
       k = i + j * n2;
       // denominator calculation
-      eps    = pow(n, alpha[j])/pow(sigma[j], 2);
-      powj   = pow(i, 1 - alpha[j]);
+      eps    = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
+      powj   = pow((double)i, 1 - alpha[j]);
       x      = g_multi_out[k][0] * g_multi_out[k][0] + g_multi_out[k][1] * g_multi_out[k][1];
       denom += eps * powj * x;
       // numerator calculation
@@ -255,8 +243,8 @@ void mlwavedxfft(fftw_complex * x_fft, int m, int n,
     for (j = 0; j < m; ++j) {
       k      = n - i + j * n2;
       // denominator calculation
-      eps    = pow(n, alpha[j])/pow(sigma[j], 2);
-      powj   = pow(i, 1 - alpha[j]);
+      eps    = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
+      powj   = pow((double)i, 1 - alpha[j]);
       x      = g_multi_out[k][0] * g_multi_out[k][0] + g_multi_out[k][1] * g_multi_out[k][1];
       denom += eps * powj * x;
       // numerator calculation
@@ -312,7 +300,7 @@ void garroteThreshFFTW(double * in, double * out, int n, double thr){
     int i;
     double x, thr2;
     
-    thr2 = pow(thr, 2);
+    thr2 = thr * thr;
     // Soft-threshold the fft inversion
     for (i = 0; i < n; ++i) {
       x = in[i];
@@ -471,7 +459,7 @@ List GarroteThreshCoef(NumericVector beta, int j0, int j1, NumericVector thr){
     ti += 1;
     per = 0;
     cur = 0;
-    thr2 = pow(thr[ti], 2);
+    thr2 = thr[ti] * thr[ti];
     for (i = 0; i < nj; ++i) {
       x = beta[k];
       ax = fabs(x);
@@ -608,7 +596,7 @@ NumericVector garroteThresh(NumericVector in, NumericVector thr, int j0, int j1)
     
     for (j = j0; j <= j1; ++j) {
       thr1 = thr[l];
-      thr2 = pow(thr1, 2);
+      thr2 = thr1 * thr1;
       for (i = 0; i < n; ++i) {
         x = in[k];
         if (fabs(x) < thr1) {
@@ -626,12 +614,8 @@ NumericVector garroteThresh(NumericVector in, NumericVector thr, int j0, int j1)
 }
 
 //[[Rcpp::export]]
-List waveletThresh(List betaList, NumericVector thr, String shrinkType = "hard"){
+List waveletThresh(NumericVector beta, NumericVector thr, String shrinkType = "hard", int j0 = 3, int deg = 3){
   
-  NumericVector beta = betaList["coef"];
-
-  int j0  = betaList["j0"];
-  int deg = betaList["deg"];
   int n   = beta.size();
   int nt  = thr.size();
   int j1  = j0 + nt - 1;
@@ -658,6 +642,8 @@ List waveletThresh(List betaList, NumericVector thr, String shrinkType = "hard")
     _["deg"]  = deg
     );
   
+  betaThresh.attr("class") = "waveletCoef";
+  
   return betaThresh;
 }
 
@@ -670,24 +656,22 @@ List BoxCarChanInfo(int m, int n, fftw_complex * g_fft, NumericVector sigma, Num
   double eps_cut = 0;
 
   n2     = n/2 + 1;
-  J      = log2(n2);
+  J      = log2((double)n2);
   NumericVector eps(m);
   NumericVector finfo(n2);
   NumericVector blockvar(J - j0);
   NumericVector blockcut(J - j0);
   
-// eps_cut = 1/(2^j.val*sum(log(eps)))
-  
 // Compute multi-channel threshold
   for (j = 0; j < m; ++j) {
-    eps[j]   = pow(n, alpha[j])/pow(sigma[j], 2);
+    eps[j]   = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
     eps_cut += log(eps[j]);
   }
   
   // Compute the normalised Fourier decay levels.
   for (i = 1; i < n2; ++i) {
       for (j = 0; j < m; ++j)
-        finfo[i] += (pow(g_fft[i + j * n2][0], 2) + pow(g_fft[i + j * n2][1], 2)) * eps[j] * pow(i, 1 - alpha[j]);
+        finfo[i] += ((g_fft[i + j * n2][0] * g_fft[i + j * n2][0]) + (g_fft[i + j * n2][1] * g_fft[i + j * n2][1])) * eps[j] * pow((double)i, 1 - alpha[j]);
   }
   
   nj = pow(2.0, j0 - 1);
@@ -746,16 +730,16 @@ List DirectChanInfo(int m, int n, NumericVector sigma, NumericVector alpha){
   IntegerVector freq(m, NA_INTEGER);
   
   n2  = n/2 + 1;
-  int J = log2(n);
+  int J = log2((double)n);
   
   NumericMatrix finfo(n2, m);
   NumericMatrix fcut(n2, m);
-  nsqrt = pow(n, 1.0/2);
+  nsqrt = pow((double)n, 1.0/2);
   
   // Compute channel level thresholds
   for (j = 0; j < m; ++j) {
     tmp          = log(sigma[j]);
-    threshfft[j] = tmp - log(pow(n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
+    threshfft[j] = tmp - log(pow((double)n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
   } 
   // Compute the cutoffs for each channel
   for (j = 0; j < m; ++j) {
@@ -763,7 +747,7 @@ List DirectChanInfo(int m, int n, NumericVector sigma, NumericVector alpha){
     tmp2 = threshfft[j];
     fcut(0, j) = R_NegInf;
     for (i = 1; i < n2; ++i) {
-      fcut(i,j)  = tmp * log(i) + tmp2;
+      fcut(i,j)  = tmp * log((double)i) + tmp2;
     }
     freq[j]  = n2 - 1;
   }
@@ -791,12 +775,12 @@ List SmoothChanInfo(int m, int n, fftw_complex * g_fft, NumericVector sigma, Num
   
   NumericMatrix finfo(n2, m);
   NumericMatrix fcut(n2, m);
-  nsqrt = pow(n, 1.0/2);
+  nsqrt = pow((double)n, 1.0/2);
   
   // Compute channel level thresholds
   for (j = 0; j < m; ++j) {
     tmp          = log(sigma[j]);
-    threshfft[j] = tmp - log(pow(n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
+    threshfft[j] = tmp - log(pow((double)n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
   } 
   // Compute the cutoffs for each channel
   for (j = 0; j < m; ++j) {
@@ -804,24 +788,24 @@ List SmoothChanInfo(int m, int n, fftw_complex * g_fft, NumericVector sigma, Num
     tmp2 = threshfft[j];
     fcut(0,j) = R_NegInf;
     for (i = 1; i < n2; ++i) {
-      finfo(i,j) = log(sqrt(pow(g_fft[i + j * n2][0], 2) + pow(g_fft[i + j * n2][1], 2)));
-      fcut(i,j)  = tmp * log(i) + tmp2;
+      finfo(i,j) = log(sqrt((g_fft[i + j * n2][0] * g_fft[i + j * n2][0]) + (g_fft[i + j * n2][1] * g_fft[i + j * n2][1])));
+      fcut(i,j)  = tmp * log((double)i) + tmp2;
     }
   }
   
   for (j = 0; j < m; ++j) {
     for (i = 1; i < n2; ++i) {
-      tmp = finfo(i, j) - 0.5 * alpha[j] * log(i);
+      tmp = finfo(i, j) - 0.5 * alpha[j] * log((double)i);
       if (tmp < threshfft[j]) {
         freq[j]  = i + 1;
-        level[j] = floor(log2(i + 1)) - 1;
+        level[j] = floor(log2((double)i + 1.0)) - 1;
         break;
       }
     }
     // Threshold never met (direct convolution case)
     if (freq[j] == NA_INTEGER) {
       freq[j]  = n2 - 1;
-      level[j] = log2(freq[j]);
+      level[j] = log2((double)freq[j]);
     }
   }
   // Find the best channel from fourier info
@@ -855,29 +839,29 @@ int FindBestChannel(int m, int n, fftw_complex * g_fft, NumericVector sigma, Num
   NumericVector level(m);
   NumericVector freq(m, -1.0);
   n2    = n/2 + 1;
-  nsqrt = pow(n, 1.0/2);
+  nsqrt = pow((double)n, 1.0/2);
   
   
   // Compute channel level thresholds
   for (j = 0; j < m; ++j) {
     tmp   = log(sigma[j]);
-    threshfft[j] = tmp - log(pow(n,alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
+    threshfft[j] = tmp - log(pow((double)n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
   }
   // Compute the normalised Fourier decay levels.
   for (j = 0; j < m; ++j) {
     // Skip first level since Inf always > threshfft 
     for (i = 1; i < n2; ++i) {
-      tmp  = log(sqrt(pow(g_fft[i + j * n2][0], 2) + pow(g_fft[i + j * n2][1], 2))) - 0.5 * alpha[j] * log(i);
+      tmp  = log(sqrt((g_fft[i + j * n2][0] * g_fft[i + j * n2][0]) + (g_fft[i + j * n2][1] * g_fft[i + j * n2][1]))) - 0.5 * alpha[j] * log((double)i);
       if (tmp < threshfft[j]) {
         freq[j]  = i + 1;
-        level[j] = floor(log2(i + 1)) - 1;
+        level[j] = floor(log2((double)i + 1)) - 1;
         break;
       }
     }
     // Threshold never met (direct convolution case)
-    if (freq[j] -1.0) {
+    if (freq[j] == -1.0) {
       freq[j]  = n2 - 1;
-      level[j] = log2(freq[j]);
+      level[j] = log2((double)freq[j]);
     }
     
   }
@@ -932,27 +916,27 @@ int HighestScale(int m, int n, fftw_complex * g_fft, NumericVector sigma,
     NumericVector threshfft(m);
     NumericVector level(m);
     IntegerVector freq(m, NA_INTEGER);
-    nsqrt = pow(n, 1.0/2); 
+    nsqrt = pow((double)n, 1.0/2); 
     // Compute channel level thresholds
     for (j = 0; j < m; ++j) {
       tmp   = log(sigma[j]);
-      threshfft[j] = tmp - log(pow(n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
+      threshfft[j] = tmp - log(pow((double)n, alpha[j]/2.0)) + 0.5 * log(fabs(log(nsqrt) - tmp));
     }
     // Compute the normalised Fourier decay levels.
     for (j = 0; j < m; ++j) {
       // Skip first level since Inf always > threshfft
       for (i = 1; i < n2; ++i) {
-        tmp  = log(sqrt(pow(g_fft[i + j * n2][0], 2) + pow(g_fft[i + j * n2][1], 2))) - 0.5 * alpha[j] * log(i);
+        tmp  = log(sqrt((g_fft[i + j * n2][0] * g_fft[i + j * n2][0]) + (g_fft[i + j * n2][1] * g_fft[i + j * n2][1]))) - 0.5 * alpha[j] * log((double)i);
         if (tmp < threshfft[j]) {
           freq[j]  = i + 1;
-          level[j] = floor(log2(i + 1)) - 1;
+          level[j] = floor(log2((double)i + 1)) - 1;
           break;
         }
       }
       // Threshold never met (direct convolution case)
       if (freq[j] == NA_INTEGER) {
         freq[j]  = n2 - 1;
-        level[j] = log2(freq[j]);
+        level[j] = log2((double)freq[j]);
       }
       
     }
@@ -965,7 +949,7 @@ int HighestScale(int m, int n, fftw_complex * g_fft, NumericVector sigma,
     }
     j1 = level[best - 1];
   } else {
-    int J = log2(n2);
+    int J = log2((double)n2);
     NumericVector eps(m);
     NumericVector finfo(n2);
     double x, xi;
@@ -975,17 +959,17 @@ int HighestScale(int m, int n, fftw_complex * g_fft, NumericVector sigma,
     nj = pow(2.0, j0 - 1);
     
     for (j = 0; j < m; ++j) {
-      eps[j]   = pow(n, alpha[j])/pow(sigma[j], 2);
+      eps[j]   = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
       eps_cut += log(eps[j]);
     }
     
     // Compute the normalised Fourier decay levels.
     for (i = 1; i < n2; ++i) {
         for (j = 0; j < m; ++j)
-          finfo[i] += (pow(g_fft[i + j * n2][0], 2) + pow(g_fft[i + j * n2][1], 2)) * eps[j] * pow(i, 1 - alpha[j]);
+          finfo[i] += ((g_fft[i + j * n2][0] * g_fft[i + j * n2][0]) + (g_fft[i + j * n2][1] * g_fft[i + j * n2][1])) * eps[j] * pow((double)i, 1 - alpha[j]);
     }
     
-    nj = pow(2, j0 - 1); 
+    nj = 1 << (j0 - 1); 
     for (j = j0; j < J; ++j) {
       nj *= 2;
       w1  = ceil(nj/3.0);
@@ -1023,13 +1007,13 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
 
   n  = beta.size();
   n2 = n/2 + 1;
-  J  = log2(n);
+  J  = log2((double)n);
   
   if (j1 == NA_INTEGER)
     j1 = J - 1;
   
   jmax = j1;
-  
+
    // FFTW specific definitions
   double *real_in, *real_out;
   fftw_complex *in, *out;
@@ -1050,7 +1034,7 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
   
   nj = 1 << j0;
   ks = floor((double)n/nj);
-  cx = 1.0/sqrt(nj);
+  cx = 1.0/sqrt((double)nj);
   w1 = ceil((double)nj/3);
   w2 = 2 * w1 + j0 % 2 - 1;
   k  = - ks;
@@ -1058,7 +1042,7 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
     k         += ks;
     real_in[k] = beta[i];
   }
-  
+
   fftw_execute(real_p);
   
   memset(in, 0, sizeof (fftw_complex) * n);
@@ -1068,8 +1052,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
   for (i = 1; i < w1; i++) {
     in[i][0]     = cx * out[i][0];
     in[i][1]     = cx * out[i][1];
-    in[n - i][0] = cx * out[n - i][0];
-    in[n - i][1] = - cx * out[n - i][1];
+    in[n - i][0] = cx * out[n2 - i][0];
+    in[n - i][1] = - cx * out[n2 - i][1];
   }
 
   for (i = w1; i < w2; i++) {
@@ -1078,8 +1062,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
     xi           = cx * cos(M_PI_2 * MeyerPol(x, deg));
     in[i][0]     = xi * out[i][0];
     in[i][1]     = xi * out[i][1];
-    in[n - i][0] = xi * out[n - i][0];
-    in[n - i][1] = - xi * out[n - i][1];
+    in[n - i][0] = xi * out[n2 - i][0];
+    in[n - i][1] = - xi * out[n2 - i][1];
   }
 
   memset(real_out, 0, sizeof (double) * n);
@@ -1098,7 +1082,7 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
   
     nj = 1 << j1;
     ks = floor((double)n/nj);
-    p  = 1.0/sqrt(nj);
+    p  = 1.0/sqrt((double)nj);
     w1 = ceil((double)nj/3);
     w2 = 2 * w1 + j0 % 2 - 1;
     w3 = n2 - pow(2.0, j1 - 3) - 1;
@@ -1122,8 +1106,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
       sx           = sin(- M_PI * xi) * x;
       in[i][0]     = cx * out[i][0] - sx * out[i][1];
       in[i][1]     = sx * out[i][0] + cx * out[i][1];
-      in[n - i][0] = cx * out[n - i][0] + sx * out[n - i][1];
-      in[n - i][1] = - sx * out[n - i][0] + cx * out[n - i][1];
+      in[n - i][0] = cx * out[n2 - i][0] + sx * out[n2 - i][1];
+      in[n - i][1] = - sx * out[n2 - i][0] + cx * out[n2 - i][1];
     }
     
     for (i = w2; i < w3; ++i) {
@@ -1134,16 +1118,16 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
       sx             = sin(- M_PI * xi) * x;
       in[i][0]       = cx * out[i][0] - sx * out[i][1];
       in[i][1]       = sx * out[i][0] + cx * out[i][1];
-      in[n - i][0]   = cx * out[n - i][0] + sx * out[n - i][1];
-      in[n - i][1]   = - sx * out[n - i][0] + cx * out[n - i][1];
+      in[n - i][0]   = cx * out[n2 - i][0] + sx * out[n2 - i][1];
+      in[n - i][1]   = - sx * out[n2 - i][0] + cx * out[n2 - i][1];
     }
     
     n2 -= 1;
     for (i = w3; i < n2; ++i) {
       in[i][0]       = - p * out[i][0];
       in[i][1]       = - p * out[i][1];
-      in[n - i][0]   = - p * out[n - i][0];
-      in[n - i][1]   = - p * out[n - i][1];
+      in[n - i][0]   = - p * out[n2 - i][0];
+      in[n - i][1]   = - p * out[n2 - i][1];
     }
     in[n2][0]   = - p * out[n2][0];
     in[n2][1]   = - p * out[n2][1];
@@ -1167,7 +1151,7 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
   for (j = j0; j < jmax; ++j) {
     nj = 1 << j;
     ks = floor((double)n/nj);
-    p  = 1.0/sqrt(nj);
+    p  = 1.0/sqrt((double)nj);
     w1 = ceil((double)nj/3);
     w2 = 2 * w1 + j0 % 2 - 1;
     w3 = w1 + nj;
@@ -1191,8 +1175,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
       sx           = sin(- M_PI * xi) * x;
       in[i][0]     = cx * out[i][0] - sx * out[i][1];
       in[i][1]     = sx * out[i][0] + cx * out[i][1];
-      in[n - i][0] = cx * out[n - i][0] + sx * out[n - i][1];
-      in[n - i][1] = - sx * out[n - i][0] + cx * out[n - i][1];
+      in[n - i][0] = cx * out[n2 - i][0] + sx * out[n2 - i][1];
+      in[n - i][1] = - sx * out[n2 - i][0] + cx * out[n2 - i][1];
     }
     
     for (i = w2; i < w3; ++i) {
@@ -1203,8 +1187,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
       sx             = sin(- M_PI * xi) * x;
       in[i][0]       = cx * out[i][0] - sx * out[i][1];
       in[i][1]       = sx * out[i][0] + cx * out[i][1];
-      in[n - i][0]   = cx * out[n - i][0] + sx * out[n - i][1];
-      in[n - i][1]   = - sx * out[n - i][0] + cx * out[n - i][1];
+      in[n - i][0]   = cx * out[n2 - i][0] + sx * out[n2 - i][1];
+      in[n - i][1]   = - sx * out[n2 - i][0] + cx * out[n2 - i][1];
     }
     
     memset(real_out, 0, sizeof (double) * n);
@@ -1245,7 +1229,7 @@ NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector a
   
   // Set default alpha to be 1 uniformly ("No dependence")
   if (alpha.size() == 0)
-    alpha = rep(1.0,m);
+    alpha = rep(1.0, m);
 
   // Check if inputs agree
   if (!( m == alpha.size() && m == G.ncol() && n == G.nrow() ))
@@ -1265,7 +1249,7 @@ NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector a
   
   NumericVector sigma = multiSigma(signal, deg);
   
-  J = log2(n);
+  J = log2((double)n);
   
   // if j1 not specified, compute all possible levels
   if (j1 == NA_INTEGER)
@@ -1286,18 +1270,18 @@ NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector a
   for (i = w1; i < n2; ++i) {
     tmpd = 0;
     for (j = 0; j < m; ++j) {
-       x     = pow(i, 1 - alpha[j]);
-       xi    = pow(n, alpha[j])/pow(sigma[j], 2);
-       tmpd += x * (pow( g_multi_out[i + j * n2][0], 2.0) + pow( g_multi_out[i + j * n2][1], 2.0)) * xi;
+       x     = pow((double)i, 1 - alpha[j]);
+       xi    = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
+       tmpd += x * ((g_multi_out[i + j * n2][0] * g_multi_out[i + j * n2][0]) + (g_multi_out[i + j * n2][1] * g_multi_out[i + j * n2][1])) * xi;
     }
     thrMat[i] = 1.0/tmpd;
   }
   for (i = n2; i < w3; ++i) {
     tmpd = 0;
     for (j = 0; j < m; ++j) {
-       x     = pow(i, 1 - alpha[j]);
-       xi    = pow(n, alpha[j])/pow(sigma[j], 2);
-       tmpd += x * (pow(g_multi_out[n - i + j * n2][0], 2.0) + pow(g_multi_out[n - i + j * n2][1], 2.0)) * xi;
+       x     = pow((double)i, 1 - alpha[j]);
+       xi    = pow((double)n, alpha[j])/pow((double)sigma[j], 2);
+       tmpd += x * ((g_multi_out[n - i + j * n2][0] * g_multi_out[n - i + j * n2][0]) + (g_multi_out[n - i + j * n2][1] * g_multi_out[n - i + j * n2][1])) * xi;
     }    
     thrMat[i] = 1.0/tmpd;
   }
@@ -1332,16 +1316,19 @@ NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector a
       x            = 1.0/nj * xi * xi;
       thr[j - j0] += x * thrMat[i] + x * thrMat[n - i];
     }
-    thr[j - j0] = sqrt(log(n) * eta * thr[j - j0]);
+    thr[j - j0] = sqrt(log((double)n) * eta * thr[j - j0]);
   }
 
-//  std::transform(thr.begin(), thr.end(), thr.begin(), ::sqrt);
-  
   // Linear extrapolate the finest level if required
   if (j1 == J - 1) {
     tmpd         = thr[jmax - j0] - thr[jmax - j0 - 1];
     thr[j1 - j0] = thr[jmax - j0] + tmpd;
   }
+  
+  fftw_free(g_m_real_in);
+  fftw_free(g_multi_out);
+  
+  fftw_destroy_plan(g_m_real_p);
   
   return thr;
 }
@@ -1354,7 +1341,7 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
   int i, m, n2, j, J, nj, jmax, w1, w2, w3;
   double tmpd, x, xi;
   
-  J = log2(n);
+  J = log2((double)n);
   n2 = n/2 + 1;
   m  = sigma.size();
   // Power factors n^alpha/sigma^2
@@ -1368,18 +1355,18 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
   for (i = w1; i < n2; ++i) {
     tmpd = 0;
     for (j = 0; j < m; ++j) {
-       x     = pow(i, 1 - alpha[j]);
-       xi    = pow(n, alpha[j])/pow(sigma[j], 2);
-       tmpd += x * (pow( g_fft[i + j * n2][0], 2.0) + pow( g_fft[i + j * n2][1], 2.0)) * xi;
+       x     = pow((double)i, 1 - alpha[j]);
+       xi    = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
+       tmpd += x * ((g_fft[i + j * n2][0] * g_fft[i + j * n2][0]) + (g_fft[i + j * n2][1] * g_fft[i + j * n2][1])) * xi;
     }
     thrMat[i] = 1.0/tmpd;
   }
   for (i = n2; i < w3; ++i) {
     tmpd = 0;
     for (j = 0; j < m; ++j) {
-       x     = pow(i, 1 - alpha[j]);
-       xi    = pow(n, alpha[j])/pow(sigma[j], 2);
-       tmpd += x * (pow(g_fft[n - i + j * n2][0], 2.0) + pow(g_fft[n - i + j * n2][1], 2.0)) * xi;
+       x     = pow((double)i, 1 - alpha[j]);
+       xi    = pow((double)n, alpha[j])/(sigma[j] * sigma[j]);
+       tmpd += x * ((g_fft[n - i + j * n2][0] * g_fft[n - i + j * n2][0]) + (g_fft[n - i + j * n2][1] * g_fft[n - i + j * n2][1])) * xi;
     }    
     thrMat[i] = 1.0/tmpd;
   }
@@ -1414,7 +1401,7 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
       x            = 1.0/nj * xi * xi;
       thr[j - j0] += x * thrMat[i] + x * thrMat[n - i];
     }
-    thr[j - j0] = sqrt(log(n) * eta * thr[j - j0]);
+    thr[j - j0] = sqrt(log((double)n) * eta * thr[j - j0]);
   }
 
 //  std::transform(thr.begin(), thr.end(), thr.begin(), ::sqrt);
@@ -1426,24 +1413,6 @@ NumericVector MaxiThreshFFTW(int n, NumericVector sigma, fftw_complex * g_fft, N
   }
   
   return thr;
-}
-
-// Helper function for scale estimation using multi FFTW
-NumericMatrix execute_multi_back_fft(fftw_plan back_p, double * real_out, int n, int m, int deg = 3){
-  
-  int i, j;
-  
-  fftw_execute(back_p);
-  
-  NumericMatrix final_out(n,m);
-  
-  for ( j = 0; j < m; ++j ){
-    for ( i = 0; i < n; ++i ){
-      final_out(i,j) = real_out[i+j*n]/n;
-    }
-  }
-  
-  return final_out;
 }
 
 // [[Rcpp::export]]
@@ -1459,7 +1428,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   n  = signal.nrow();
   m  = signal.ncol();
   n2 = n/2 + 1;
-  J  = log2(n);
+  J  = log2((double)n);
   
   if (alpha.size() == 0)
     alpha = rep(1.0,m);
@@ -1526,10 +1495,10 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   // Compute fine levels for scale estimation
   j  = J - 1;
   nj = 1 << j;
-  w1 = ceil(nj/3);
-  w2 = ceil(2*nj/3);
+  w1 = ceil(nj/3.);
+  w2 = ceil(2.*nj/3.);
   w3 = n2 - pow(2.0, j - 3) - 1;
-  p  = 1.0/pow(n, 1.0/2)/pow(2, j/2.0);
+  p  = 1.0/pow((double)n, 1.0/2)/pow(2.0, j/2.0);
   
   // Input convolution matrix to compute FFT, also 
   for ( j = 0; j < m; ++j) {
@@ -1579,7 +1548,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   w1 = ceil((double)nj/3);
   w2 = 2 * w1 + j % 2 - 1;
   p  = pow(2.0, 1 - j0) * M_PI;
-  cx = x/pow(2, j/2.0);
+  cx = x/pow(2.0, j/2.0);
   
   in[0][0] = x * x_fft[0][0];
   
@@ -1593,7 +1562,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   for (i = w1; i < w2; i++) {
     xi           = (double)i/nj;
     x            = 3 * xi - 1;
-    xi           = pow(cos(M_PI_2 * MeyerPol(x, deg)), 2)/n;
+    xi           = pow(cos(M_PI_2 * MeyerPol(x, deg)), 2.0)/n;
     in[i][0]     = xi * x_fft[i][0];
     in[i][1]     = xi * x_fft[i][1];
     in[n - i][0] = xi * x_fft[n - i][0];
@@ -1618,7 +1587,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
     w1 = ceil((double)nj/3.0);
     w2 = 2 * w1 + j % 2 - 1;
     w3 = n2 - pow(2.0, j - 3) - 1;
-    p  = 1.0/n/pow(2, j/2.0);
+    p  = 1.0/n/pow(2.0, j/2.0);
     bp = 4 * M_PI / n;
     
     for (i = w1; i < w2; ++i) {
@@ -1698,8 +1667,8 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   // Set factors first to simplify loop adjustments
   j   = j0 - 1;
   nj  = 1 << j;
-  p   = 1.0/n/pow(nj, 1.0/2.0);
-  bp  = M_PI * pow(2, 2 - j0);
+  p   = 1.0/n/pow((double)nj, 1.0/2.0);
+  bp  = M_PI * pow(2.0, 2 - j0);
   
   for (j = j0; j < jmax; ++j) {
     
@@ -1707,8 +1676,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
     memset(in, 0, sizeof (fftw_complex) * n);
     memset(conj, 0, sizeof (fftw_complex) * n);
     
-    p  /= pow(2, 0.5);
-    bp /= 2;
+    p  /= pow(2.0, 0.5);
     nj *= 2;
     i   = 1 << j;
     w1  = ceil(i/3.0);
@@ -1796,9 +1764,8 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
 
 // [[Rcpp::export]]
 List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(),
-                          String blur = "direct", int j0 = 3,  int j1 = NA_INTEGER, 
-                          NumericVector thresh = NumericVector::create(), 
-                          double eta = NA_REAL, int deg = 3){
+                          int j0 = 3,  int j1 = NA_INTEGER, NumericVector thresh = NumericVector::create(), 
+                          int deg = 3){
 
   // Regular definitions
   int i, j, J, k, bk, n, n2, w1, w2, w3, jmax, m, nj;
@@ -1806,7 +1773,7 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   n  = signal.nrow();
   m  = signal.ncol();
   n2 = n/2 + 1;
-  J  = log2(n);
+  J  = log2((double)n);
   
   if (alpha.size() == 0)
     alpha = rep(1.0,m);
@@ -1854,11 +1821,10 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   // Compute fine levels for scale estimation
   j  = J - 1;
   nj = 1 << j;
-  Rcout << nj;
-  w1 = ceil(nj/3);
-  w2 = ceil(2*nj/3);
+  w1 = ceil(nj/3.0);
+  w2 = ceil(2.0 * nj/3.0);
   w3 = n2 - pow(2.0, j - 3) - 1;
-  p  = 1.0/pow(n, 1.0/2)/pow(2, j/2.0);
+  p  = 1.0/pow((double)n, 1.0/2)/pow(2.0, j/2.0);
   
   // Input convolution matrix to compute FFT, also 
   for (j = 0; j < m; ++j) {
@@ -1932,7 +1898,7 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   j = j0;
   
   x  = 1.0/n;
-  nf = x / pow(2, j/2.0);
+  nf = x / pow(2.0, j/2.0);
   nj = 1 << j;
   w1 = ceil((double)nj/3);
   w2 = 2 * w1 + j % 2 - 1;
@@ -1989,7 +1955,7 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
     w2 = 2 * w1 + j % 2 - 1;
     w3 = n2 - pow(2.0, j - 3) - 1;
         
-    p  = 1.0/n/pow(2, j/2.0);
+    p  = 1.0/n/pow(2.0, j/2.0);
     bp = 4 * M_PI / n;
     
     for (i = w1; i < w2; ++i) {
@@ -2071,14 +2037,14 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   // Set factors first to simplify loop adjustments
   j   = j0 - 1;
   nj  = 1 << j;
-  p   = 1.0/n/pow(nj, 0.5);
+  p   = 1.0/n/pow((double)nj, 0.5);
   bp  = M_PI * pow(2.0, 2 - j0);
   
   ComplexVector out(n);
   
   for (j = j0; j < jmax ; ++j) {
     
-    p  /= pow(2, 0.5);
+    p  /= pow(2.0, 0.5);
     bp /= 2;
     nj *= 2;
     w1  = ceil((double)nj/3.0);
@@ -2165,7 +2131,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   n  = signal.nrow();
   m  = signal.ncol();
   n2 = n/2 + 1;
-  J  = log2(n);
+  J  = log2((double)n);
   
   if (alpha.size() == 0) {
     alpha = rep(1.0, m);
@@ -2236,10 +2202,10 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   // Compute fine levels for scale estimation
   j  = J - 1;
   nj = 1 << j;
-  w1 = ceil(nj/3);
-  w2 = ceil(2*nj/3);
+  w1 = ceil(nj/3.);
+  w2 = ceil(2. * nj/3.);
   w3 = n2 - pow(2.0, j - 3) - 1;
-  p  = 1.0/pow(n, 1.0/2)/pow(2, j/2.0);
+  p  = 1.0/pow((double)n, 1.0/2)/pow(2.0, j/2.0);
   
   // Input convolution matrix to compute FFT, also 
   for (j = 0; j < m; ++j) {
@@ -2354,7 +2320,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   w1 = ceil((double)nj/3);
   w2 = 2 * w1 + j % 2 - 1;
   p  = pow(2.0, 1 - j0) * M_PI;
-  cx = x/pow(2, j/2.0);
+  cx = x/pow(2.0, j/2.0);
   
   in[0][0] = x * x_fft[0][0];
   
@@ -2381,7 +2347,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   for (i = w1; i < w2; i++) {
     xi           = (double)i/nj;
     x            = 3 * xi - 1;
-    xi           = pow(cos(M_PI_2 * MeyerPol(x, deg)), 2)/n;
+    xi           = pow(cos(M_PI_2 * MeyerPol(x, deg)), 2.0)/n;
     in[i][0]     = xi * x_fft[i][0];
     in[i][1]     = xi * x_fft[i][1];
     in[n - i][0] = xi * x_fft[n - i][0];
@@ -2420,7 +2386,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     w1 = ceil((double)nj/3.0);
     w2 = 2 * w1 + j % 2 - 1;
     w3 = n2 - pow(2.0, j - 3) - 1;
-    p  = 1.0/n/pow(2,j/2.0);
+    p  = 1.0/n/pow(2.0,j/2.0);
     bp = 4 * M_PI / n;
     
     for (i = w1; i < w2; ++i) {
@@ -2553,7 +2519,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   // Set factors first to simplify loop adjustments
   j   = j0 - 1;
   nj  = 1 << j;
-  p   = 1.0/n/pow(nj, 1.0/2.0);
+  p   = 1.0/n/pow((double)nj, 1.0/2.0);
   bp  = M_PI * pow(2.0, 2 - j0);
   
   for (j = j0; j < jmax; ++j) {
@@ -2562,7 +2528,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
     memset(in, 0, sizeof (fftw_complex) * n);
     memset(conj, 0, sizeof (fftw_complex) * n);
     
-    p  /= pow(2, 0.5);
+    p  /= pow(2.0, 0.5);
     bp /= 2;
     nj *= 2;
     i   = 1 << j;
