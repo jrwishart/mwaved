@@ -14,9 +14,9 @@ if test x"${RSCRIPT}" == x"yes" ; then
          AC_MSG_ERROR([Could not determine R_HOME.])
      fi
      ## Rcpp compile flag providing header directory containing Rcpp.h
-     RCPP_CXXFLAGS=`${R_HOME}/bin/Rscript -e 'Rcpp:::CxxFlags()'`
+     RCPP_CXXFLAGS=`${R_HOME}/bin/R -e 'Rcpp:::CxxFlags()'`
      ## link flag providing libary as well as path to library, and optionally rpath
-     RCPP_LDFLAGS=`${R_HOME}/bin/Rscript -e 'Rcpp:::LdFlags()'`
+     RCPP_LDFLAGS=`${R_HOME}/bin/R -e 'Rcpp:::LdFlags()'`
 else
     AC_MSG_ERROR([Rscript not found, is R installed?])
 fi
