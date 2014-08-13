@@ -113,7 +113,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
     lowest <- x$j0
   } else {
     # Catch lowest level too low
-    if (lowest > x$j0 )
+    if (lowest < x$j0 )
       warning("lowest level shouldn't be smaller than j0 specified in wavelet coefficient object.")
   }
   if (is.null(highest)) {
