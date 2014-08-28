@@ -288,18 +288,13 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   
   if (show[3L]) {
     if (blurType != "box.car") {
-      blurf <- blurInfo$decay
-      cutf <- blurInfo$cutoff
-      ymin <- min(cutf)
-      revblur <- as.matrix(blurf[n2:2, ])
-      revcut <- as.matrix(cutf[n2:2, ])
-      iw = -(n2 - 1):n2
-      blur <- rbind(revblur, blurf)
-      cut <- rbind(revcut, cutf)
-      ylim <- c(min(cutf[2, ]), 0)
+      xw = fourierWindow(n)
+      blur <- mirrorSpec(blurInfo$decay)
+      cut <- mirrorSpec(blurInfo$cutoff)
+      ylim <- c(min(blurInfo$cutoff[2, ]), 0)
       if (blurType == 'smooth') {
         xbest <- max(blurInfo$freqCutoffs) - 1
-        ybest <- blurf[xbest, blurInfo$bestChannel]
+        ybest <- cut[n/2 + xbest, blurInfo$bestChannel]
         xlim <- min(2*max(blurInfo$freqCutoff), n/2)
         xlim <- c(-xlim, xlim)
       } else {
@@ -327,12 +322,13 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   }
   if (show[3L] && ggAvailable) {
     if (blurType != 'box.car') {
-      fourierData <- data.frame(Y = as.vector(blur), x = rep(iw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n),m=m)
+      fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
       resolutionPlot <- ggplot(fourierData) + geom_line(aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + geom_line(aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggtitle(fourierTitle) + labs(x = fourierLabel, y = '')
       if (blurType == 'smooth') {
-        highlightData <- data.frame(x = rep(xbest, 2), y = c(-Inf, ybest))
-        pointData <- data.frame(xbest = xbest, ybest = ybest)
-        resolutionPlot <- resolutionPlot + geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted' , data = highlightData) + geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted' , data = data.frame(x = rep(-xbest + 1, 2), y = c(-Inf, ybest))) + geom_point( aes_string(x = 'xbest', y = 'ybest'), size = 4, shape = 1, data = pointData) + geom_point( aes_string(x = 'x', y = 'y'), size = 4, shape = 1, data = data.frame(x = -xbest + 1, y = ybest)) + coord_cartesian(xlim = xlim)
+        rightLine <- geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
+        leftLine <- geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
+        pointDots <- geom_point(aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
+        resolutionPlot <- resolutionPlot + leftLine + rightLine + pointDots + coord_cartesian(xlim = xlim)
       }
     } else {
       resolutionData <- data.frame(Y = c(blkV, blkc), x = rep(j,2), colour = rep(c("Resolution var.",'Resolution bounds'), each = length(j)) , Ycut = blkc)
@@ -346,7 +342,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   }
   
   if (show[4L] && ggAvailable) {
-      mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste(x$shrinkType, ' Thresholding', sep = '')), ggplot = TRUE)
+      mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste('Thresholding (', x$shrinkType, ')', sep = '')), ggplot = TRUE)
       ggList[[i]] <- mraPlot
   }
 
@@ -391,7 +387,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
 
     if (show[2L]) {
       # Plot mWaveD estimate
-      plot(t, x$estimate, type = 'l', main = estimateTitle, ylab = '', xlab = '')
+      plot(t, x$estimate, type = 'l', main = estimateTitle, ylab = '', xlab = '', ...)
       grid()
     }
 
@@ -423,6 +419,25 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       plot(x$coef, x$shrinkCoef, highest = j1, ..., ggplot = FALSE)
     }
   }
+}
+
+# Auxiliary function to obtain domain for plot as a func of Fourier freq
+mirrorSpec <- function(x) {
+  if (is.matrix(x)){
+    n <- dim(x)[1]
+    x <- rbind(as.matrix(x[(n-1):2, ]), x)
+  } else {
+    n <- length(x)
+    x <- c(x[(n-1):2], x)
+  }
+  x
+}
+
+# Auxiliary function to obtain domain for plot as a func of Fourier freq
+fourierWindow <- function(n) {
+  n2 <- floor(n/2)
+  iw = -(n2 - 1):n2
+  iw
 }
 
 #' @name mWaveDDemo
