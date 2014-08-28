@@ -797,7 +797,7 @@ List SmoothChanInfo(int m, int n, fftw_complex * g_fft, NumericVector sigma, Num
     for (i = 1; i < n2; ++i) {
       tmp = finfo(i, j) - 0.5 * alpha[j] * log((double)i);
       if (tmp < threshfft[j]) {
-        freq[j]  = i + 1;
+        freq[j]  = i;
         level[j] = floor(log2((double)i + 1.0)) - 1;
         break;
       }
