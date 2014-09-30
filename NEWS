@@ -3,7 +3,7 @@ mwaved 1.0.2
 
 * Fixed plotting errors for smooth resolution method
 * Fixed ggplot labelling issue
-* Added blur detection function to validate input G matches structure of direct or box.car blur.
+* Added blur detection function to validate input G matches structure of direct or box.car blur (sets to smooth otherwise). This removes the need to specify the blur argument in functions.
 * Slightly tweaked directBlur input arguments to be (n, m) instead of (dim(G))
 
 mwaved 1.0.1
