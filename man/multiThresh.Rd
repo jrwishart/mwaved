@@ -3,9 +3,9 @@
 \alias{multiThresh}
 \title{Resolution level thresholds for hard thresholded wavelet deconvolution estimator}
 \usage{
-multiThresh(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
-  dim(as.matrix(Y))[2]), blur = "direct", j0 = 3L, j1 = NA_integer_,
-  eta = NA_real_, deg = 3L)
+multiThresh(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
+  alpha = rep(1, dim(as.matrix(Y))[2]), blur = detectBlur(G), j0 = 3L,
+  j1 = NA_integer_, eta = NA_real_, deg = 3L)
 }
 \arguments{
 \item{G}{The input multichannel blur matrix/vector (needs to be the same dimension/length as the signal input which is a matrix or vector for the multichannel or single channel case respectively). This argument dictates the form of blur present in each of the channels.}
@@ -57,8 +57,8 @@ alpha <- c(0.75, 0.8, 1)
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
-# Determine thresholds
-thresh <- multiThresh(Y, G, blur = 'smooth')
+# Determine thresholds blur = 'smooth'
+thresh <- multiThresh(Y, G)
 }
 \references{
 Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).

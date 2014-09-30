@@ -3,9 +3,9 @@
 \alias{multiEstimate}
 \title{Wavelet deconvolution signal estimate from the noisy multichannel convoluted signal}
 \usage{
-multiEstimate(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
-  dim(as.matrix(Y))[2]), blur = "direct", sigma = as.numeric(c()),
-  j0 = 3L, j1 = NA_integer_, eta = NA_real_,
+multiEstimate(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
+  alpha = rep(1, dim(as.matrix(Y))[2]), blur = detectBlur(G),
+  sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, eta = NA_real_,
   thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 =
   j0, j1 = j1, eta = eta, deg = 3L), shrinkType = "hard", deg = 3L)
 }
@@ -71,8 +71,8 @@ if (require(fracdiff)) {
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
-# Estimate the underlying doppler signal
-dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1, m), blur = 'smooth')
+# Estimate the underlying doppler signal blur = 'smooth'
+dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1, m))
 # Plot the result and compare with truth
 par(mfrow=c(2, 1))
 matplot(x, Y, type = 'l', main = 'Noisy multichannel signal')

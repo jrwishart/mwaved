@@ -3,10 +3,10 @@
 \alias{multiWaveD}
 \title{Full mWaveD analysis}
 \usage{
-multiWaveD(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
-  dim(as.matrix(Y))[2]), j0 = 3L, j1 = NA_integer_, blur = "direct",
-  thresh = as.numeric(c()), eta = NA_real_, shrinkType = "hard",
-  deg = 3L)
+multiWaveD(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
+  alpha = rep(1, dim(as.matrix(Y))[2]), j0 = 3L, j1 = NA_integer_,
+  blur = detectBlur(G), thresh = as.numeric(c()), eta = NA_real_,
+  shrinkType = "hard", deg = 3L)
 }
 \arguments{
 \item{shrinkType}{A character string that specifies which thresholding regime to use.
@@ -61,8 +61,8 @@ if (require(fracdiff)) {
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
-# Compute mWaveD object
-mWaveDObj <- multiWaveD(Y, G = G, alpha = alpha, blur = 'smooth')
+# Compute mWaveD object, blur = 'smooth'
+mWaveDObj <- multiWaveD(Y, G = G, alpha = alpha)
 plot(mWaveDObj)
 summary(mWaveDObj)
 }

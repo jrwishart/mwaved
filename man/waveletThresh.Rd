@@ -60,8 +60,8 @@ if (require(fracdiff)){
 E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
-# Determine thresholds
-thresh <- multiThresh(Y, G, blur = 'smooth')
+# Determine thresholds, blur = 'smooth'
+thresh <- multiThresh(Y, G)
 beta <- multiCoef(Y, G)
 betaShrunk <- waveletThresh(beta, thresh)
 plot(beta, betaShrunk)

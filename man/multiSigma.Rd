@@ -23,7 +23,8 @@ This function estimates the noise present in each channel by computing the Meyer
 library(mwaved)
 # Simulate matrix of Gaussian variables with three different noise levels
 sig <- c(0.25, 0.5, 1.25)
-Y <- sapply(1:3, function(i) sig[i]*rnorm(1024))
+n <- 1024
+Y <- sapply(1:3, function(i) sig[i]* rnorm(n))
 # Estimate the noise levels
 multiSigma(Y, deg = 3)
 }

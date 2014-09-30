@@ -24,15 +24,75 @@
 #' @docType package
 NULL
 #' @name directBlur
-#' @title Direct kernel
+#' @title Direct kernel matrix
 #' @description Creates appropriately sized blur matrix for the special case when no blurring is apparent.
 #' @details Function creates a matrix of dimension n by m which contains appropriate entries for the case when a direct multichannel signal is observed. That is, no blurring operator is apparent. This is the default argument for the blurring matrix to all the multichannel functions in the \code{mwaved} package.
-#' @param G.dim A numeric vector with two elements specifying the values of n and m respectively
+#' @param n Number of observations in each channel
+#' @param m Number of channels
 #' @export
-directBlur <- function(G.dim){
-  y <- matrix(0, G.dim[1], G.dim[2])
-  y[1,] <- 1 
+directBlur <- function(n, m){
+  y <- matrix(0, n, m)
+  y[1,] <- 1
   y
+}
+
+boxcarDetect <- function(G) {
+  # Determine unique values in each column (2 unique values in box car, potentially more otherwise)
+  G <- as.matrix(G)
+  vals <- sapply(1:ncol(G), function(i) unique(G[,i]))
+  # returns list if different number of unique values in each columns.
+  if (typeof(vals) == 'list') {
+    result <- FALSE
+  } else {
+    if (nrow(vals) == 2) {
+      if (all(vals[2,] == 0) && all(vals[1, ] > 0)) {
+        result <- TRUE
+      } else {
+        result <- FALSE
+      } 
+    } else {
+      result <- FALSE
+    }
+  }
+  result
+}
+
+directDetect <- function(G) {
+  Gw <- mvfft(G)
+  if (all(Re(Gw) == 1) && all(Im(Gw) == 0)) {
+    result <- TRUE
+  } else {
+    result <- FALSE
+  }
+  result
+}
+
+#' @name detectBlur
+#' @title Detect type of blur
+#' @description Detect the form of the input blur matrix, G
+#' @details Detects if the input blur matrix, G, has uniform structure in being of direct blur type everywhere or box.car type everywhere. In those cases, it will return a character string 'direct' or 'box.car' respectively, otherwise it returns 'smooth'. This is done in the direct blur case by checking that the mvfft(G) is equal to 1 everywhere (complex part is zero everywhere) and in the box.car case by checking that each column has two unique values, a zero and positive value. If the blur type is not identified to be direct or box.car, the string 'smooth' is returned.
+#' @param G The input blur matrix to be analysed and checked whether it corresponds to direct blur or box.car blur.
+#' @export
+detectBlur <- function(G) {
+  if (directDetect(G)) {
+    blur <- 'direct'
+  } else {
+    if (boxcarDetect(G)) {
+      blur <- 'box.car'
+    } else {
+      blur <- 'smooth'
+    }
+  }
+  blur
+}
+
+# check if blur input method is consistent with observed G input
+blurCheck <- function(G, blur) {
+  detected <- detectBlur(G)
+  if ( blur != detected) {
+    warning(paste0("blur = '", blur, "' specified but input G appears to be ", detected, ' or other.\n Perhaps change blur type to blur = ', detected,'.\n'))
+  }
+  detected
 }
 
 # Function to check resolution levels are sane
@@ -124,7 +184,8 @@ feasibleShrinkage <- function(shrinkType){
 #' library(mwaved)
 #' # Simulate matrix of Gaussian variables with three different noise levels
 #' sig <- c(0.25, 0.5, 1.25)
-#' Y <- sapply(1:3, function(i) sig[i]*rnorm(1024))
+#' n <- 1024
+#' Y <- sapply(1:3, function(i) sig[i]* rnorm(n))
 #' # Estimate the noise levels
 #' multiSigma(Y, deg = 3)
 #'
@@ -204,30 +265,30 @@ multiProj <- function(beta, j1 = log2(length(beta$coef)) - 1) {
 #' n <- 2^10
 #' signal <- makeDoppler(n)
 #' # Noise levels per channel
-#' e <- rnorm(m*n)
+#' e <- rnorm(m * n)
 #' # Create Gamma blur
 #' shape <- seq(from = 0.5, to = 1, length = m)
-#' scale <- rep(0.25,m)
+#' scale <- rep(0.25, m)
 #' G <- gammaBlur(n, shape = shape, scale = scale)
 #' # Convolve the signal
 #' X <- blurSignal(signal, G)
 #' # Create error with custom signal to noise ratio
-#' SNR <- c(10,15,20)
+#' SNR <- c(10, 15, 20)
 #' sigma <- sigmaSNR(X, SNR)
 #' alpha <- c(0.75, 0.8, 1)
 #' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
-#' # Determine thresholds
-#' thresh <- multiThresh(Y, G, blur = 'smooth')
+#' # Determine thresholds blur = 'smooth'
+#' thresh <- multiThresh(Y, G)
 #' 
 #' @return A numeric vector of the resolution level thresholds for the hard-thresholding nonlinear wavelet estimator from the multichannel model.
 #' @references
 #' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
 #' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
 #' @export
-multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
-                        blur = "direct", j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
+multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
+                        blur = detectBlur(G), j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
   G <- as.matrix(G)
   dimY <- dim(Y)
@@ -238,6 +299,7 @@ multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(
   jvals <- feasibleResolutions(dimY[1], j0, j1)
   alpha <- feasibleAlpha(dimY[2], alpha)
   feasibleBlur(blur)
+  blurCheck(G, blur)
   .Call('mwaved_multiThresh', Y, G, alpha, blur, jvals$j0, jvals$j1, eta, deg)
 }
 
@@ -281,15 +343,15 @@ multiThresh <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(
 #' Y <- X + E
 #' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 #' matlines(Y)
-#' # Estimate the wavelet coefficients
-#' estimatedCoefs <- multiCoef(Y, G, alpha = alpha, blur = 'smooth')
+#' # Estimate the wavelet coefficients blur = 'smooth'
+#' estimatedCoefs <- multiCoef(Y, G, alpha = alpha)
 #' plot(estimatedCoefs)
 #' # Compute true wavelet coefficients
 #' trueCoefs <- multiCoef(signal)
 #' plot(trueCoefs)
 #' @export
-multiCoef <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
-                      blur = "direct", j0 = 3L, j1 = NA_integer_, thresh = multiThresh(as.matrix(Y),
+multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
+                      blur = detectBlur(G), j0 = 3L, j1 = NA_integer_, thresh = multiThresh(as.matrix(Y),
                       G = G, alpha = alpha, blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), 
                       eta = NA_real_, deg = 3L) {
   Y <- as.matrix(Y)
@@ -304,6 +366,7 @@ multiCoef <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as
   
   blur <- tolower(blur)
   feasibleBlur(blur)
+  blurCheck(G, blur)
   # Pass to C code
   .Call('mwaved_multiCoef', Y, G, alpha, jvals$j0, jvals$j1, thresh, deg)
 }
@@ -360,7 +423,7 @@ multiCoef <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Determine thresholds
-#' thresh <- multiThresh(Y, G, blur = 'smooth')
+#' thresh <- multiThresh(Y, G) 
 #' beta <- multiCoef(Y, G)
 #' betaShrunk <- waveletThresh(beta, thresh)
 #' plot(beta, betaShrunk)
@@ -430,15 +493,15 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' # Compute mWaveD object
-#' mWaveDObj <- multiWaveD(Y, G = G, alpha = alpha, blur = 'smooth')
+#' mWaveDObj <- multiWaveD(Y, G = G, alpha = alpha)
 #' plot(mWaveDObj)
 #' summary(mWaveDObj)
 #' 
 #' @seealso \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
 #' 
 #' @export
-multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
-                       j0 = 3L, j1 = NA_integer_, blur = "direct", thresh = as.numeric(c()), 
+multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
+                       j0 = 3L, j1 = NA_integer_, blur = detectBlur(G), thresh = as.numeric(c()), 
                        eta = NA_real_, shrinkType = "hard", deg = 3L) {
   Y <- as.matrix(Y)
   G <- as.matrix(G)
@@ -451,6 +514,7 @@ multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(a
   alpha <- feasibleAlpha(dimY[2], alpha)
   blur <- tolower(blur)
   feasibleBlur(blur)
+  blurCheck(G, blur)
   shrinkType <- tolower(shrinkType)
   feasibleShrinkage(shrinkType)
   # Pass to C code
@@ -494,8 +558,8 @@ multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(a
 #' E <- multiNoise(n, sigma, alpha)
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
-#' # Estimate the underlying doppler signal
-#' dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1, m), blur = 'smooth')
+#' # Estimate the underlying doppler signal blur = 'smooth'
+#' dopplerEstimate <- multiEstimate(Y, G = G, alpha = rep(1, m))
 #' # Plot the result and compare with truth
 #' par(mfrow=c(2, 1))
 #' matplot(x, Y, type = 'l', main = 'Noisy multichannel signal')
@@ -503,8 +567,8 @@ multiWaveD <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(a
 #' lines(x, dopplerEstimate)
 #' 
 #' @export
-multiEstimate <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
-                          blur = "direct", sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, 
+multiEstimate <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
+                          blur = detectBlur(G), sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, 
                           eta = NA_real_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha,
                                                                blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L) , shrinkType = "hard", deg = 3L) {
   Y <- as.matrix(Y)
@@ -518,6 +582,7 @@ multiEstimate <- function(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,di
   alpha <- feasibleAlpha(dimY[2], alpha)
   blur <- tolower(blur)
   feasibleBlur(blur)
+  blurCheck(G, blur)
   shrinkType <- tolower(shrinkType)
   feasibleShrinkage(shrinkType)
   # Pass to C code

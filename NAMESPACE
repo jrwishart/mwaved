@@ -18,6 +18,7 @@ export(multiEstimate)
 export(multiProj)
 export(multiSigma)
 export(multiThresh)
+export(detectBlur)
 
 # Functions for simulation
 export(makeBumps)

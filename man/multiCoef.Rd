@@ -3,10 +3,11 @@
 \alias{multiCoef}
 \title{Wavelet coefficient estimation from a multichannel signal}
 \usage{
-multiCoef(Y, G = directBlur(dim(as.matrix(Y))), alpha = rep(1,
-  dim(as.matrix(Y))[2]), blur = "direct", j0 = 3L, j1 = NA_integer_,
-  thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, blur = blur, j0 =
-  j0, j1 = j1, eta = eta, deg = 3L), eta = NA_real_, deg = 3L)
+multiCoef(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
+  alpha = rep(1, dim(as.matrix(Y))[2]), blur = detectBlur(G), j0 = 3L,
+  j1 = NA_integer_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha,
+  blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), eta = NA_real_,
+  deg = 3L)
 }
 \arguments{
 \item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
@@ -67,8 +68,8 @@ E <- multiNoise(n, sigma, alpha)
 Y <- X + E
 plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 matlines(Y)
-# Estimate the wavelet coefficients
-estimatedCoefs <- multiCoef(Y, G, alpha = alpha, blur = 'smooth')
+# Estimate the wavelet coefficients blur = 'smooth'
+estimatedCoefs <- multiCoef(Y, G, alpha = alpha)
 plot(estimatedCoefs)
 # Compute true wavelet coefficients
 trueCoefs <- multiCoef(signal)
