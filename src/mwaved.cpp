@@ -1437,7 +1437,7 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   if (!( m == alpha.size() && m == G.ncol() && n == G.nrow() ))
     stop("Dimension mismatch; sigma, alpha and G");
     
-  double xi, x, p, bp, cx, sx;
+  double xi, x, p, cx, sx;
   
   // R objects
   NumericVector final_out(n);
@@ -1588,7 +1588,6 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
     w2 = 2 * w1 + j % 2 - 1;
     w3 = n2 - pow(2.0, j - 3) - 1;
     p  = 1.0/n/pow(2.0, j/2.0);
-    bp = 4 * M_PI / n;
     
     for (i = w1; i < w2; ++i) {
       xi             = (double)i/nj;
@@ -1668,7 +1667,6 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   j   = j0 - 1;
   nj  = 1 << j;
   p   = 1.0/n/pow((double)nj, 1.0/2.0);
-  bp  = M_PI * pow(2.0, 2 - j0);
   
   for (j = j0; j < jmax; ++j) {
     
