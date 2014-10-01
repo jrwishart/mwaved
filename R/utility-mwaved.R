@@ -354,7 +354,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   if (ggAvailable) {
     # Plot them
     if (singlePlot == TRUE) {
-      do.call(grid.arrange, ggList)  
+      do.call(gridExtra::grid.arrange, ggList)  
     } else {
       if (show[1L]) {
         print(signalPlot)

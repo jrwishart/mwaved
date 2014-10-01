@@ -246,7 +246,7 @@ multiNoise <- function(n, sigma = 1, alpha = length(sigma), ...) {
         warning("Dimension mismatch: length of sigma should equal length of alpha")
       }
       d <- (1 - alpha)/2
-      noise <- sapply(1:m, function(x,y) y[x] * fracdiff.sim(n, d = d[x], ...)$series, y = sigma)
+      noise <- sapply(1:m, function(x,y) y[x] * fracdiff::fracdiff.sim(n, d = d[x], ...)$series, y = sigma)
     } else {
       # ignore the alpha parameter
       m <- length(sigma)
