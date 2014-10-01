@@ -172,14 +172,14 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   if (ggplot && require(ggplot2)) {
     if (ns == 2) {
       nData <- data.frame(w = c(ws,wss), js = c(js, jss), ks = c(ks, kss), col = rep(labels, c(nw, nss)))
-      mraPlot <- ggplot(nData) + geom_segment(aes(x = ks, xend = ks, y = js, yend = w, colour = col, size = col)) + labs(x = mraLabels[1], y = mraLabels[2]) + scale_size_discrete(range = c(1, 2))
+      mraPlot <- ggplot2::ggplot(nData) + ggplot2::geom_segment(ggplot2::aes(x = ks, xend = ks, y = js, yend = w, colour = col, size = col)) + ggplot2::labs(x = mraLabels[1], y = mraLabels[2]) + ggplot2::scale_size_discrete(range = c(1, 2))
       # Fix legend
-      mraPlot <- mraPlot + theme(legend.position = "top", axis.text.y = element_text(angle = 90)) + guides(colour = guide_legend(title = mraTitle), size = guide_legend(title = mraTitle))
+      mraPlot <- mraPlot + ggplot2::theme(legend.position = "top", axis.text.y = ggplot2::element_text(angle = 90)) + ggplot2::guides(colour = ggplot2::guide_legend(title = mraTitle), size = ggplot2::guide_legend(title = mraTitle))
     } else {
       nData <- data.frame(w = ws, js = js, ks = ks)
-      mraPlot <- ggplot(nData) + geom_segment(aes(x = ks, xend = ks, y = js, yend = w), colour = 'red') + ggtitle(mraTitle)
+      mraPlot <- ggplot2::ggplot(nData) + ggplot2::geom_segment(ggplot2::aes(x = ks, xend = ks, y = js, yend = w), colour = 'red') + ggplot2::ggtitle(mraTitle)
     }
-    mraPlot + labs(x = mraLabels[1], y = mraLabels[2]) + scale_y_continuous(breaks = lowest:highest) 
+    mraPlot + ggplot2::labs(x = mraLabels[1], y = mraLabels[2]) + ggplot2::scale_y_continuous(breaks = lowest:highest) 
   } else {
     buf <- 0.5
     plot(0, type = "n", xlim = c(0,1), ylim = c(lowest - buf, highest + buf), yaxt = 'n', xlab = mraLabels[1], ylab = mraLabels[2], main = mraTitle)
@@ -310,24 +310,24 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   }
   if (show[1L] && ggAvailable) {
     signalData <- data.frame(Y = as.vector(x$signal), x = rep(t, m), Channel = rep(LETTERS[1:m], each = n))
-    signalPlot <- ggplot2::ggplot(signalData, aes_string(x = 'x', y = 'Y', colour = 'Channel')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(signalTitle) + ggplot2::labs(x = '', y = '')
+    signalPlot <- ggplot2::ggplot(signalData, ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(signalTitle) + ggplot2::labs(x = '', y = '')
     ggList[[i]] <- signalPlot
     i <- i + 1
   }
   if (show[2L] && ggAvailable) {
     estimateData <- data.frame(Y = as.vector(x$estimate), x = t)
-    estimatePlot <- ggplot2::ggplot(estimateData, aes_string(x = 'x', y = 'Y')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(estimateTitle) + ggplot2::labs(x = '', y = '')
+    estimatePlot <- ggplot2::ggplot(estimateData, ggplot2::aes_string(x = 'x', y = 'Y')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(estimateTitle) + ggplot2::labs(x = '', y = '')
     ggList[[i]] <- estimatePlot
     i <- i + 1
   }
   if (show[3L] && ggAvailable) {
     if (blurType != 'box.car') {
       fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
-      resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '')
+      resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '')
       if (blurType == 'smooth') {
-        rightLine <- ggplot2::geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
-        leftLine <- ggplot2::geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
-        pointDots <- ggplot2::geom_point(aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
+        rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
+        leftLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
+        pointDots <- ggplot2::geom_point(ggplot2::aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
         resolutionPlot <- resolutionPlot + leftLine + rightLine + pointDots + ggplot2::coord_cartesian(xlim = xlim)
       }
     } else {
@@ -335,7 +335,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       bestV <- blkV[j == j1]
       highlightData <- data.frame(x = c(j1, j1), y = c(ylim[1], bestV))
       pointData <- data.frame(j1 = j1, bestV = bestV)
-      resolutionPlot <- ggplot2::ggplot(resolutionData) + ggplot2::geom_line(aes_string(x = 'x', y = 'Y', colour = 'colour', linetype = 'colour'), size = hsize) +  ggplot2::geom_line(aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = highlightData) + ggplot2::labs(x = 'j', y = '') + ggplot2::geom_point( aes_string(x = 'j1', y = 'bestV'), size = 4, shape = 1, data = pointData)  + ggplot2::scale_color_discrete(labels= c('Resolution bounds', 'Resolution var.'), guide=guide_legend(title.position='left',title.theme = element_text(size=15,angle=0))) + ggplot2::scale_size(guide='none') + ggplot2::guides(colour = guide_legend( title='Blockwise resolution decay')) + ggplot2::theme(legend.position="top", legend.key = element_rect(fill = NA), axis.text.y = element_text(angle = 90)) + ggplot2::scale_linetype_manual(values=c(1,2), name="Blockwise resolution decay", labels=c('Resolution bounds', 'Resolution var.')) + ggplot2::scale_x_continuous(breaks = j)
+      resolutionPlot <- ggplot2::ggplot(resolutionData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'colour', linetype = 'colour'), size = hsize) +  ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = highlightData) + ggplot2::labs(x = 'j', y = '') + ggplot2::geom_point( ggplot2::aes_string(x = 'j1', y = 'bestV'), size = 4, shape = 1, data = pointData)  + ggplot2::scale_color_discrete(labels= c('Resolution bounds', 'Resolution var.'), guide=ggplot2::guide_legend(title.position='left',title.theme = ggplot2::element_text(size=15,angle=0))) + ggplot2::scale_size(guide='none') + ggplot2::guides(colour = ggplot2::guide_legend( title='Blockwise resolution decay')) + ggplot2::theme(legend.position="top", legend.key = ggplot2::element_rect(fill = NA), axis.text.y = ggplot2::element_text(angle = 90)) + ggplot2::scale_linetype_manual(values=c(1,2), name="Blockwise resolution decay", labels=c('Resolution bounds', 'Resolution var.')) + ggplot2::scale_x_continuous(breaks = j)
     }
     ggList[[i]] <- resolutionPlot
     i <- i + 1
