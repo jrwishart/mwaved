@@ -31,40 +31,7 @@ NULL
 #' @param m Number of channels
 #' @export
 directBlur <- function(n, m){
-  y <- matrix(0, n, m)
-  y[1,] <- 1
-  y
-}
-
-boxcarDetect <- function(G) {
-  # Determine unique values in each column (2 unique values in box car, potentially more otherwise)
-  G <- as.matrix(G)
-  vals <- sapply(1:ncol(G), function(i) unique(G[,i]))
-  # returns list if different number of unique values in each columns.
-  if (typeof(vals) == 'list') {
-    result <- FALSE
-  } else {
-    if (nrow(vals) == 2) {
-      if (all(vals[2,] == 0) && all(vals[1, ] > 0)) {
-        result <- TRUE
-      } else {
-        result <- FALSE
-      } 
-    } else {
-      result <- FALSE
-    }
-  }
-  result
-}
-
-directDetect <- function(G) {
-  Gw <- mvfft(G)
-  if (all(Re(Gw) == 1) && all(Im(Gw) == 0)) {
-    result <- TRUE
-  } else {
-    result <- FALSE
-  }
-  result
+  .Call('mwaved_directBlur', m, n)
 }
 
 #' @name detectBlur
@@ -74,10 +41,10 @@ directDetect <- function(G) {
 #' @param G The input blur matrix to be analysed and checked whether it corresponds to direct blur or box.car blur.
 #' @export
 detectBlur <- function(G) {
-  if (directDetect(G)) {
+  if (.Call('mwaved_directDetect', G)) {
     blur <- 'direct'
   } else {
-    if (boxcarDetect(G)) {
+    if (.Call('mwaved_boxcarDetect', G)) {
       blur <- 'box.car'
     } else {
       blur <- 'smooth'

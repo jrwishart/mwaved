@@ -150,3 +150,49 @@ BEGIN_RCPP
     return __sexp_result;
 END_RCPP
 }
+// directDetect
+bool directDetect(NumericMatrix x);
+RcppExport SEXP mwaved_directDetect(SEXP xSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
+        bool __result = directDetect(x);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// boxcarDetect
+bool boxcarDetect(NumericMatrix x);
+RcppExport SEXP mwaved_boxcarDetect(SEXP xSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
+        bool __result = boxcarDetect(x);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// directBlur
+NumericMatrix directBlur(int n, int m);
+RcppExport SEXP mwaved_directBlur(SEXP nSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< int >::type n(nSEXP );
+        Rcpp::traits::input_parameter< int >::type m(mSEXP );
+        NumericMatrix __result = directBlur(n, m);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}

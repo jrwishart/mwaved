@@ -2687,3 +2687,88 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   
   return multiWaveD;
 }
+
+//[[Rcpp::export]]
+bool directDetect(NumericMatrix x){
+  
+  int i, j, m, n, n2;
+  
+  bool checkFlag = true;
+  
+  // FFTW specific definitions
+  double       *x_m_real;
+  fftw_complex *x_m_out;
+  fftw_plan     x_m_real_p;
+  
+  n  = x.nrow();
+  m  = x.ncol();  
+  n2 = n/2 + 1;
+
+  x_m_real   = (double*)fftw_malloc(sizeof(double) * n * m);
+  x_m_out    = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * n2 * m);
+  x_m_real_p = fftw_plan_many_dft_r2c(1, &n, m, x_m_real, NULL, 1, n, x_m_out , NULL, 1, n2, FFTW_ESTIMATE);
+  
+  for ( j = 0; j < m; ++j ){
+    for ( i = 0; i < n; ++i ){
+      x_m_real[i + j * n] = x(i,j);
+    }
+  }
+  
+  fftw_execute(x_m_real_p);
+  
+  for (j = 0; j < m; ++j) {
+    for (i = 0; i < n2; ++i) {
+      if ( fabs(x_m_out[i + j * n2][0] - 1.0) > DBL_EPSILON || fabs(x_m_out[i + j * n2][1]) > DBL_EPSILON) {
+        checkFlag = false;
+        //  break out of both loops
+        j = m;
+        break;
+      }
+    }
+  }
+
+  fftw_free(x_m_out);
+  fftw_free(x_m_real);
+  
+  fftw_destroy_plan(x_m_real_p);
+  
+  return checkFlag;
+}
+
+//[[Rcpp::export]]
+bool boxcarDetect(NumericMatrix x){
+  
+  bool result = true;
+  
+  NumericMatrix vals(2, x.ncol());
+  
+  for(int i = 0; i< x.ncol(); i++){
+    NumericVector test = unique(x(_, i));
+    if (test.size() != 2) {
+      result = false;
+      break;
+    } else {
+      vals(_, i) = test;
+    }
+  }
+  
+  if (is_true(all(vals(0, _) == 0)) && is_true(all(vals(1, _) > 0))) {
+    result = true;
+  } else {
+    result = false;
+  }
+  
+  return result;
+}
+
+//[[Rcpp::export]]
+NumericMatrix directBlur(int n, int m) {
+  
+  NumericMatrix result(n, m);
+  
+  for (int i = 0; i < m; ++i) {
+    result(0, i) = 1;
+  }
+  
+  return result;
+}
