@@ -2,6 +2,10 @@
 \name{plot.mWaveD}
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
+\usage{
+\method{plot}{mWaveD}(x, ..., which = 1L:4L, singlePlot = TRUE,
+  ask = !singlePlot, ggplot = TRUE)
+}
 \arguments{
 \item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
 
@@ -9,9 +13,9 @@
 
 \item{which}{A numeric vector that specifies which plots to output. Default value is \code{1:4} which  specifies that all four plots are to be displayed.}
 
-\item{ask}{A logical value that specifies whether the user is \emph{ask}ed before each plot output.}
+\item{singlePlot}{A logical value that controls whether all plots should appear on a single window. The plot window is resized depending on the value of \code{which}.}
 
-\item{singlePlot}{A logical value that controls whether all plots should appear on a single window. The plot window is resized depending the value of \code{which}.}
+\item{ask}{A logical value that specifies whether the user is \emph{ask}ed before each plot output.}
 
 \item{ggplot}{A logical value to specify if the user wants to use base graphics (FALSE) or ggplot2 graphics (TRUE).}
 }
