@@ -207,7 +207,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 #' @param ... Arguments to be passed to methods.
 #' @param which A numeric vector that specifies which plots to output. Default value is \code{1:4} which  specifies that all four plots are to be displayed.
 #' @param ask A logical value that specifies whether the user is \emph{ask}ed before each plot output.
-#' @param singlePlot A logical value that controls whether all plots should appear on a single window. The plot window is resized depending the value of \code{which}.
+#' @param singlePlot A logical value that controls whether all plots should appear on a single window. The plot window is resized depending on the value of \code{which}.
 #' @param ggplot A logical value to specify if the user wants to use base graphics (FALSE) or ggplot2 graphics (TRUE).
 #' 
 #' @details Four plots are output that summarise the multichannel input, a visualisation of the characteristics of the channels and the output estimate and a multi-resolution analysis plot.\itemize{

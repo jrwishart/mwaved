@@ -2,10 +2,6 @@
 \name{plot.waveletCoef}
 \alias{plot.waveletCoef}
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
-\usage{
-\method{plot}{waveletCoef}(x, y = NULL, labels = NULL, ..., lowest = NULL,
-  highest = NULL, scaling = 1, ggplot = TRUE)
-}
 \arguments{
 \item{x}{A list of class waveletCoef.}
 

@@ -2,9 +2,6 @@
 \name{summary.mWaveD}
 \alias{summary.mWaveD}
 \title{Summary Output for the mWaveD object}
-\usage{
-\method{summary}{mWaveD}(object, ...)
-}
 \arguments{
 \item{object}{A mWaveD object which is a list containing all the information for a multichannel
 deconvolution analysis produced by the \code{\link{multiWaveD}} function.}

@@ -31,7 +31,7 @@ NULL
 #' @param m Number of channels
 #' @export
 directBlur <- function(n, m){
-  .Call('mwaved_directBlur', m, n)
+  .Call('mwaved_directBlur', n, m)
 }
 
 #' @name detectBlur
