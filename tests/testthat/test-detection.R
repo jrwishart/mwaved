@@ -18,10 +18,5 @@ test_that("Correct identification", {
 
 # Warnings are thrown for incorrect specifications
 test_that("Throw warnings when input inconsistent", {
-  expect_warning(blurCheck(Gdirect, 'smooth'))
-  expect_warning(blurCheck(Gdirect, 'box.car'))
-  expect_warning(blurCheck(Gsmooth, 'direct'))
-  expect_warning(blurCheck(Gsmooth, 'box.car'))
   expect_warning(blurCheck(Gboxcar, 'smooth'))
-  expect_warning(blurCheck(Gboxcar, 'direct'))
 })
