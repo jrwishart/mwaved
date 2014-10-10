@@ -3,7 +3,8 @@ mwaved 1.1.0
 
 * Fixed plotting errors for smooth resolution method
 * Fixed ggplot labelling issue
-* Added blur detection function, detectBlur, to validate input G matches structure of direct or box.car blur and returns character string 'direct' or 'box.car' respectively,  (returns 'smooth' otherwise). This removes the need to specify the blur argument to control inversion type in functions since detectBlur can identify the appropriate inversion required. The user can still force the desired inversion method by manually setting the blur type, warnings are thrown if the detectBlur function does not match the desired inversion type.
+* Fixed bug in coarse coefficient computation in multiWaveD code
+* Added blur detection function, detectBlur, to validate input G matches structure of direct or box.car blur and returns character string 'direct' or 'box.car' respectively,  (returns 'smooth' otherwise). This removes the need to specify the blur argument to control inversion type in functions since detectBlur can identify the appropriate inversion required. The user can still force the desired selection method by manually setting the resolution selection type, warnings are thrown if the detectBlur function does not match the desired selection type.
 * Slightly tweaked directBlur input arguments to be (n, m) instead of (dim(G))
 
 mwaved 1.0.1
