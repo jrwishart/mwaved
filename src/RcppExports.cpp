@@ -59,7 +59,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // multiThresh
-NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String resolution = "direct", int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, int deg = 3);
+NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String resolution = "smooth", int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, int deg = 3);
 RcppExport SEXP mwaved_multiThresh(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
@@ -81,8 +81,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // multiEstimate
-NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String resolution = "direct", NumericVector sigma = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, NumericVector thresh = NumericVector::create(), String shrinkType = "hard", int deg = 3);
-RcppExport SEXP mwaved_multiEstimate(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP sigmaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
+NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String resolution = "smooth", String blur = "direct", NumericVector sigma = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, NumericVector thresh = NumericVector::create(), String shrinkType = "hard", int deg = 3);
+RcppExport SEXP mwaved_multiEstimate(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP sigmaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -91,6 +91,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< NumericMatrix >::type G(GSEXP );
         Rcpp::traits::input_parameter< NumericVector >::type alpha(alphaSEXP );
         Rcpp::traits::input_parameter< String >::type resolution(resolutionSEXP );
+        Rcpp::traits::input_parameter< String >::type blur(blurSEXP );
         Rcpp::traits::input_parameter< NumericVector >::type sigma(sigmaSEXP );
         Rcpp::traits::input_parameter< int >::type j0(j0SEXP );
         Rcpp::traits::input_parameter< int >::type j1(j1SEXP );
@@ -98,7 +99,7 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< NumericVector >::type thresh(threshSEXP );
         Rcpp::traits::input_parameter< String >::type shrinkType(shrinkTypeSEXP );
         Rcpp::traits::input_parameter< int >::type deg(degSEXP );
-        NumericVector __result = multiEstimate(signal, G, alpha, resolution, sigma, j0, j1, eta, thresh, shrinkType, deg);
+        NumericVector __result = multiEstimate(signal, G, alpha, resolution, blur, sigma, j0, j1, eta, thresh, shrinkType, deg);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -106,8 +107,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // multiCoef
-List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, NumericVector thresh = NumericVector::create(), int deg = 3);
-RcppExport SEXP mwaved_multiCoef(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP threshSEXP, SEXP degSEXP) {
+List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), int j0 = 3, int j1 = NA_INTEGER, int deg = 3);
+RcppExport SEXP mwaved_multiCoef(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -117,9 +118,8 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< NumericVector >::type alpha(alphaSEXP );
         Rcpp::traits::input_parameter< int >::type j0(j0SEXP );
         Rcpp::traits::input_parameter< int >::type j1(j1SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type thresh(threshSEXP );
         Rcpp::traits::input_parameter< int >::type deg(degSEXP );
-        List __result = multiCoef(signal, G, alpha, j0, j1, thresh, deg);
+        List __result = multiCoef(signal, G, alpha, j0, j1, deg);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
@@ -127,8 +127,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // multiWaveD
-List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String resolution = "smooth", String blur = "direct", int j0 = 3, int j1 = NA_INTEGER, NumericVector thresh = NumericVector::create(), double eta = NA_REAL, String shrinkType = "hard", int deg = 3);
-RcppExport SEXP mwaved_multiWaveD(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP threshSEXP, SEXP etaSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
+List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = NumericVector::create(), String resolution = "smooth", String blur = "direct", int j0 = 3, int j1 = NA_INTEGER, double eta = NA_REAL, NumericVector thresh = NumericVector::create(), String shrinkType = "hard", int deg = 3);
+RcppExport SEXP mwaved_multiWaveD(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
@@ -140,11 +140,11 @@ BEGIN_RCPP
         Rcpp::traits::input_parameter< String >::type blur(blurSEXP );
         Rcpp::traits::input_parameter< int >::type j0(j0SEXP );
         Rcpp::traits::input_parameter< int >::type j1(j1SEXP );
-        Rcpp::traits::input_parameter< NumericVector >::type thresh(threshSEXP );
         Rcpp::traits::input_parameter< double >::type eta(etaSEXP );
+        Rcpp::traits::input_parameter< NumericVector >::type thresh(threshSEXP );
         Rcpp::traits::input_parameter< String >::type shrinkType(shrinkTypeSEXP );
         Rcpp::traits::input_parameter< int >::type deg(degSEXP );
-        List __result = multiWaveD(signal, G, alpha, resolution, blur, j0, j1, thresh, eta, shrinkType, deg);
+        List __result = multiWaveD(signal, G, alpha, resolution, blur, j0, j1, eta, thresh, shrinkType, deg);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
