@@ -4,6 +4,7 @@
 \alias{makeBumps}
 \alias{makeCusp}
 \alias{makeDoppler}
+\alias{makeHeaviSine}
 \alias{makeLIDAR}
 \alias{makeSignals}
 \title{Generate test signals for simulation}
@@ -17,6 +18,8 @@ makeDoppler(n)
 makeCusp(n)
 
 makeBlocks(n)
+
+makeHeaviSine(n)
 }
 \arguments{
 \item{n}{An integer specifying the length of the desired signal.}
@@ -40,5 +43,7 @@ signal <- makeCusp(n)
 plot(x, signal, main = 'Cusp test signal', type = 'l')
 signal <- makeBlocks(n)
 plot(x, signal, main = 'Blocks test signal', type = 'l')
+signal <- makeHeaviSine(n)
+plot(x, signal, main = 'HeaviSine test signal', type = 'l')
 }
 

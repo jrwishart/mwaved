@@ -53,7 +53,7 @@ gammaBlur <- function(n, shape, scale) {
 #' @title Multichannel box car blur
 #' 
 #' @param n An integer specifying the number of observations in each channel
-#' @param BA A numeric vector of length m where each element specifies the box car widths to blur in each channel.
+#' @param width A numeric vector of length m where each element specifies the box car widths to blur in each channel.
 #' 
 #' @description Create blur of the box car type.
 #' 
@@ -63,10 +63,10 @@ gammaBlur <- function(n, shape, scale) {
 #' 
 #' @examples
 #' n <- 1024
-#' BA <- 1/sqrt(c(89,353))
+#' width <- 1/sqrt(c(89,353))
 #' 
 #' # Plot the box car blur
-#' blurMat <- boxcarBlur(n, BA)
+#' blurMat <- boxcarBlur(n, width)
 #' x <- (1:n)/n
 #' matplot(x, blurMat, type = 'l', main = paste('Set of box car blur functions'))
 #' 
@@ -78,8 +78,8 @@ gammaBlur <- function(n, shape, scale) {
 #' @seealso \code{\link{gammaBlur}}, \code{\link{blurSignal}}
 #' 
 #' @export
-boxcarBlur <- function(n, BA) {
-  m <- length(BA)
+boxcarBlur <- function(n, width) {
+  m <- length(width)
   
   box.car <- function(n, a) {
     left <- seq(from = 0, to = 1 - 1/n, length = n)
@@ -88,7 +88,7 @@ boxcarBlur <- function(n, BA) {
     y <- left + aux
   }
   
-  G <- sapply(BA, function(BA) box.car(n, BA))
+  G <- sapply(width, function(i) box.car(n, i))
    
   return(G) 
 }
@@ -116,7 +116,7 @@ makeLIDAR <- function(n) {
     x - 106.66) * (x > 0.8) * (x < 0.815) + (-133.33 * x + 110.6639) * (x > 
     0.815) * (x < 0.83) + (133.33 * x - 119.997) * (x > 0.9) * (x < 0.915) + 
     (-133.33 * x + 123.9969) * (x > 0.915) * (x < 0.93))
-  return(y)
+  y
 }
 
 #' @rdname makeSignals
@@ -135,7 +135,7 @@ makeBumps <- function(n) {
         y <- y + hgt[j]/(1 + abs((x - pos[j])/wth[j]))^4
     }
     y <- y * 1.8
-  return(y)
+  y
 }
 
 #' @rdname makeSignals
@@ -147,7 +147,7 @@ makeDoppler <- function(n) {
     x <- (1:n)/n
     y <- (sqrt(x * (1 - x))) * sin((2 * pi * 1.05)/(x + 0.05))
     y <- y * 2.4
-    return(y)
+    y
 }
 
 #' @rdname makeSignals
@@ -158,7 +158,7 @@ makeDoppler <- function(n) {
 makeCusp <- function(n) {
   x <- (1:n)/n
   y <- 2.4 * sqrt(abs(x - 0.37))
-  return(y)
+  y
 }
 
 #' @rdname makeSignals
@@ -174,7 +174,18 @@ makeBlocks <- function(n) {
     for (j in 1:length(pos)) {
         y <- y + (1 + sign(x - pos[j])) * (hgt[j]/2)
     }
-    return(y)
+    y
+}
+
+#' @rdname makeSignals
+#' @examples
+#' signal <- makeHeaviSine(n)
+#' plot(x, signal, main = 'HeaviSine test signal', type = 'l')
+#' @export
+makeHeaviSine <- function(n) {
+  x <- (1:n)/n
+  y <- 4 * sin(4 * pi * x) - sign(x - 0.3) - sign(0.72 - x)
+  y
 }
 
 #' @title Blur an input signal 
