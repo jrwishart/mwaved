@@ -4,10 +4,9 @@
 \title{Wavelet coefficient estimation from a multichannel signal}
 \usage{
 multiCoef(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
-  alpha = rep(1, dim(as.matrix(Y))[2]), blur = detectBlur(G), j0 = 3L,
-  j1 = NA_integer_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha,
-  blur = blur, j0 = j0, j1 = j1, eta = eta, deg = 3L), eta = NA_real_,
-  deg = 3L)
+  alpha = rep(1, dim(as.matrix(Y))[2]),
+  resolution = resolutionMethod(detectBlur(G)), j0 = 3L, j1 = NA_integer_,
+  eta = NA_real_, deg = 3L)
 }
 \arguments{
 \item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
@@ -16,16 +15,14 @@ multiCoef(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
 
 \item{alpha}{A numeric vector, with m elements, specifying the level of long memory for the noise process within each channel of the form alpha = 2 - 2H, where H is the Hurst parameter. If alpha is a single element, that same element is repeated across all required channels.}
 
-\item{blur}{A character string describing which deconvolution regime is to be applied.\itemize{
-\item 'direct' (default): No deconvolution required and direct signal observed. This is captured when G is an n by m matrix with all entries being zero except the first row where all elements are one.
-\item 'smooth': Indirect signal observed and the blurring kernel is of regular smooth blur type.
-\item 'box.car': Indirect signal observed and the blurring kernel is of box car type.}}
+\item{resolution}{A character string describing which resolution selection method is to be applied.\itemize{
+\item 'smooth': Smooth stopping rule in Fourier domain applied piecewise in each channel and maximum selected which is appropriate if blurring kernel is of regular smooth blur type or direct model (no convolution).
+\item 'block': Blockwise variance selection method is used which is appropriate for box car type.}
+The default choice uses the detectBlur function to identify what type of blur matrix, G, is input and then maps that identification to the resolution type via a simple switch statement in the hidden \code{resolutionMethod} function, whereby, identified 'smooth' and 'direct' blur use the smooth resolution selection while box.car uses the blockwise resolution selection method.}
 
 \item{j0}{The coarsest resolution level for the wavelet expansion.}
 
 \item{j1}{The finest resolution level for the wavelet expansion. If unspecified, the function will compute all thresholds up to the maximum possible resolution level at j1 = log2(n) - 1.}
-
-\item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
 \item{eta}{The smoothing parameter. The default level is \eqn{2\sqrt(\alpha^*)} where \eqn{\alpha^*} is an optimal level depending on the type of blur. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
@@ -68,7 +65,7 @@ E <- multiNoise(n, sigma, alpha)
 Y <- X + E
 plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
 matlines(Y)
-# Estimate the wavelet coefficients blur = 'smooth'
+# Estimate the wavelet coefficients
 estimatedCoefs <- multiCoef(Y, G, alpha = alpha)
 plot(estimatedCoefs)
 # Compute true wavelet coefficients
