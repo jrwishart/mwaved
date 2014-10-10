@@ -3,12 +3,12 @@
 \alias{boxcarBlur}
 \title{Multichannel box car blur}
 \usage{
-boxcarBlur(n, BA)
+boxcarBlur(n, width)
 }
 \arguments{
 \item{n}{An integer specifying the number of observations in each channel}
 
-\item{BA}{A numeric vector of length m where each element specifies the box car widths to blur in each channel.}
+\item{width}{A numeric vector of length m where each element specifies the box car widths to blur in each channel.}
 }
 \value{
 A n by m matrix of normalised box car blur.
@@ -21,10 +21,10 @@ Creates a matrix of dimension n by m which contains a normalised (unit energy in
 }
 \examples{
 n <- 1024
-BA <- 1/sqrt(c(89,353))
+width <- 1/sqrt(c(89,353))
 
 # Plot the box car blur
-blurMat <- boxcarBlur(n, BA)
+blurMat <- boxcarBlur(n, width)
 x <- (1:n)/n
 matplot(x, blurMat, type = 'l', main = paste('Set of box car blur functions'))
 
