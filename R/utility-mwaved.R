@@ -37,38 +37,38 @@
 #' @export
 summary.mWaveD <- function(object, ...){
   n <- length(object$estimate)
-  
+  m <- dim(object$signal)[2]
   cat("Degree of Meyer wavelet =", object$degree, "  , Coarse resolution level j0 =", object$j0)
   cat("\n")
   cat("Sample size per channel = ", n, ", Maximum possible resolution level = ", log2(n) - 1, ".", sep = '')
   cat("\n\n")
-  cat("Number of channels: m =", object$channels,"\n")
-  cat('Blur type: ',object$blurType,'\n\n')
+  cat("Number of channels: m =", m,"\n")
+  cat('Detected Blur Type:',detectBlur(object$G), '\n\n')
+  cat('Resolution selection method: ',object$resolution,'\n\n')
   cat("Estimated Channel information:\n\n")
   
-  if (object$blurType == "direct") {
-    mat <- cbind(round(object$sigma, 3), round(object$alpha, 3), object$blurInfo$freq, rep(object$j1, object$channels))
+  if (object$blurDetected == "direct" && object$resolution == "smooth") {
+    mat <- cbind(round(object$sigma, 3), round(object$alpha, 3), object$blurInfo$freq, rep(object$j1, m))
     colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier freq cutoff", "Highest resolution")
-    rownames(mat) <- paste("Channel ", 1:object$channels,':', sep='')
+    rownames(mat) <- paste("Channel ", 1:m,':', sep='')
     print(mat, ...)
   } else {
     # If Smooth blur is used, display the matrix of values
-    if (object$blurType == "smooth"){
+    if (object$resolution == "smooth"){
       mat <- cbind(round(object$sigma, 3), round(object$alpha, 3), object$blurInfo$freq, object$blurInfo$maxLevels)
       colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier freq cutoff", "Highest resolution")
-      rownames(mat) <- paste("Channel ", 1:object$channels,':', sep='')
+      rownames(mat) <- paste("Channel ", 1:m,':', sep='')
       print(mat, ...)
       cat("\n")
-      cat("Estimated best channel = Channel", object$blurInfo$bestChannel)
-      
+      cat("Estimated best channel = Channel", object$blurInfo$bestChannel)      
     } else {
-      if (object$blurType == "box.car"){
+      if (object$resolution == "block"){
         mat <- cbind(round(object$sigma, 3), round(object$alpha, 3))
         colnames(mat) <- c("Sigma.hat", "Alpha")
-        rownames(mat) <- paste("Channel ", 1:object$channels,':', sep='')
+        rownames(mat) <- paste("Channel ", 1:m,':', sep='')
         print(mat, ...)
       } else {
-        warning('Unrecognised blur.type')
+        warning('Unrecognised resolution selection method.')
       }
     } 
   }
@@ -102,8 +102,9 @@ summary.mWaveD <- function(object, ...){
 #' 
 #' @export
 plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, highest = NULL, scaling = 1, ggplot = TRUE){
+  stopifnot(class(x) == "waveletCoef")
   if (!is.null(y) && class(y) != "waveletCoef") {
-    stop('y argument must be a waveletCoef object')
+    stop('y must be a waveletCoef object')
   }
   
   J <- floor(log2(length(x$coef)))
@@ -198,6 +199,21 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   }
 }
 
+#' @name threshWaveletCoef
+#' @title Threshold waveletCoef object
+#' @description Thresholds a wavelet coefficient object using specified thresholds
+#' @param x A waveletCoef object that is to be thresholded.
+#' @param thresh A numeric vector of positive thresholds to apply to each resolution
+#' @param shrinkType A string specifying which thresholding regime to apply \see{\code{multiThresh}}
+threshWaveletCoef <- function(x, thresh = rep(0, floor(log2(length(x$coef))) - x$j0), shrinkType = 'hard') {
+  stopifnot(class(x) == "waveletCoef")
+  feasibleShrinkage(shrinkType)
+  stopifnot(is.numeric(thresh), all(thresh >= 0))
+  if (length(thresh) != floor(log2(length(x$coef))) - x$j0)
+    stop('thresh vector not long enough to threshold the waveletCoef object for all resolutions')
+  .Call('mwaved_ThresholdCoef', x, j0, j1, thresh, shrinkType)
+}
+
 #' @name plot.mWaveD
 #' @title Plot Output for the mWaveD object
 #' 
@@ -270,11 +286,11 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   
   n  <- length(x$estimate)
   n2 <- n/2
-  m  <- x$channels
+  m  <- dim(x$signal)[2]
   t  <- (1:n)/n
   
   blurInfo <- x$blurInfo
-  blurType <- x$blurType
+  resolution <- x$resolution
   j0 <- x$j0
   j1 <- x$j1
   
@@ -287,12 +303,12 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   mraTitle <- 'Multiresolution Analysis'
   
   if (show[3L]) {
-    if (blurType != "box.car") {
+    if (resolution != "block") {
       xw = fourierWindow(n)
       blur <- mirrorSpec(blurInfo$decay)
       cut <- mirrorSpec(blurInfo$cutoff)
       ylim <- c(min(blurInfo$cutoff[2, ]), 0)
-      if (blurType == 'smooth') {
+      if (x$blurDetected == 'smooth') {
         xbest <- max(blurInfo$freqCutoffs) - 1
         ybest <- cut[n/2 + xbest, blurInfo$bestChannel]
         xlim <- min(2*max(blurInfo$freqCutoff), n/2)
@@ -302,7 +318,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       }
     } else {
       J    <- floor(log2(n)) - 1
-      j    <- j0:min(c(J - 1, 2 * j1))
+      j    <- j0:min(c(J, 2 * j1))
       blkV <- blurInfo$blockVar[1:length(j)]
       blkc <- blurInfo$blockCutoff[1:length(j)]
       ylim <- range(c(blurInfo$blockVar, blurInfo$blockCutoff))
@@ -321,10 +337,10 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
     i <- i + 1
   }
   if (show[3L] && ggAvailable) {
-    if (blurType != 'box.car') {
+    if (resolution != 'block') {
       fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
       resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '')
-      if (blurType == 'smooth') {
+      if (resolution == 'smooth' && x$blurDetected == 'smooth') {
         rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
         leftLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
         pointDots <- ggplot2::geom_point(ggplot2::aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
@@ -393,12 +409,12 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
 
     if (show[3L]) {
       # Plot resolution analysis
-      if (blurType != 'box.car') {
+      if (resolution != 'block') {
         iw = fourierWindow(n)
         matplot(iw, blur, type = 'l', lty = 1, xlim = xlim, ylim = ylim, main = fourierTitle, xlab = fourierLabel, ylab = "")
         matlines(iw, cut, lty = 2)
         grid()      
-        if (blurType == 'smooth') {
+        if (resolution == 'smooth') {
           points(xbest, ybest, col='blue')
           points(-xbest + 1, ybest, col = 'blue')
           xbest <- rep(xbest, 2)
