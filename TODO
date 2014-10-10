@@ -1,0 +1,5 @@
+TODO
+====
+
+* Allow user to specify the planning method, FFTW_ESTIMATE, FFTW_PATIENT etc.
+* Incorporate FFTW Widsom to really allow users to exploit speed. 
