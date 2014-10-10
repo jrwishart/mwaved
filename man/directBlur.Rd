@@ -3,7 +3,7 @@
 \alias{directBlur}
 \title{Direct kernel matrix}
 \usage{
-directBlur(n, m)
+directBlur(n, m = 1)
 }
 \arguments{
 \item{n}{Number of observations in each channel}
