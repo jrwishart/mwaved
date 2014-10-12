@@ -49,14 +49,14 @@ summary.mWaveD <- function(object, ...){
   
   if (object$blurDetected == "direct" && object$resolution == "smooth") {
     mat <- cbind(round(object$sigma, 3), round(object$alpha, 3), object$blurInfo$freq, rep(object$j1, m))
-    colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier freq cutoff", "Highest resolution")
+    colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier number cutoff", "Highest resolution")
     rownames(mat) <- paste("Channel ", 1:m,':', sep='')
     print(mat, ...)
   } else {
     # If Smooth blur is used, display the matrix of values
     if (object$resolution == "smooth"){
       mat <- cbind(round(object$sigma, 3), round(object$alpha, 3), object$blurInfo$freq, object$blurInfo$maxLevels)
-      colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier freq cutoff", "Highest resolution")
+      colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier number cutoff", "Highest resolution")
       rownames(mat) <- paste("Channel ", 1:m,':', sep='')
       print(mat, ...)
       cat("\n")
@@ -106,28 +106,26 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   if (!is.null(y) && class(y) != "waveletCoef") {
     stop('y must be a waveletCoef object')
   }
-  
-  J <- floor(log2(length(x$coef)))
+  n <- length(x$coef)
+  J <- floor(log2(n))
   fine <- ceiling(J) - 1
   # Check resolution ranges
   if (is.null(lowest)) {
     lowest <- x$j0
-  } else {
-    # Catch lowest level too low
-    if (lowest < x$j0 )
+  } else if (lowest < x$j0 ) {
       warning("lowest level shouldn't be smaller than j0 specified in wavelet coefficient object.")
   }
+  
+  # Check resolution levels aren't empty.
+  ind <- which.max(rev(x$coef) != 0)
+  lastres <- floor(log2(n - ind + 1)) - 1
   if (is.null(highest)) {
-    highest <- fine
-  } else {
-    if (highest > fine) {
+    highest <- lastres
+  } else if (highest > fine) {
       warning(paste('highest level too high. Resetting highest level to the maximum at j1 = ', fine))
-    } else {
-      if (highest < lowest) {
-        warning('highest level must be higher than the lowest level.')
-        highest <- lowest
-      }
-    }
+  } else if (highest < lowest) {
+      warning('highest level must be higher than the lowest level.')
+      highest <- lowest
   }
   
   js <- rep(lowest:highest, 2^(lowest:highest))
@@ -159,7 +157,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
     ns <- 1
   }
   
-  mraTitle <- 'Multiresolution Analysis of Coef.'
+  mraTitle <- 'MRA'
   mraLabels <- c("Location", "Resolution Level")
   if (!is.null(labels)) {
     if (length(labels) != ns) {
@@ -197,21 +195,6 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
       segments(kss, jss, kss, wss, lwd = 2, col = 'blue')
     }
   }
-}
-
-#' @name threshWaveletCoef
-#' @title Threshold waveletCoef object
-#' @description Thresholds a wavelet coefficient object using specified thresholds
-#' @param x A waveletCoef object that is to be thresholded.
-#' @param thresh A numeric vector of positive thresholds to apply to each resolution
-#' @param shrinkType A string specifying which thresholding regime to apply \see{\code{multiThresh}}
-threshWaveletCoef <- function(x, thresh = rep(0, floor(log2(length(x$coef))) - x$j0), shrinkType = 'hard') {
-  stopifnot(class(x) == "waveletCoef")
-  feasibleShrinkage(shrinkType)
-  stopifnot(is.numeric(thresh), all(thresh >= 0))
-  if (length(thresh) != floor(log2(length(x$coef))) - x$j0)
-    stop('thresh vector not long enough to threshold the waveletCoef object for all resolutions')
-  .Call('mwaved_ThresholdCoef', x, j0, j1, thresh, shrinkType)
 }
 
 #' @name plot.mWaveD
@@ -254,18 +237,13 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       hsize <- 1
       lsize <- 0.5
       asize <- 0.5
-      library(ggplot2)
       # Initialise list
       ggList <- list(NULL)
       i <- 1
     } 
-    if (singlePlot) {
-      if (gridExtraAvailable) {
-        library(gridExtra)
-      } else {
-        warning('gridExtra package required to create ggplot2 graphics in same window. Setting output to separate windows.')
-        singlePlot <- FALSE
-      }
+    if (singlePlot && !gridExtraAvailable) {
+      warning('gridExtra package required to create ggplot2 graphics in same window. Setting output to separate windows.')
+      singlePlot <- FALSE
     }
   } else {
     ggAvailable <- FALSE
@@ -296,8 +274,8 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   
   estimateTitle <- 'mWaveD estimate'
   signalTitle <- 'Input Signal'
-  fourierLabel <- 'Fourier freq'
-  fourierTitle <- 'Kernel decay in Fourier domain'
+  fourierLabel <- 'Fourier number'
+  fourierTitle <- 'Kernel decay'
   blockTitle <- 'Block wise resolution selection'
   mraLabels <- c('raw',paste(x$shrinkType, ' thresholded', sep = ''))
   mraTitle <- 'Multiresolution Analysis'
@@ -308,13 +286,13 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       blur <- mirrorSpec(blurInfo$decay)
       cut <- mirrorSpec(blurInfo$cutoff)
       ylim <- c(min(blurInfo$cutoff[2, ]), 0)
-      if (x$blurDetected == 'smooth') {
+      if (x$blurDetected == 'direct') {
+        xlim = c(-n2, n2)
+      } else {
         xbest <- max(blurInfo$freqCutoffs) - 1
         ybest <- cut[n/2 + xbest, blurInfo$bestChannel]
-        xlim <- min(2*max(blurInfo$freqCutoff), n/2)
+        xlim <- min(2*max(blurInfo$freqCutoffs), n/2)
         xlim <- c(-xlim, xlim)
-      } else {
-        xlim = c(-n2, n2)
       }
     } else {
       J    <- floor(log2(n)) - 1
@@ -339,12 +317,12 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   if (show[3L] && ggAvailable) {
     if (resolution != 'block') {
       fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
-      resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '')
+      resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '') + ggplot2::coord_cartesian(xlim = xlim)
       if (resolution == 'smooth' && x$blurDetected == 'smooth') {
         rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
         leftLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
         pointDots <- ggplot2::geom_point(ggplot2::aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
-        resolutionPlot <- resolutionPlot + leftLine + rightLine + pointDots + ggplot2::coord_cartesian(xlim = xlim)
+        resolutionPlot <- resolutionPlot + leftLine + rightLine + pointDots
       }
     } else {
       resolutionData <- data.frame(Y = c(blkV, blkc), x = rep(j,2), colour = rep(c("Resolution var.",'Resolution bounds'), each = length(j)) , Ycut = blkc)
@@ -358,7 +336,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   }
   
   if (show[4L] && ggAvailable) {
-      mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste('Thresholding (', x$shrinkType, ')', sep = '')), ggplot = TRUE)
+      mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste('Thresholded (', x$shrinkType, ')', sep = '')), ggplot = TRUE)
       ggList[[i]] <- mraPlot
   }
 
@@ -414,9 +392,9 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
         matplot(iw, blur, type = 'l', lty = 1, xlim = xlim, ylim = ylim, main = fourierTitle, xlab = fourierLabel, ylab = "")
         matlines(iw, cut, lty = 2)
         grid()      
-        if (resolution == 'smooth') {
+        if (resolution == 'smooth' && x$blurDetected != "direct") {
           points(xbest, ybest, col='blue')
-          points(-xbest + 1, ybest, col = 'blue')
+          points(-xbest, ybest, col = 'blue')
           xbest <- rep(xbest, 2)
           ybest <- c(ylim[1], ybest)
           lines(xbest, ybest, lty = 'dotted')
@@ -424,10 +402,13 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
         }
       } else {
   #       showPrompt(ask)
-        plot(j, blkV, type = 'b', xlab = 'j', ylab = '', main = blockTitle)
+        rang = range(as.vector(c(blkV, blkc)))
+        buf = 0.1 * diff(rang)
+        ylims = c(rang[1] - buf, rang[2] + buf)
+        plot(j, blkV, type = 'b', xlab = 'j', ylab = '', main = blockTitle, ylim = ylims)
         lines(j, blkc, col = 2)
         points(j1, blurInfo$blockVar[j == j1], col='blue')
-        lines(c(j1, j1), c(ylim[1], blurInfo$blockVar[j == j1]), lty = 'dashed')
+        lines(c(j1, j1), c(ylims[1], blurInfo$blockVar[j == j1]), lty = 'dashed')
         grid()
       }
     }
