@@ -335,7 +335,7 @@ multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))
 #' # Create noisy & blurred multichannel signal
 #' Y <- X + E
 #' plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
-#' matlines(Y)
+#' matlines(Y, lty = 1)
 #' # Estimate the wavelet coefficients
 #' estimatedCoefs <- multiCoef(Y, G, alpha = alpha)
 #' plot(estimatedCoefs)
@@ -420,22 +420,19 @@ multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
 #' betaShrunk <- waveletThresh(beta, thresh)
 #' plot(beta, betaShrunk)
 #' @export 
-waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
-  stopifnot(class(beta) == "waveletCoef", is.numeric(thresh), any(thresh > 0))
+waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
+  stopifnot(class(beta) == "waveletCoef", is.numeric(thresh), all(thresh > 0))
   nthr <- length(thresh)
   req <- log2(length(beta$coef)) - beta$j0
-  j1 <- beta$j0j0 + req
+  j1 <- beta$j0 + req
   # convert to lower case to avoid trivial issues
   shrinkType <- tolower(shrinkType)
   feasibleShrinkage(shrinkType)
 
-  if (nthr == 1 ) {
-    if (thresh == 0) {
-      thresh <- rep(0, req)  
-    } else {
-      warning("thresh input vector only has one element. Universal threshold applied on all resolutions.")
-      thresh <- rep(thresh, req)
-    }
+  if (nthr == 1 && req > 0) {
+    warning("thresh input vector only has one element. Universal threshold applied on all resolutions.")
+    thresh <- rep(thresh, req)
+    nthr <- length(thresh)
   }
   
   if (nthr < req) {
@@ -454,6 +451,7 @@ waveletThresh <- function(beta, thresh = 0, shrinkType = 'hard'){
 #' 
 #' @description Returns a mWaveD object that contains all the required information for the multichannel analysis.
 #' @inheritParams multiCoef
+#' @param thresh A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.
 #' @param shrinkType A character string that specifies which thresholding regime to use. 
 #' Available choices are the 'hard', 'soft' or 'garrote'.
 #' @examples
@@ -517,7 +515,6 @@ multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y)))
 #' 
 #' @inheritParams multiWaveD
 #' @param sigma A numeric vector with m elements that specifies the level of noise (standard deviation) in each channel. The default method uses the Median Absolute Deviation of wavelet coefficients in the finest resolution (see \code{\link{multiSigma}}) for details.
-#' 
 #' @details Function requires input of a noisy multichannel signal matrix, Y, which contains the information for each channel in each of the m columns. Optional inputs are a matrix, G, the same dimension as Y, that gives the multichannel blur information.
 #' 
 #' @return A numeric vector of the estimate of the underlying signal of interest.
