@@ -15,10 +15,12 @@ shinyUI(navbarPage(
                         "Blurred signal" = 2,
                         "Noisy & blurred signal" = 3), selected=3),
         selectInput("sig", "Underlying Signal:",
-                  list("LIDAR" = "lidar",
-                       "Doppler" = "doppler",
+                  list("Blocks" = "blocks",
                        "Bumps" = "bumps",
-                       "Blocks" = "blocks")),
+                       "Cusp" = "cusp",
+                       "Doppler" = "doppler",
+                       "HeaviSine" = "heavisine",
+                       "LIDAR" = "lidar")),
         selectInput("blur", "Type of blur:",
                   list("No blur (direct)" = "direct",
                        "Smooth (Gamma)" = "smooth",
@@ -40,9 +42,9 @@ shinyUI(navbarPage(
   tabPanel("Resolution selection",
       sidebarLayout(
         sidebarPanel(
-          conditionalPanel(condition="input.blur=='smooth'",
-                           radioButtons("zoom", "Zoom in Fourier:",
-                      list("Yes" = TRUE,"No" = FALSE), selected=TRUE)),
+          selectInput("resolution", "Finest resolution selection method:",
+                      list("Smooth stopping rule" = "smooth",
+                           "Blockwise variance" = "block")),
         verbatimTextOutput("summaryResolution"),
         verbatimTextOutput("resolutionCalls")),
       mainPanel(
