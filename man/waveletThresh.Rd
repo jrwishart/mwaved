@@ -3,7 +3,7 @@
 \alias{waveletThresh}
 \title{Apply thresholding regime to a set of wavelet coefficients}
 \usage{
-waveletThresh(beta, thresh = 0, shrinkType = "hard")
+waveletThresh(beta, thresh, shrinkType = "hard")
 }
 \arguments{
 \item{beta}{A \code{waveletCoef} object.}

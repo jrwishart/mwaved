@@ -30,6 +30,8 @@ The default choice uses the detectBlur function to identify what type of blur ma
 
 \item{eta}{The smoothing parameter. The default level is \eqn{2\sqrt(\alpha^*)} where \eqn{\alpha^*} is an optimal level depending on the type of blur. (see Kulik, Sapatinas and Wishart (2014) for details and justification)}
 
+\item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
+
 \item{shrinkType}{A character string that specifies which thresholding regime to use.
 Available choices are the 'hard', 'soft' or 'garrote'.}
 
