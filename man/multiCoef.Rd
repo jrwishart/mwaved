@@ -64,7 +64,7 @@ E <- multiNoise(n, sigma, alpha)
 # Create noisy & blurred multichannel signal
 Y <- X + E
 plot(signal, type='l', lty='dashed', main='dashed: True signal, solid: multichannel signals')
-matlines(Y)
+matlines(Y, lty = 1)
 # Estimate the wavelet coefficients
 estimatedCoefs <- multiCoef(Y, G, alpha = alpha)
 plot(estimatedCoefs)
