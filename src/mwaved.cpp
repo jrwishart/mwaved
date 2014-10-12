@@ -507,13 +507,13 @@ NumericVector hardThresh(NumericVector in, NumericVector thr, int j0, int j1){
     }
     
     // Start thresholding at correct spot
-    k = (1 << j0) - 1;
+    k = (1 << j0);
     l = 0;
     
     for (j = j0; j <= j1; ++j) {
       thr1 = thr[l];
       for (i = 0; i < n; ++i) {
-        x = in[k];
+          x = in[k];
         if (fabs(x) < thr1) {
           out[k] = 0;
         } else {
@@ -1800,6 +1800,7 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   m  = signal.ncol();
   n2 = n/2 + 1;
   J  = log2((double)n);
+  NumericVector beta(n);  
   
   if (alpha.size() == 0)
     alpha = rep(1.0,m);
@@ -1910,9 +1911,6 @@ List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Nume
   if (j1 < j0) {
     j1 = j0;
   }
-  
-  j = 1 << (j1 + 1);
-  NumericVector beta(j);
   
   // Compute the multichannel normalised Fourier coefficients
   mlwavedxfft(x_fft, m, n, x_multi_out, g_multi_out, sigma, alpha);
