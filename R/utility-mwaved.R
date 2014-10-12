@@ -318,7 +318,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
     if (resolution != 'block') {
       fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
       resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '') + ggplot2::coord_cartesian(xlim = xlim)
-      if (resolution == 'smooth' && x$blurDetected == 'smooth') {
+      if (resolution == 'smooth' && x$blurDetected != 'direct') {
         rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
         leftLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
         pointDots <- ggplot2::geom_point(ggplot2::aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
