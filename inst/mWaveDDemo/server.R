@@ -78,9 +78,18 @@ shinyServer(function(input, output, session) {
   mWaveDList <- reactive({
     
     multiSig <- sigList()
-    mlwvd <- multiWaveD(multiSig$signal, multiSig$G, alpha = multiSig$alpha, 
-                        resolution = multiSig$resolution, shrinkType = input$shrinkage1,
-                        deg = as.integer(input$degree))
+    if (input$etaChoose == "TRUE"){
+      eta <- input$eta
+      mlwvd <- multiWaveD(multiSig$signal, multiSig$G, alpha = multiSig$alpha, eta = eta,
+                          resolution = multiSig$resolution, shrinkType = input$shrinkage1,
+                          deg = as.integer(input$degree))
+    } else {
+      mlwvd <- multiWaveD(multiSig$signal, multiSig$G, alpha = multiSig$alpha, 
+                          resolution = multiSig$resolution, shrinkType = input$shrinkage1,
+                          deg = as.integer(input$degree))
+    }
+    
+
     
     j0 <- mlwvd$j0
     j1 <- mlwvd$j1
@@ -371,14 +380,16 @@ output$wvdPlot <- renderPlot({
            'lidar' = cat('signal <- makeLIDAR(n)', '\n'),
            'doppler' = cat('signal <- makeDoppler(n)', '\n'),
            'bumps' = cat('signal <- makeBumps(n)', '\n'),
-           'blocks' = cat('signal <- makeBlocks(n)', '\n'))
+           'blocks' = cat('signal <- makeBlocks(n)', '\n'),
+           'cusp' = cat('signal <- makeCusp(n)\n'),
+           'heavisine' = cat('signal <- makeHeaviSine(n)\n'))
     cat('t <- (0:(n-1))/n\n')
     if (input$signalShow == '1'){
       cat("plot(t, signal, type = 'l')\n")
     }
     if (input$signalShow == '2' || input$signalShow == '3'){
       if (sList$blur == 'direct'){
-        cat('G <- directBlur(c(n, m))\n') 
+        cat('G <- directBlur(n, m)\n') 
       }
       if (sList$blur == 'smooth'){
         if (sList$m == 1){
@@ -392,9 +403,9 @@ output$wvdPlot <- renderPlot({
       }
       if (sList$blur == 'box.car'){
         if (sList$m == 1){
-          cat('boxWindow <- 1/sqrt(', 1/as.numeric(sList$BA)^2,')\n', sep = '')
+          cat('boxWindow <- 1/sqrt(', 1/as.numeric(sList$width)^2,')\n', sep = '')
         } else {
-          cat('boxWindow <- 1/sqrt(', xcat(1/as.numeric(sList$BA)^2),')\n', sep = '')
+          cat('boxWindow <- 1/sqrt(', xcat(1/as.numeric(sList$width)^2),')\n', sep = '')
         }
         cat("G <- boxcarBlur(n, boxWindow)\n")
       }
@@ -404,14 +415,18 @@ output$wvdPlot <- renderPlot({
       }
       if (input$signalShow == '3'){
         if (sList$m == 1){
-          cat('alpha <-', numclean(sList$alpha),'\n')
+          if (any(input$alpha != 1)){
+            cat('alpha <-', numclean(sList$alpha),'\n')
+          }
           cat('SNR <-', numclean(sList$SNR), '\n')
         } else {
-          cat('alpha <-', xcat(numclean(sList$alpha)),'\n')
+          if (any(input$alpha != 1)){
+            cat('alpha <-', xcat(numclean(sList$alpha)),'\n')  
+          }
           cat('SNR <-', xcat(numclean(sList$SNR)), '\n')  
         }
         cat('sigma <- sigmaSNR(X, SNR)\n')
-        cat('E <- multiNoise(n, sigma, alpha)\n')
+        cat('E <- multiNoise(n, sigma, ',ifelse(any(input$alpha != 1), paste0('alpha'),),')\n', sep ='')
         cat('Y <- X + E\n')
         cat("matplot(t, Y, type = 'l')")
       }
@@ -422,7 +437,12 @@ output$wvdPlot <- renderPlot({
     cat('Base R Function calls:\n\n')
     
     wList <- mWaveDList()
-    cat("mWaveD.output <- multiWaveD(Y, G = G, alpha = alpha, resolution = '",wList$mWaveD$resolutionMethod,"', shrinkType = '",wList$mWaveD$shrinkType,"', deg = ",wList$mWaveD$degree,')\n', sep = '')
+    showG <- ifelse(input$blur != "direct", paste0(",G = G"), paste0(""))
+    showAlpha <- ifelse(any(input$alpha != 1), paste0(", alpha = alpha"), paste0(""))
+    showRes <- ifelse((wList$mWaveD$resolution == "block" && detectBlur(wList$mWaveD$G) != "box.car") || (wList$mWaveD$resolution == "smooth" && detectBlur(wList$mWaveD$G) == "box.car"), paste0(", resolution = '",wList$mWaveD$resolutionMethod,"'"),paste0(""))
+    showShrink <- ifelse(wList$mWaveD$shrinkType != "hard", paste0(", shrinkType = '",wList$mWaveD$shrinkType,"'"),paste0(""))
+    showDeg <- ifelse(wList$mWaveD$degree != 3,  paste0(", deg = ",wList$mWaveD$degree), paste0(""))
+    cat("mWaveD.output <- multiWaveD(Y", showG, showAlpha, showRes, showShrink, showDeg,')\n', sep = '')
     cat('plot(mWaveD.output, which = 3)')
   })
 
@@ -430,12 +450,17 @@ output$wvdPlot <- renderPlot({
     cat('Base R Function calls:\n\n')
 
     wList <- mWaveDList()
+    showG <- ifelse(input$blur != "direct", paste0(",G = G"), paste0(""))
+    showAlpha <- ifelse(any(input$alpha != 1), paste0(", alpha = alpha"), paste0(""))
+    showRes <- ifelse((wList$mWaveD$resolution == "block" && detectBlur(wList$mWaveD$G) != "box.car") || (wList$mWaveD$resolution == "smooth" && detectBlur(wList$mWaveD$G) == "box.car"), paste0(", resolution = '",wList$mWaveD$resolutionMethod,"'"),paste0(""))
+    showShrink <- ifelse(wList$mWaveD$shrinkType != "hard", paste0(", shrinkType = '",wList$mWaveD$shrinkType,"'"),paste0(""))
+    showDeg <- ifelse(wList$mWaveD$degree != 3,  paste0(", deg = ",wList$mWaveD$degree), paste0(""))
     cat('# Note the following commands just give the mWaveD estimate only.\n')
-    cat("mWaveD.output <- multiWaveD(Y, G = G, alpha = alpha, resolution = '",wList$mWaveD$resolutionMethod,"', shrinkType = '",wList$mWaveD$shrinkType,"', deg = ",wList$mWaveD$degree,')\n', sep = '')
+    cat("mWaveD.output <- multiWaveD(Y", showG, showAlpha, showRes, showShrink, showDeg,')\n', sep = '')
     cat('plot(mWaveD.output, which = 2)\n')
     cat('## Or alternatively\n')
     cat('x = (0:(n-1))/n\n')
-    cat("estimate <- multiEstimate(Y, G = G, alpha = alpha, resolution = '",wList$mWaveD$resolutionMethod,"', shrinkType = '",wList$mWaveD$shrinkType,"', deg = ",wList$mWaveD$degree,')\n', sep = '')
+    cat("estimate <- multiEstimate(Y", showG, showAlpha, showRes, showShrink, showDeg,')\n', sep = '')
     cat("plot(x, estimate, type = 'l')")
   })
 
@@ -474,6 +499,13 @@ output$wvdPlot <- renderPlot({
                   selected = currentShrinkage)
   updateSelectInput(session, inputId = 'shrinkage2', label = shrinkLabel, choices = shrinkChoices,
                   selected = currentShrinkage)
+
+  output$etaSlider <- renderUI({
+    sList <- sigList()
+    deta <- theoreticalEta(alpha = sList$alpha, blur = sList$blur, G = sList$G, sList$sigma)
+    sliderInput("eta", "Smoothing parameter range:",
+                min = 0.1, max = 4, value = deta)
+  })
 })
 
 

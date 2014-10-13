@@ -54,6 +54,11 @@ shinyUI(navbarPage(
     sidebarLayout(
       sidebarPanel(
         selectInput("shrinkage1", label = shrinkLabel, choices = shrinkChoices, selected = 'hard'),
+        radioButtons("etaChoose", "Smoothing parameter:",
+                     c("Default" = "FALSE",
+                       "Custom" = "TRUE")),
+        conditionalPanel(condition="input.etaChoose=='TRUE'",
+                         uiOutput("etaSlider")),
         selectInput("degree", label = 'Degree of Meyer Wavelet polynomial:', choices = 0:4, selected = 3),
         verbatimTextOutput("summaryWVD"),
         conditionalPanel(condition="input.m > 1",
