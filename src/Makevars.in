@@ -3,4 +3,4 @@ RCPP_LDFLAGS = @RCPP_LDFLAGS@
 FFTW_LIBS = @FFTW_LIBS@
 
 # combine with standard arguments for R
-PKG_LIBS += $(FFTW_LIBS) $(RCPP_LDFLAGS)
+PKG_LIBS = $(FFTW_LIBS) $(RCPP_LDFLAGS)
