@@ -326,7 +326,7 @@ multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10,15,20)
 #' sigma <- sigmaSNR(X, SNR)
-#' if (require(fracdiff)) {
+#' if (requireNamespace("fracdiff", quietly = TRUE)) {
 #'   alpha <- c(0.75, 0.8, 1)
 #' } else {
 #'   alpha <- rep(1, m)
@@ -406,7 +406,7 @@ multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10, 15, 20)
 #' sigma <- sigmaSNR(X, SNR)
-#' if (require(fracdiff)){
+#' if (requireNamespace("fracdiff", quietly = TRUE)){
 #'   alpha <- c(0.75, 0.8, 1)
 #' } else {
 #'   alpha <- rep(1, m)
@@ -471,7 +471,7 @@ waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10, 15, 20)
 #' sigma <- sigmaSNR(X, SNR)
-#' if (require(fracdiff)) {
+#' if (requireNamespace("fracdiff", quietly = TRUE)) {
 #'   alpha <- c(0.75, 0.8, 1)
 #' } else {
 #'   alpha <- rep(1, m)
@@ -537,7 +537,7 @@ multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y)))
 #' # Create error with custom signal to noise ratio
 #' SNR <- c(10, 15, 20)
 #' sigma <- sigmaSNR(X, SNR)
-#' if (require(fracdiff)) {
+#' if (requireNamespace("fracdiff", quietly = TRUE)) {
 #'   alpha <- c(0.75, 0.8, 1)
 #' } else {
 #'   alpha <- rep(1, m)

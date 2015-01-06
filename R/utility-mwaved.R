@@ -167,8 +167,8 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   } else {
     labels = c('x', 'y')
   }
-  
-  if (ggplot && require(ggplot2)) {
+  ggAvailable <- requireNamespace("ggplot2", quietly = TRUE)
+  if (ggplot && ggAvailable) {
     if (ns == 2) {
       nData <- data.frame(w = c(ws,wss), js = c(js, jss), ks = c(ks, kss), col = rep(labels, c(nw, nss)))
       mraPlot <- ggplot2::ggplot(nData) + ggplot2::geom_segment(ggplot2::aes(x = ks, xend = ks, y = js, yend = w, colour = col, size = col)) + ggplot2::labs(x = mraLabels[1], y = mraLabels[2]) + ggplot2::scale_size_discrete(range = c(1, 2))
@@ -184,9 +184,9 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
     plot(0, type = "n", xlim = c(0,1), ylim = c(lowest - buf, highest + buf), yaxt = 'n', xlab = mraLabels[1], ylab = mraLabels[2], main = mraTitle)
     axis(2, at = lowest:highest)
     if (!is.null(y)) {
-      col = 'red'
+      col <- 'red'
     } else {
-      col = 1
+      col <- 1
     }
     
     segments(ks, js, ks, ws, col = col)
@@ -230,9 +230,9 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   
   # Check if ggplot is available if requested
   if (ggplot) {
-    ggAvailable <- require(ggplot2)
+    ggAvailable <- requireNamespace("ggplot2", quietly = TRUE)
     # Check optional dependency
-    gridExtraAvailable <- require(gridExtra)
+    gridExtraAvailable <- requireNamespace("gridExtra", quietly = TRUE)
     if (ggAvailable) {
       hsize <- 1
       lsize <- 0.5

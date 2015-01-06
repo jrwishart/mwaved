@@ -247,7 +247,7 @@ multiNoise <- function(n, sigma = 1, alpha = length(sigma), ...) {
     m <- length(sigma)
     noise <- matrix(rnorm(n * m, sd = sigma), ncol = m, byrow = TRUE)
   } else {
-    if ( require(fracdiff) ){
+    if ( requireNamespace("fracdiff", quietly = TRUE) ){
       m <- length(sigma)
       # Repeat dependence on all channels if alpha is a single element.
       if (length(alpha) == 1 & m > 1){
