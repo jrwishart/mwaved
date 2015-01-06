@@ -5,7 +5,6 @@ m <- 3
 shape <- seq(from = 0.25, to = 0.75, length = m)
 scale <- rep(0.25, m)
 signal <- makeLIDAR(n)
-# G <- directBlur(n, m)
 G <- gammaBlur(n, shape = c(0.25, 0.5, 0.75), scale = rep(0.25, m))
 X <- blurSignal(signal, G) 
 E <- multiNoise(n, sigma = sigmaSNR(X, SNR = rep(20, m)))
