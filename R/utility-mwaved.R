@@ -222,12 +222,6 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 #' @seealso \code{\link{multiWaveD}}
 #' @export
 plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singlePlot, ggplot = TRUE){
-  showPrompt <- function(condition) {
-    if (condition) {
-      readline('Press any key to see the next plot.')  
-    }
-  }
-  
   # Check if ggplot is available if requested
   if (ggplot) {
     ggAvailable <- requireNamespace("ggplot2", quietly = TRUE)
@@ -347,22 +341,19 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   
   if (ggAvailable) {
     # Plot them
-    if (singlePlot == TRUE) {
+    if (singlePlot == TRUE && gridExtraAvailable) {
       do.call(gridExtra::grid.arrange, ggList)  
     } else {
       if (show[1L]) {
         print(signalPlot)
       }
       if (show[2L]) {
-#         showPrompt(ask)
         print(estimatePlot)
       }
       if (show[3L]) {
-#         showPrompt(ask)
         print(resolutionPlot)
       }
       if (show[4L]) {
-#         showPrompt(ask)
         print(mraPlot)
       }
     }
@@ -401,7 +392,6 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
           lines(-xbest, ybest, lty = 'dotted')
         }
       } else {
-  #       showPrompt(ask)
         rang = range(as.vector(c(blkV, blkc)))
         buf = 0.1 * diff(rang)
         ylims = c(rang[1] - buf, rang[2] + buf)
@@ -412,7 +402,6 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
         grid()
       }
     }
-#     showPrompt(ask)
     if (show[4L]) {
       plot(x$coef, x$shrinkCoef, highest = j1, ..., ggplot = FALSE)
     }
