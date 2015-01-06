@@ -1056,8 +1056,8 @@ NumericVector multiProj(NumericVector beta, int j0 = 3, int j1 = NA_INTEGER, int
   in       = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * n);
   out      = (fftw_complex*)fftw_malloc(sizeof(fftw_complex) * n2);
 
-  real_p   = fftw_plan_dft_r2c_1d(n, real_in, out, FFTW_PATIENT);
-  back_p   = fftw_plan_dft_c2r_1d(n, in, real_out, FFTW_PATIENT);
+  real_p   = fftw_plan_dft_r2c_1d(n, real_in, out, FFTW_ESTIMATE);
+  back_p   = fftw_plan_dft_c2r_1d(n, in, real_out, FFTW_ESTIMATE);
   
   NumericVector final_out(n);
   
@@ -1493,9 +1493,9 @@ NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G,
   // plans
   x_m_real_p   = fftw_plan_many_dft_r2c(1, &n, m, x_m_real_in, NULL, 1, n, x_multi_out, NULL, 1, n2, FFTW_ESTIMATE);
   g_m_real_p   = fftw_plan_many_dft_r2c(1, &n, m, g_m_real_in, NULL, 1, n, g_multi_out, NULL, 1, n2, FFTW_ESTIMATE);
-  real_p       = fftw_plan_dft_r2c_1d(n, real_in, out, FFTW_PATIENT);
+  real_p       = fftw_plan_dft_r2c_1d(n, real_in, out, FFTW_ESTIMATE);
   // Need to determine appropriate c2r transform plan;
-  backward_p   = fftw_plan_dft_c2r_1d(n, in, real_out,FFTW_PATIENT);
+  backward_p   = fftw_plan_dft_c2r_1d(n, in, real_out, FFTW_ESTIMATE);
   
   // Need an appropriate c2r multi plan for scale estimation;
   sigma_back_p = fftw_plan_many_dft_c2r(1, &n, m, sig_in, NULL, 1, n, sig_real_out , NULL, 1, n, FFTW_ESTIMATE);
@@ -2192,7 +2192,7 @@ List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha = Num
   g_m_real_p = fftw_plan_many_dft_r2c(1, &n, m, g_m_real_in, NULL, 1, n, g_multi_out, NULL, 1, n2, FFTW_ESTIMATE);
   real_p     = fftw_plan_dft_r2c_1d(n, real_in, out, FFTW_ESTIMATE);
   // Need to determine appropriate c2r transform plan;
-  backward_p = fftw_plan_dft_c2r_1d(n, in, real_out,FFTW_ESTIMATE);
+  backward_p = fftw_plan_dft_c2r_1d(n, in, real_out, FFTW_ESTIMATE);
   
   // Need an appropriate c2r multi plan for scale estimation;
   sigma_back_p = fftw_plan_many_dft_c2r(1, &n, m, sig_in, NULL, 1, n, sig_real_out , NULL, 1, n, FFTW_ESTIMATE);
