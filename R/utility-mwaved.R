@@ -167,8 +167,14 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   } else {
     labels = c('x', 'y')
   }
-  ggAvailable <- requireNamespace("ggplot2", quietly = TRUE)
-  if (ggplot && ggAvailable) {
+  if (ggplot) {
+    ggAvailable <- requireNamespace("ggplot2", quietly = TRUE)
+    if (!ggAvailable) {
+      ggplot = FALSE
+    }
+  }
+  
+  if (ggplot) {
     if (ns == 2) {
       nData <- data.frame(w = c(ws,wss), js = c(js, jss), ks = c(ks, kss), col = rep(labels, c(nw, nss)))
       mraPlot <- ggplot2::ggplot(nData) + ggplot2::geom_segment(ggplot2::aes(x = ks, xend = ks, y = js, yend = w, colour = col, size = col)) + ggplot2::labs(x = mraLabels[1], y = mraLabels[2]) + ggplot2::scale_size_discrete(range = c(1, 2))
@@ -220,13 +226,13 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 #' 
 #' Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 #' @seealso \code{\link{multiWaveD}}
+#' @importFrom grid grid.newpage pushViewport viewport grid.layout
 #' @export
 plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singlePlot, ggplot = TRUE){
   # Check if ggplot is available if requested
   if (ggplot) {
     ggAvailable <- requireNamespace("ggplot2", quietly = TRUE)
     # Check optional dependency
-    gridExtraAvailable <- requireNamespace("gridExtra", quietly = TRUE)
     if (ggAvailable) {
       hsize <- 1
       lsize <- 0.5
@@ -235,10 +241,6 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       ggList <- list(NULL)
       i <- 1
     } 
-    if (singlePlot && !gridExtraAvailable) {
-      warning('gridExtra package required to create ggplot2 graphics in same window. Setting output to separate windows.')
-      singlePlot <- FALSE
-    }
   } else {
     ggAvailable <- FALSE
   }
@@ -296,53 +298,71 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       ylim <- range(c(blurInfo$blockVar, blurInfo$blockCutoff))
     }
   }
-  if (show[1L] && ggAvailable) {
-    signalData <- data.frame(Y = as.vector(x$signal), x = rep(t, m), Channel = rep(LETTERS[1:m], each = n))
-    signalPlot <- ggplot2::ggplot(signalData, ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(signalTitle) + ggplot2::labs(x = '', y = '')
-    ggList[[i]] <- signalPlot
-    i <- i + 1
-  }
-  if (show[2L] && ggAvailable) {
-    estimateData <- data.frame(Y = as.vector(x$estimate), x = t)
-    estimatePlot <- ggplot2::ggplot(estimateData, ggplot2::aes_string(x = 'x', y = 'Y')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(estimateTitle) + ggplot2::labs(x = '', y = '')
-    ggList[[i]] <- estimatePlot
-    i <- i + 1
-  }
-  if (show[3L] && ggAvailable) {
-    if (resolution != 'block') {
-      fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
-      resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '') + ggplot2::coord_cartesian(xlim = xlim)
-      if (resolution == 'smooth' && x$blurDetected != 'direct') {
-        rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
-        leftLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
-        pointDots <- ggplot2::geom_point(ggplot2::aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
-        resolutionPlot <- resolutionPlot + leftLine + rightLine + pointDots
-      }
-    } else {
-      resolutionData <- data.frame(Y = c(blkV, blkc), x = rep(j,2), colour = rep(c("Resolution var.",'Resolution bounds'), each = length(j)) , Ycut = blkc)
-      bestV <- blkV[j == j1]
-      highlightData <- data.frame(x = c(j1, j1), y = c(ylim[1], bestV))
-      pointData <- data.frame(j1 = j1, bestV = bestV)
-      resolutionPlot <- ggplot2::ggplot(resolutionData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'colour', linetype = 'colour'), size = hsize) +  ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = highlightData) + ggplot2::labs(x = 'j', y = '') + ggplot2::geom_point( ggplot2::aes_string(x = 'j1', y = 'bestV'), size = 4, shape = 1, data = pointData)  + ggplot2::scale_color_discrete(labels= c('Resolution bounds', 'Resolution var.'), guide=ggplot2::guide_legend(title.position='left',title.theme = ggplot2::element_text(size=15,angle=0))) + ggplot2::scale_size(guide='none') + ggplot2::guides(colour = ggplot2::guide_legend( title='Blockwise resolution decay')) + ggplot2::theme(legend.position="top", legend.key = ggplot2::element_rect(fill = NA), axis.text.y = ggplot2::element_text(angle = 90)) + ggplot2::scale_linetype_manual(values=c(1,2), name="Blockwise resolution decay", labels=c('Resolution bounds', 'Resolution var.')) + ggplot2::scale_x_continuous(breaks = j)
-    }
-    ggList[[i]] <- resolutionPlot
-    i <- i + 1
-  }
   
-  if (show[4L] && ggAvailable) {
-      mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste('Thresholded (', x$shrinkType, ')', sep = '')), ggplot = TRUE)
-      ggList[[i]] <- mraPlot
-  }
-
   if (ask) {
     oask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(oask))
   }
   
-  if (ggAvailable) {
+  if (ggplot) {
+    if (show[1L]) {
+      signalData <- data.frame(Y = as.vector(x$signal), x = rep(t, m), Channel = rep(LETTERS[1:m], each = n))
+      signalPlot <- ggplot2::ggplot(signalData, ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(signalTitle) + ggplot2::labs(x = '', y = '')
+      ggList[[i]] <- signalPlot
+      i <- i + 1
+    }
+    if (show[2L]) {
+      estimateData <- data.frame(Y = as.vector(x$estimate), x = t)
+      estimatePlot <- ggplot2::ggplot(estimateData, ggplot2::aes_string(x = 'x', y = 'Y')) + ggplot2::geom_line(size = lsize, alpha = asize) + ggplot2::ggtitle(estimateTitle) + ggplot2::labs(x = '', y = '')
+      ggList[[i]] <- estimatePlot
+      i <- i + 1
+    }
+    if (show[3L]) {
+      if (resolution != 'block') {
+        fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
+        resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '') + ggplot2::coord_cartesian(xlim = xlim)
+        if (resolution == 'smooth' && x$blurDetected != 'direct') {
+          rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
+          leftLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(-xbest,2), y = c(ybest, -Inf)))
+          pointDots <- ggplot2::geom_point(ggplot2::aes_string(x = 'xbest', y = 'ybest'), shape = 1, size = 4, data = data.frame(xbest = c(-xbest, xbest), ybest = rep(ybest, 2)))
+          resolutionPlot <- resolutionPlot + leftLine + rightLine + pointDots
+        }
+      } else {
+        resolutionData <- data.frame(Y = c(blkV, blkc), x = rep(j,2), colour = rep(c("Resolution var.",'Resolution bounds'), each = length(j)) , Ycut = blkc)
+        bestV <- blkV[j == j1]
+        highlightData <- data.frame(x = c(j1, j1), y = c(ylim[1], bestV))
+        pointData <- data.frame(j1 = j1, bestV = bestV)
+        resolutionPlot <- ggplot2::ggplot(resolutionData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'colour', linetype = 'colour'), size = hsize) +  ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = highlightData) + ggplot2::labs(x = 'j', y = '') + ggplot2::geom_point( ggplot2::aes_string(x = 'j1', y = 'bestV'), size = 4, shape = 1, data = pointData)  + ggplot2::scale_color_discrete(labels= c('Resolution bounds', 'Resolution var.'), guide=ggplot2::guide_legend(title.position='left',title.theme = ggplot2::element_text(size=15,angle=0))) + ggplot2::scale_size(guide='none') + ggplot2::guides(colour = ggplot2::guide_legend( title='Blockwise resolution decay')) + ggplot2::theme(legend.position="top", legend.key = ggplot2::element_rect(fill = NA), axis.text.y = ggplot2::element_text(angle = 90)) + ggplot2::scale_linetype_manual(values=c(1,2), name="Blockwise resolution decay", labels=c('Resolution bounds', 'Resolution var.')) + ggplot2::scale_x_continuous(breaks = j)
+      }
+      ggList[[i]] <- resolutionPlot
+      i <- i + 1
+    }
+    
+    if (show[4L]) {
+        mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste('Thresholded (', x$shrinkType, ')', sep = '')), ggplot = TRUE)
+        ggList[[i]] <- mraPlot
+    }
     # Plot them
-    if (singlePlot == TRUE && gridExtraAvailable) {
-      do.call(gridExtra::grid.arrange, ggList)  
+    if (singlePlot) {
+      nPlots <- sum(show)
+      if (nPlots < 4) {
+        cols <- 1
+      } else {
+        cols <- 2
+      }
+      layout <- matrix(seq(1, cols * ceiling(nPlots/cols)),
+                       ncol = cols, nrow = ceiling(nPlots/cols))
+      if (nPlots == 1) {
+        print(ggList[[1]])
+      } else {
+        grid.newpage()
+        pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+        for (i in 1:nPlots) {
+          matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+          print(ggList[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                           layout.pos.col = matchidx$col))
+        }
+      }
     } else {
       if (show[1L]) {
         print(signalPlot)
@@ -364,18 +384,18 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
     } else {
       par(mfrow = c(1,1))
     }
-
+    
     if (show[1L]) {
       matplot(t, x$signal, type = 'l', main = signalTitle, ylab = '', xlab = '', lty = 1, cex = 0.8)
       grid()
     }
-
+    
     if (show[2L]) {
       # Plot mWaveD estimate
       plot(t, x$estimate, type = 'l', main = estimateTitle, ylab = '', xlab = '', ...)
       grid()
     }
-
+    
     if (show[3L]) {
       # Plot resolution analysis
       if (resolution != 'block') {
@@ -430,7 +450,7 @@ fourierWindow <- function(n) {
 #' @name mWaveDDemo
 #' @title Interactive Demonstration
 #' @description Interactive Demonstration
-#' 
+#' @importFrom shiny runApp
 #' @export
 mWaveDDemo <- function (){
   runApp(system.file('mWaveDDemo', package = 'mwaved'))
