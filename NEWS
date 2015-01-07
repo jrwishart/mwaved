@@ -1,3 +1,11 @@
+mwaved 1.1.1
+============
+
+* Fixed Makevars.in to adhere to POSIX standard.
+* Removed the `require` commands from the source code.
+* Dropped `Suggests gridExtra` in favour of leaner import of a few select functions from the `r-base grid` package.
+* Cleaned some code to improve readability.
+
 mwaved 1.1.0
 ============
 
