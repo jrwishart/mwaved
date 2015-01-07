@@ -350,7 +350,8 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
         cols <- 2
       }
       layout <- matrix(seq(1, cols * ceiling(nPlots/cols)),
-                       ncol = cols, nrow = ceiling(nPlots/cols))
+                       ncol = cols, nrow = ceiling(nPlots/cols),
+                       byrow = TRUE)
       if (nPlots == 1) {
         print(ggList[[1]])
       } else {
