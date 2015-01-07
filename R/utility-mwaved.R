@@ -194,9 +194,8 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
     } else {
       col <- 1
     }
-    
     segments(ks, js, ks, ws, col = col)
-    
+    abline(h = lowest:highest, v = axTicks(1), col="gray", lty=3)
     if (!is.null(y)) {
       segments(kss, jss, kss, wss, lwd = 2, col = 'blue')
     }
