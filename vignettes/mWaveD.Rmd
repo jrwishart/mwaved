@@ -155,7 +155,7 @@ NB: the above command to download the development version from github requires t
 
 * To get the most use out of the package, it is recommended to install the suggested packages,
 ```R
-install.packages(c('fracdiff', 'gridExtra', 'ggplot2', 'shiny'))
+install.packages(c('fracdiff', 'ggplot2', 'shiny'))
 ```
 
 # Input {#input}
@@ -242,7 +242,6 @@ plot(x, Doppler, type = 'l')
 ```{r plot-simulation, echo = FALSE, results='hide', message = FALSE, fig.show='hold'}
 library(mwaved)
 library(ggplot2)
-library(gridExtra)
 n <- 1024
 dat <- data.frame(x = seq(from = 0, to = 1-1/n, length = n), 
                   Doppler = makeDoppler(n),
