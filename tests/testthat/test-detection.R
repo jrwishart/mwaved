@@ -11,9 +11,9 @@ Gsmooth <- gammaBlur(n, shape, scale)
 
 # Check correct blur types are identified
 test_that("Correct identification", {
-  expect_output(detectBlur(Gdirect),"direct")
-  expect_output(detectBlur(Gboxcar),"box.car")
-  expect_output(detectBlur(Gsmooth),"smooth")
+  expect_output(print(detectBlur(Gdirect)), "direct")
+  expect_output(print(detectBlur(Gboxcar)), "box.car")
+  expect_output(print(detectBlur(Gsmooth)), "smooth")
 })
 
 # Warnings are thrown for incorrect specifications

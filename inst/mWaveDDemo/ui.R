@@ -2,6 +2,8 @@ library(shiny)
 shrinkLabel <- "Shrinkage Type:"
 shrinkChoices <- list("Hard" = "Hard", "Soft" = "Soft", "Garrote" = "Garrote")
 # Define UI
+sideWidth = 3
+mainWidth = 12 - sideWidth
 shinyUI(navbarPage(
   # Application title
   "mWaveD Interactive Demo",
@@ -35,7 +37,7 @@ shinyUI(navbarPage(
         sliderInput("SNR","SNR = Signal to Noise Ratio (dB):",5,30,value=c(25,30),locale='au'),
         sliderInput("J","n = 2^J : # obs per channel:",8,14,12,locale='au'), 
         verbatimTextOutput("summarySignal"),
-        verbatimTextOutput("signalCalls")),
+        verbatimTextOutput("signalCalls"), width = sideWidth),
       mainPanel(
         plotOutput("reactiveSignal", height = "auto"))), icon = icon("signal")),
   # Second Tab Panel
@@ -46,9 +48,9 @@ shinyUI(navbarPage(
                       list("Smooth stopping rule" = "smooth",
                            "Blockwise variance" = "block")),
         verbatimTextOutput("summaryResolution"),
-        verbatimTextOutput("resolutionCalls")),
+        verbatimTextOutput("resolutionCalls"), width = sideWidth),
       mainPanel(
-        plotOutput("resolutionPlot", height = "auto"))), icon = icon("check-square-o")),
+        plotOutput("resolutionPlot", height = "auto"), width = mainWidth)), icon = icon("check-square-o")),
   # Third tab panel
   tabPanel("Re-constructed Signal",
     sidebarLayout(
@@ -66,15 +68,15 @@ shinyUI(navbarPage(
             list("Using only best channel" = 1,
                   "Using naive mean" = 2,
                   "No alternatives" = 3), selected = 3)),
-        verbatimTextOutput("mWaveDCalls")),
+        verbatimTextOutput("mWaveDCalls"), width = sideWidth),
       mainPanel(
-        plotOutput("wvdPlot", height = "auto"))), icon = icon("pencil-square-o")),
+        plotOutput("wvdPlot", height = "auto"), width = mainWidth)), icon = icon("pencil-square-o")),
   # Fourth tab panel
   tabPanel("Multiresolution Analysis",
     sidebarLayout(
       sidebarPanel(
         selectInput("shrinkage2", label = shrinkLabel, choices = shrinkChoices, selected = "Hard"),
         verbatimTextOutput("summaryMRA"),
-        verbatimTextOutput("mraCalls")),
-      mainPanel(plotOutput("multiPlot", height = "auto"))), icon = icon("search-plus"))
+        verbatimTextOutput("mraCalls"), width = sideWidth),
+      mainPanel(plotOutput("multiPlot", height = "auto"), width = mainWidth)), icon = icon("search-plus"))
 ))

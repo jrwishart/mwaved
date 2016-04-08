@@ -268,6 +268,7 @@ multiNoise <- function(n, sigma = 1, alpha = length(sigma), ...) {
 }
 
 #' @title Determine noise scale levels from specified \bold{S}ignal to \bold{N}oise \bold{R}atios
+#' @description Compute the noise scale levels for each channel using the \bold{S}ignal to \bold{N}oise \bold{R}atios
 #' @param signal Noisefree multichannel input signal
 #' @param SNR A numeric vector specifying the desired \bold{S}ignal to \bold{N}oise \bold{R}atio for each channel.
 #' @details The output noise scale levels (theoretical standard deviation for the process noise process in each channel) is governed by the blurred \bold{S}ignal-to-\bold{N}oise \bold{R}atio (SNR) measured in decibels (dB) where,
