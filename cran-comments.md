@@ -9,9 +9,3 @@
 ## R CMD check results
 
 * There were no ERRORs or WARNINGs. 
-* There were 2 NOTEs:
-    - Possibly mis-spelled words in DESCRIPTION:
-        - Deconvolution (3:29)
-        - Multichannel (3:8)
-        - deconvolution (9:35)
-    - Updated maintainer's email address.
