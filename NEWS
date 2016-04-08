@@ -1,3 +1,14 @@
+mwaved 1.1.3
+============
+
+* Updated `testthat` function calls to be compatible with the new `testthat` package. i.e. new `testthat` version is backwards incompatible.
+
+mwaved 1.1.2
+============
+
+* Update maintainer's email address.
+
+
 mwaved 1.1.1
 ============
 
