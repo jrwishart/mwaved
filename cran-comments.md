@@ -4,14 +4,8 @@
 
 ## Test environments
 * locally Windows 10, R 3.2.4
-* win-builder (devel 2016-03-12 r70325 and release)
+* win-builder (3.3.0 beta (2016-04-06 r70434) and release)
 
 ## R CMD check results
 
 * There were no ERRORs or WARNINGs. 
-* There were 2 NOTEs:
-    - Possibly mis-spelled words in DESCRIPTION:
-        - Deconvolution (3:29)
-        - Multichannel (3:8)
-        - deconvolution (9:35)
-    - Updated maintainer's email address.
