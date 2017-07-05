@@ -1,8 +1,8 @@
 # 
 # Master file to control the output functions and their documentation.
-# Copyright Justin R Wishart 2014
+# Copyright Justin R Wishart 2017
 # Questions or comments?
-# email: j.wishart@unsw.edu.au
+# email: justin.wishart@mq.edu.au
 
 #' @name mwaved
 #' @title Multichannel wavelet deconvolution with long memory using mwaved.
@@ -11,8 +11,6 @@
 #'
 #' @details \code{mwaved} uses the WaveD wavelet deconvolution paradigm and is based on the \code{waved} R-package given by Raimondo and Stewart (2007). It generalises the approach by allowing a multichannel signal instead of a single channel signal and allows long memory errors within each channel (independent of each channel). See Kulik, Sapatinas and Wishart (2014) for theoretical results and a short numerical investigation. The \code{mwaved} package also uses the external C FFTW library described in Frigo and Johnson, (2005) to dramatically increase the speed of the computations. Detailed information and instructions for implementation are available at \url{http://www.fftw.org}.
 #' 
-#' @import Rcpp
-#' @useDynLib mwaved mwaved_multiSigma mwaved_multiEstimate mwaved_multiWaveD mwaved_multiThresh mwaved_multiCoef mwaved_multiProj mwaved_waveletThresh
 #' @references 
 #' Frigo, M and Johnson, S.G. (2005) \emph{The design and implementation of FFTW3}, Proceedings of the IEEE \bold{93}, 216--231.
 #' \url{http://dx.doi.org/10.1109/JPROC.2004.840301}
@@ -30,7 +28,6 @@ NULL
 #' @details Function creates a matrix of dimension n by m which contains appropriate entries for the case when a direct multichannel signal is observed. That is, no blurring operator is apparent. This is the default argument for the blurring matrix to all the multichannel functions in the \code{mwaved} package.
 #' @param n Number of observations in each channel
 #' @param m Number of channels
-#' @export
 directBlur <- function(n, m = 1){
   stopifnot(is.vector(n), length(n)==1, is.vector(m), length(m) == 1)
   .Call('mwaved_directBlur', n, m)
@@ -41,7 +38,6 @@ directBlur <- function(n, m = 1){
 #' @description Detect the form of the input blur matrix, G
 #' @details Detects if the input blur matrix, G, has uniform structure in being of direct blur type everywhere or box.car type everywhere. In those cases, it will return a character string 'direct' or 'box.car' respectively, otherwise it returns 'smooth'. This is done in the direct blur case by checking that the mvfft(G) is equal to 1 everywhere (complex part is zero everywhere) and in the box.car case by checking that each column has two unique values, a zero and positive value. If the blur type is not identified to be direct or box.car, the string 'smooth' is returned.
 #' @param G The input blur matrix to be analysed and checked whether it corresponds to direct blur or box.car blur.
-#' @export
 detectBlur <- function(G) {
   stopifnot(is.matrix(G), !is.complex(G))
   if (.Call('mwaved_directDetect', G)) {
@@ -63,7 +59,6 @@ detectBlur <- function(G) {
 #' \item 'smooth': Blur that has smooth decay in the Fourier domain.
 #' \item 'box.car': Blur that is of box.car type.
 #' }
-#' @export
 resolutionMethod <- function(blur) {
   stopifnot(is.character(blur), length(blur) == 1)
   switch(blur,
@@ -181,7 +176,6 @@ feasibleShrinkage <- function(shrinkType){
 #' # Estimate the noise levels
 #' multiSigma(Y, deg = 3)
 #'
-#' @export 
 multiSigma <- function(Y, deg = 3L){
   stopifnot(is.numeric(Y), !is.complex(Y), is.numeric(deg), length(deg) == 1)
   Y <- as.matrix(Y)
@@ -223,7 +217,6 @@ multiSigma <- function(Y, deg = 3L){
 #' ltys <-  c(1, 1:length(j))
 #' matlines(x, sapply(j, function(i) multiProj(beta, j1 = i)), type = 'l', col = lcols[-1])
 #' legend("bottomright", legend = c("Signal", paste('j1 =', j)), col = lcols, lty =ltys)
-#' @export
 multiProj <- function(beta, j1 = log2(length(beta$coef)) - 1) {
   stopifnot(class(beta) == 'waveletCoef')
   coefs <- beta$coef
@@ -280,7 +273,6 @@ multiProj <- function(beta, j1 = log2(length(beta$coef)) - 1) {
 #' @references
 #' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
 #' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
-#' @export
 multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
                         resolution = resolutionMethod(detectBlur(G)), j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
   stopifnot(!is.complex(Y), !is.complex(G))
@@ -343,7 +335,6 @@ multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))
 #' # Compute true wavelet coefficients
 #' trueCoefs <- multiCoef(signal)
 #' plot(trueCoefs)
-#' @export
 multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
                       resolution = resolutionMethod(detectBlur(G)), j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
   stopifnot(!is.complex(Y), !is.complex(G))
@@ -420,7 +411,6 @@ multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
 #' beta <- multiCoef(Y, G)
 #' betaShrunk <- waveletThresh(beta, thresh)
 #' plot(beta, betaShrunk)
-#' @export 
 waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
   stopifnot(class(beta) == "waveletCoef", is.numeric(thresh), all(thresh > 0))
   nthr <- length(thresh)
@@ -487,7 +477,6 @@ waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
 #' 
 #' @seealso \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
 #' 
-#' @export
 multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
                        j0 = 3L, j1 = NA_integer_, resolution = resolutionMethod(detectBlur(G)), eta = NA_real_,
                        thresh = as.numeric(c()), shrinkType = "hard", deg = 3L) {
@@ -554,7 +543,6 @@ multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y)))
 #' plot(x, signal, type = 'l', lty = 2, main = 'True Doppler signal and estimate', col = 'red')
 #' lines(x, dopplerEstimate)
 #' 
-#' @export
 multiEstimate <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
                           resolution = resolutionMethod(detectBlur(G)), sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, 
                           eta = NA_real_, thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha,
@@ -592,7 +580,6 @@ multiEstimate <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y
 #' @references
 #' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
 #' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
-#' @export
 theoreticalEta <- function(alpha, blur, G, sigma) {
   feasibleBlur(blur)
   if (blur == 'box.car') {

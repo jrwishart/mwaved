@@ -30,7 +30,6 @@
 #' blurredSignal <- blurSignal(signal, blurMat)
 #' matplot(x, blurredSignal, type = 'l', main = 'Smooth blurred LIDAR test signals')
 #' @seealso \code{\link{boxcarBlur}}, \code{\link{blurSignal}}
-#' @export
 gammaBlur <- function(n, shape, scale) {
   if (length(shape) != length(scale)){
     warning("Dimension mismatch: Length of vectors for scale and shape parameters do not match")
@@ -77,7 +76,6 @@ gammaBlur <- function(n, shape, scale) {
 #' matplot(x, blurredSignal, type = 'l', main = 'Box car blurred LIDAR test signals')
 #' @seealso \code{\link{gammaBlur}}, \code{\link{blurSignal}}
 #' 
-#' @export
 boxcarBlur <- function(n, width) {
   m <- length(width)
   
@@ -109,7 +107,6 @@ NULL
 #' @examples
 #' signal <- makeLIDAR(n)
 #' plot(x, signal, main = 'LIDAR test signal', type = 'l')
-#' @export
 makeLIDAR <- function(n) {
   x <- (1:n)/n
   y <- 0.7 * (1 * (x > 0.15) * (x < 0.65) + 1 * (x > 0.28) * (x < 0.48) + (133.33 * 
@@ -123,7 +120,6 @@ makeLIDAR <- function(n) {
 #' @examples
 #' signal <- makeBumps(n)
 #' plot(x, signal, main = 'Bumps test signal', type = 'l')
-#' @export
 makeBumps <- function(n) {
     x <- 1:n/n
     pos <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
@@ -142,7 +138,6 @@ makeBumps <- function(n) {
 #' @examples
 #' signal <- makeDoppler(n)
 #' plot(x, signal, main = 'Doppler test signal', type = 'l')
-#' @export
 makeDoppler <- function(n) {
     x <- (1:n)/n
     y <- (sqrt(x * (1 - x))) * sin((2 * pi * 1.05)/(x + 0.05))
@@ -154,7 +149,6 @@ makeDoppler <- function(n) {
 #' @examples
 #' signal <- makeCusp(n)
 #' plot(x, signal, main = 'Cusp test signal', type = 'l')
-#' @export
 makeCusp <- function(n) {
   x <- (1:n)/n
   y <- 2.4 * sqrt(abs(x - 0.37))
@@ -165,7 +159,6 @@ makeCusp <- function(n) {
 #' @examples
 #' signal <- makeBlocks(n)
 #' plot(x, signal, main = 'Blocks test signal', type = 'l')
-#' @export
 makeBlocks <- function(n) {
     x <- (1:n)/n
     pos <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.4, 0.44, 0.65, 0.76, 0.78, 0.81)
@@ -181,7 +174,6 @@ makeBlocks <- function(n) {
 #' @examples
 #' signal <- makeHeaviSine(n)
 #' plot(x, signal, main = 'HeaviSine test signal', type = 'l')
-#' @export
 makeHeaviSine <- function(n) {
   x <- (1:n)/n
   y <- 4 * sin(4 * pi * x) - sign(x - 0.3) - sign(0.72 - x)
@@ -209,7 +201,6 @@ makeHeaviSine <- function(n) {
 #' 
 #' @seealso \code{\link{gammaBlur}}, \code{\link{boxcarBlur}}
 #' 
-#' @export
 blurSignal <- function(signal, G) {
   n <- length(signal)
   G <- as.matrix(G)
@@ -240,7 +231,6 @@ blurSignal <- function(signal, G) {
 #' sigma <- sigmaSNR(X, SNR)
 #' E <- multiNoise(n, sigma, alpha = c(0.5, 0.75, 1))
 #' matplot(X + E, type = 'l')
-#' @export
 multiNoise <- function(n, sigma = 1, alpha = length(sigma), ...) {
   # Simulate independent Gaussian noise by default
   if ( length(alpha) == 1 && alpha %% 1 == 0 ){
@@ -286,7 +276,6 @@ multiNoise <- function(n, sigma = 1, alpha = length(sigma), ...) {
 #' sigma <- sigmaSNR(X, SNR)
 #' E <- multiNoise(n, sigma)
 #' sigmaEst <- multiSigma(E)
-#' @export
 sigmaSNR <- function(signal, SNR) {
   Y <- as.matrix(signal)
   n <- dim(Y)[1]

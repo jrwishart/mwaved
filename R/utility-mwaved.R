@@ -34,7 +34,6 @@
 #' Y <- X + E
 #' mWaveDObject <- multiWaveD(Y, G)
 #' summary(mWaveDObject)
-#' @export
 summary.mWaveD <- function(object, ...){
   n <- length(object$estimate)
   m <- dim(object$signal)[2]
@@ -100,7 +99,6 @@ summary.mWaveD <- function(object, ...){
 #' 
 #' @seealso \code{\link{multiCoef}} for generating a list of class `waveletCoef`
 #' 
-#' @export
 plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, highest = NULL, scaling = 1, ggplot = TRUE){
   stopifnot(class(x) == "waveletCoef")
   if (!is.null(y) && class(y) != "waveletCoef") {
@@ -225,8 +223,6 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 #' 
 #' Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 #' @seealso \code{\link{multiWaveD}}
-#' @importFrom grid grid.newpage pushViewport viewport grid.layout
-#' @export
 plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singlePlot, ggplot = TRUE){
   # Check if ggplot is available if requested
   if (ggplot) {
@@ -450,8 +446,6 @@ fourierWindow <- function(n) {
 #' @name mWaveDDemo
 #' @title Interactive Demonstration
 #' @description Interactive Demonstration
-#' @importFrom shiny runApp
-#' @export
 mWaveDDemo <- function (){
   runApp(system.file('mWaveDDemo', package = 'mwaved'))
 }
