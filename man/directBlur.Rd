@@ -17,4 +17,3 @@ Creates appropriately sized blur matrix for the special case when no blurring is
 \details{
 Function creates a matrix of dimension n by m which contains appropriate entries for the case when a direct multichannel signal is observed. That is, no blurring operator is apparent. This is the default argument for the blurring matrix to all the multichannel functions in the \code{mwaved} package.
 }
-

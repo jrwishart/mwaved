@@ -73,4 +73,3 @@ plot(estimatedCoefs)
 trueCoefs <- multiCoef(signal)
 plot(trueCoefs)
 }
-

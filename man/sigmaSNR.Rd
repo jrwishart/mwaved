@@ -36,4 +36,3 @@ sigmaEst <- multiSigma(E)
 \seealso{
 \code{\link{multiNoise}} \code{\link{multiSigma}}
 }
-

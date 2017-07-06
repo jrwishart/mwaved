@@ -39,4 +39,3 @@ Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel
 \seealso{
 \code{\link{multiWaveD}}
 }
-

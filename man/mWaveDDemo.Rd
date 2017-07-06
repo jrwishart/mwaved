@@ -9,4 +9,3 @@ mWaveDDemo()
 \description{
 Interactive Demonstration
 }
-

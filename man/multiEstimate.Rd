@@ -82,4 +82,3 @@ plot(x, signal, type = 'l', lty = 2, main = 'True Doppler signal and estimate', 
 lines(x, dopplerEstimate)
 
 }
-

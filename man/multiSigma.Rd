@@ -30,4 +30,3 @@ Y <- sapply(1:3, function(i) sig[i]* rnorm(n))
 multiSigma(Y, deg = 3)
 
 }
-

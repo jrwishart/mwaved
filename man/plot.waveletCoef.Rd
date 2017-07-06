@@ -30,4 +30,3 @@ Plots the wavelet coefficient object in the multiresolution analysis
 \seealso{
 \code{\link{multiCoef}} for generating a list of class `waveletCoef`
 }
-
