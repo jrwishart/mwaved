@@ -1,6 +1,8 @@
 mwaved
 ===========
 
+[![Build Status](https://travis-ci.org/jrwishart/mwaved.svg?branch=master)](https://travis-ci.org/jrwishart/mwaved)
+
 mwaved is a set of functions that generalise the waved package for wavelet deconvolution in the Fourier domain. These generalisations are the following extensions:
 
 * Allow a multichannel model where the practitioner has access to multiple channels of data of a common signal of interest.
