@@ -1,3 +1,14 @@
+mwaved 1.1.5
+============
+
+* Fixed bug in plot code in direct setting using ggplot
+* Maintenance update adhering to CRAN policies
+
+mwaved 1.1.4
+============
+
+* Scripts to have LF (Unix style) line endings.
+
 mwaved 1.1.3
 ============
 
