@@ -1,10 +1,14 @@
-# mwaved v1.1.3 update candidate from v1.1.2 package. 
+# mwaved v1.1.5 update candidate from v1.1.4 package. 
 
-* Update to facilitate syntax changes in the `testthat` dependency. Otherwise errors are thrown during the `testthat` checks.
+* Changed usage of `person` command to use `given`, `family` and `email` arguments as directed by Kurt Hornik.
+* Added registration of external libraries
+* Fixed minor plot bug
 
 ## Test environments
-* locally Windows 10, R 3.2.4
-* win-builder (3.3.0 beta (2016-04-06 r70434) and release)
+
+* locally Windows 10, R 3.4.1
+* locally Ubuntu LTS 16.04
+* win-builder (devel and release)
 
 ## R CMD check results
 
