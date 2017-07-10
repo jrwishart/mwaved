@@ -1,7 +1,7 @@
 mwaved
 ===========
 
-[![Build Status](https://travis-ci.org/jrwishart/mwaved.svg?branch=master)](https://travis-ci.org/jrwishart/mwaved)[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/mwaved)](https://cran.r-project.org/package=mwaved) [![](https://cranlogs.r-pkg.org/badges/mwaved)](https://cran.r-project.org/package=mwaved) [![DL_Total](http://cranlogs.r-pkg.org/badges/grand-total/mwaved?color=blue)](http://cran.r-project.org/package=mwaved)
+[![Build Status](https://travis-ci.org/jrwishart/mwaved.svg?branch=master)](https://travis-ci.org/jrwishart/mwaved)[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/mwaved)](https://cran.r-project.org/package=mwaved) [![](https://cranlogs.r-pkg.org/badges/mwaved)](https://cran.r-project.org/package=mwaved) [![DL_Total](http://cranlogs.r-pkg.org/badges/grand-total/mwaved?color=blue)](https://cran.r-project.org/package=mwaved)
 
 mwaved is a set of functions that generalise the waved package for wavelet deconvolution in the Fourier domain. These generalisations are the following extensions:
 
