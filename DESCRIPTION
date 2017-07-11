@@ -2,7 +2,7 @@ Package: mwaved
 Type: Package
 Title: Multichannel Wavelet Deconvolution with Additive Long Memory Noise
 Version: 1.1.5
-Date: 2017-07-05
+Date: 2017-07-11
 Author: Justin Rory Wishart
 Maintainer: Justin Rory Wishart <justin.wishart@mq.edu.au>
 Description: Computes the Wavelet deconvolution estimate of a common signal
