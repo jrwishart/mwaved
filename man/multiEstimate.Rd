@@ -6,10 +6,11 @@
 \usage{
 multiEstimate(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
   alpha = rep(1, dim(as.matrix(Y))[2]),
-  resolution = resolutionMethod(detectBlur(G)), sigma = as.numeric(c()),
-  j0 = 3L, j1 = NA_integer_, eta = NA_real_,
-  thresh = multiThresh(as.matrix(Y), G = G, alpha = alpha, j0 = j0, j1 = j1,
-  eta = eta, deg = 3L), shrinkType = "hard", deg = 3L)
+  resolution = resolutionMethod(detectBlur(G)),
+  sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_,
+  eta = NA_real_, thresh = multiThresh(as.matrix(Y), G = G, alpha =
+  alpha, j0 = j0, j1 = j1, eta = eta, deg = 3L), shrinkType = "hard",
+  deg = 3L)
 }
 \arguments{
 \item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
@@ -80,5 +81,4 @@ par(mfrow=c(2, 1))
 matplot(x, Y, type = 'l', main = 'Noisy multichannel signal')
 plot(x, signal, type = 'l', lty = 2, main = 'True Doppler signal and estimate', col = 'red')
 lines(x, dopplerEstimate)
-
 }

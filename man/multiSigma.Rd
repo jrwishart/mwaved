@@ -28,5 +28,4 @@ n <- 1024
 Y <- sapply(1:3, function(i) sig[i]* rnorm(n))
 # Estimate the noise levels
 multiSigma(Y, deg = 3)
-
 }

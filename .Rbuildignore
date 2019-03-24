@@ -1,5 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-JSS
+^R/RcppExports\.R$
 cran-comments.md
-^\.travis\.yml$
+RJournal

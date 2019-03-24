@@ -1,17 +1,18 @@
 Package: mwaved
 Type: Package
 Title: Multichannel Wavelet Deconvolution with Additive Long Memory Noise
-Version: 1.1.5
-Date: 2017-07-11
+Version: 1.1.6
+Date: 2019-03-22
 Author: Justin Rory Wishart
 Maintainer: Justin Rory Wishart <justin.wishart@mq.edu.au>
 Description: Computes the Wavelet deconvolution estimate of a common signal
     present in multiple channels that have possible different levels of blur
     and long memory additive error.
+Encoding: UTF-8
 License: GPL
 LinkingTo: Rcpp
 Imports:
-    Rcpp (>= 0.11.1),
+    Rcpp,
     shiny,
     grid
 SystemRequirements: fftw3 (>= 3.3.4)
@@ -25,4 +26,4 @@ Suggests:
 URL: https://github.com/jrwishart/mwaved
 BugReports: https://github.com/jrwishart/mwaved/issues
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

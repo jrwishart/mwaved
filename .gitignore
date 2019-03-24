@@ -8,8 +8,7 @@ src/*.o
 src/*.so
 src/*.dll
 inst/doc
-R/RcppExports.R
-JSS
+^R/RcppExports\.R$
+RJournal
 build
-mwaved.Rcheck
-mwaved.Rproj
+

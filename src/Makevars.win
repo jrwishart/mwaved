@@ -1,1 +1,1 @@
-PKG_LIBS += -lfftw3 -lm
+PKG_LIBS += $(LDFLAGS) -lfftw3 -lm

@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // multiSigma
 NumericVector multiSigma(NumericMatrix signal, int deg);
-RcppExport SEXP mwaved_multiSigma(SEXP signalSEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_multiSigma(SEXP signalSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // waveletThresh
 List waveletThresh(NumericVector beta, NumericVector thr, String shrinkType, int j0, int deg);
-RcppExport SEXP mwaved_waveletThresh(SEXP betaSEXP, SEXP thrSEXP, SEXP shrinkTypeSEXP, SEXP j0SEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_waveletThresh(SEXP betaSEXP, SEXP thrSEXP, SEXP shrinkTypeSEXP, SEXP j0SEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -34,7 +34,7 @@ END_RCPP
 }
 // multiProj
 NumericVector multiProj(NumericVector beta, int j0, int j1, int deg);
-RcppExport SEXP mwaved_multiProj(SEXP betaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_multiProj(SEXP betaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -48,7 +48,7 @@ END_RCPP
 }
 // multiThresh
 NumericVector multiThresh(NumericMatrix signal, NumericMatrix G, NumericVector alpha, String resolution, int j0, int j1, double eta, int deg);
-RcppExport SEXP mwaved_multiThresh(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_multiThresh(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -66,7 +66,7 @@ END_RCPP
 }
 // multiEstimate
 NumericVector multiEstimate(NumericMatrix signal, NumericMatrix G, NumericVector alpha, String resolution, String blur, NumericVector sigma, int j0, int j1, double eta, NumericVector thresh, String shrinkType, int deg);
-RcppExport SEXP mwaved_multiEstimate(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP sigmaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_multiEstimate(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP sigmaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -88,7 +88,7 @@ END_RCPP
 }
 // multiCoef
 List multiCoef(NumericMatrix signal, NumericMatrix G, NumericVector alpha, int j0, int j1, int deg);
-RcppExport SEXP mwaved_multiCoef(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_multiCoef(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -104,7 +104,7 @@ END_RCPP
 }
 // multiWaveD
 List multiWaveD(NumericMatrix signal, NumericMatrix G, NumericVector alpha, String resolution, String blur, int j0, int j1, double eta, NumericVector thresh, String shrinkType, int deg);
-RcppExport SEXP mwaved_multiWaveD(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
+RcppExport SEXP _mwaved_multiWaveD(SEXP signalSEXP, SEXP GSEXP, SEXP alphaSEXP, SEXP resolutionSEXP, SEXP blurSEXP, SEXP j0SEXP, SEXP j1SEXP, SEXP etaSEXP, SEXP threshSEXP, SEXP shrinkTypeSEXP, SEXP degSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -125,7 +125,7 @@ END_RCPP
 }
 // directDetect
 bool directDetect(NumericMatrix x);
-RcppExport SEXP mwaved_directDetect(SEXP xSEXP) {
+RcppExport SEXP _mwaved_directDetect(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -136,7 +136,7 @@ END_RCPP
 }
 // boxcarDetect
 bool boxcarDetect(NumericMatrix x);
-RcppExport SEXP mwaved_boxcarDetect(SEXP xSEXP) {
+RcppExport SEXP _mwaved_boxcarDetect(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -147,7 +147,7 @@ END_RCPP
 }
 // directBlur
 NumericMatrix directBlur(int n, int m);
-RcppExport SEXP mwaved_directBlur(SEXP nSEXP, SEXP mSEXP) {
+RcppExport SEXP _mwaved_directBlur(SEXP nSEXP, SEXP mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -159,7 +159,7 @@ END_RCPP
 }
 // theoreticalEta
 double theoreticalEta(NumericVector alpha, String blur, ComplexMatrix g_fft, NumericVector sigma);
-RcppExport SEXP mwaved_theoreticalEta(SEXP alphaSEXP, SEXP blurSEXP, SEXP g_fftSEXP, SEXP sigmaSEXP) {
+RcppExport SEXP _mwaved_theoreticalEta(SEXP alphaSEXP, SEXP blurSEXP, SEXP g_fftSEXP, SEXP sigmaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -173,17 +173,17 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"mwaved_multiSigma", (DL_FUNC) &mwaved_multiSigma, 2},
-    {"mwaved_waveletThresh", (DL_FUNC) &mwaved_waveletThresh, 5},
-    {"mwaved_multiProj", (DL_FUNC) &mwaved_multiProj, 4},
-    {"mwaved_multiThresh", (DL_FUNC) &mwaved_multiThresh, 8},
-    {"mwaved_multiEstimate", (DL_FUNC) &mwaved_multiEstimate, 12},
-    {"mwaved_multiCoef", (DL_FUNC) &mwaved_multiCoef, 6},
-    {"mwaved_multiWaveD", (DL_FUNC) &mwaved_multiWaveD, 11},
-    {"mwaved_directDetect", (DL_FUNC) &mwaved_directDetect, 1},
-    {"mwaved_boxcarDetect", (DL_FUNC) &mwaved_boxcarDetect, 1},
-    {"mwaved_directBlur", (DL_FUNC) &mwaved_directBlur, 2},
-    {"mwaved_theoreticalEta", (DL_FUNC) &mwaved_theoreticalEta, 4},
+    {"_mwaved_multiSigma", (DL_FUNC) &_mwaved_multiSigma, 2},
+    {"_mwaved_waveletThresh", (DL_FUNC) &_mwaved_waveletThresh, 5},
+    {"_mwaved_multiProj", (DL_FUNC) &_mwaved_multiProj, 4},
+    {"_mwaved_multiThresh", (DL_FUNC) &_mwaved_multiThresh, 8},
+    {"_mwaved_multiEstimate", (DL_FUNC) &_mwaved_multiEstimate, 12},
+    {"_mwaved_multiCoef", (DL_FUNC) &_mwaved_multiCoef, 6},
+    {"_mwaved_multiWaveD", (DL_FUNC) &_mwaved_multiWaveD, 11},
+    {"_mwaved_directDetect", (DL_FUNC) &_mwaved_directDetect, 1},
+    {"_mwaved_boxcarDetect", (DL_FUNC) &_mwaved_boxcarDetect, 1},
+    {"_mwaved_directBlur", (DL_FUNC) &_mwaved_directBlur, 2},
+    {"_mwaved_theoreticalEta", (DL_FUNC) &_mwaved_theoreticalEta, 4},
     {NULL, NULL, 0}
 };
 
