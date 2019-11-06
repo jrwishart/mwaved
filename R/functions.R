@@ -1,18 +1,38 @@
 # 
 # Master file to control the output functions and their documentation.
-# Copyright Justin R Wishart 2014
+# Copyright Justin R Wishart 2017
 # Questions or comments?
-# email: j.wishart@unsw.edu.au
+# email: justin.wishart@mq.edu.au
 
 #' @name mwaved
 #' @title Multichannel wavelet deconvolution with long memory using mwaved.
 #'
+#' @useDynLib mwaved, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+#' @importFrom grid grid.layout
+#' @importFrom grid grid.newpage 
+#' @importFrom grid pushViewport 
+#' @importFrom grid viewport 
+#' @importFrom shiny runApp 
+#' @importFrom graphics abline 
+#' @importFrom graphics axTicks 
+#' @importFrom graphics axis 
+#' @importFrom graphics grid 
+#' @importFrom graphics lines 
+#' @importFrom graphics matlines 
+#' @importFrom graphics matplot 
+#' @importFrom graphics par 
+#' @importFrom graphics plot 
+#' @importFrom graphics points 
+#' @importFrom graphics segments 
+#' @importFrom grDevices devAskNewPage 
+#' @importFrom stats dgamma 
+#' @importFrom stats mvfft 
+#' @importFrom stats rnorm
 #' @description \code{mwaved} computes the Wavelet deconvolution estimate of a common signal present in multiple channels that have possible different levels of blur and additive error. More information about each function can be found in its help documentation.
 #'
 #' @details \code{mwaved} uses the WaveD wavelet deconvolution paradigm and is based on the \code{waved} R-package given by Raimondo and Stewart (2007). It generalises the approach by allowing a multichannel signal instead of a single channel signal and allows long memory errors within each channel (independent of each channel). See Kulik, Sapatinas and Wishart (2014) for theoretical results and a short numerical investigation. The \code{mwaved} package also uses the external C FFTW library described in Frigo and Johnson, (2005) to dramatically increase the speed of the computations. Detailed information and instructions for implementation are available at \url{http://www.fftw.org}.
 #' 
-#' @import Rcpp
-#' @useDynLib mwaved mwaved_multiSigma mwaved_multiEstimate mwaved_multiWaveD mwaved_multiThresh mwaved_multiCoef mwaved_multiProj mwaved_waveletThresh
 #' @references 
 #' Frigo, M and Johnson, S.G. (2005) \emph{The design and implementation of FFTW3}, Proceedings of the IEEE \bold{93}, 216--231.
 #' \url{http://dx.doi.org/10.1109/JPROC.2004.840301}
@@ -33,7 +53,7 @@ NULL
 #' @export
 directBlur <- function(n, m = 1){
   stopifnot(is.vector(n), length(n)==1, is.vector(m), length(m) == 1)
-  .Call('mwaved_directBlur', n, m)
+  .Call(`_mwaved_directBlur`, n, m)
 }
 
 #' @name detectBlur
@@ -44,10 +64,10 @@ directBlur <- function(n, m = 1){
 #' @export
 detectBlur <- function(G) {
   stopifnot(is.matrix(G), !is.complex(G))
-  if (.Call('mwaved_directDetect', G)) {
+  if (.Call(`_mwaved_directDetect`, G)) {
     blur <- 'direct'
   } else {
-    if (.Call('mwaved_boxcarDetect', G)) {
+    if (.Call(`_mwaved_boxcarDetect`, G)) {
       blur <- 'box.car'
     } else {
       blur <- 'smooth'
@@ -180,14 +200,13 @@ feasibleShrinkage <- function(shrinkType){
 #' Y <- sapply(1:3, function(i) sig[i]* rnorm(n))
 #' # Estimate the noise levels
 #' multiSigma(Y, deg = 3)
-#'
-#' @export 
+#' @export
 multiSigma <- function(Y, deg = 3L){
   stopifnot(is.numeric(Y), !is.complex(Y), is.numeric(deg), length(deg) == 1)
   Y <- as.matrix(Y)
   n <- dim(Y)[1]
   feasibleLength(n)
-  .Call(mwaved_multiSigma, Y, deg)
+  .Call(`_mwaved_multiSigma`, Y, deg)
 }
 
 #' @title Meyer wavelet projection given a set of wavelet coefficients
@@ -232,7 +251,7 @@ multiProj <- function(beta, j1 = log2(length(beta$coef)) - 1) {
   n <- length(coefs)
   jvals <- feasibleResolutions(n, j0, j1)
   
-  .Call('mwaved_multiProj', coefs, jvals$j0, jvals$j1, deg)
+  .Call(`_mwaved_multiProj`, coefs, jvals$j0, jvals$j1, deg)
 }
 
 #' @title Resolution level thresholds for hard thresholded wavelet deconvolution estimator
@@ -295,7 +314,7 @@ multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))
   alpha <- feasibleAlpha(dimY[2], alpha)
   feasibleMethod(resolution)
   blurCheck(G, resolution)
-  .Call('mwaved_multiThresh', Y, G, alpha, resolution, jvals$j0, jvals$j1, eta, deg)
+  .Call(`_mwaved_multiThresh`, Y, G, alpha, resolution, jvals$j0, jvals$j1, eta, deg)
 }
 
 #' @title Wavelet coefficient estimation from a multichannel signal
@@ -361,7 +380,7 @@ multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
   feasibleMethod(resolution)
   blurCheck(G, resolution)
   # Pass to C code
-  .Call('mwaved_multiCoef', Y, G, alpha, jvals$j0, jvals$j1, deg)
+  .Call(`_mwaved_multiCoef`, Y, G, alpha, jvals$j0, jvals$j1, deg)
 }
 
 #' @title Apply thresholding regime to a set of wavelet coefficients
@@ -420,7 +439,7 @@ multiCoef <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
 #' beta <- multiCoef(Y, G)
 #' betaShrunk <- waveletThresh(beta, thresh)
 #' plot(beta, betaShrunk)
-#' @export 
+#' @export
 waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
   stopifnot(class(beta) == "waveletCoef", is.numeric(thresh), all(thresh > 0))
   nthr <- length(thresh)
@@ -444,7 +463,7 @@ waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
     warning("Thresh input length too long, higher threshold elements ignored.")
     thresh <- thresh[1:req]
   }
-  return(.Call('mwaved_waveletThresh', beta$coef, thresh, shrinkType, beta$j0, beta$deg))
+  return(.Call(`_mwaved_waveletThresh`, beta$coef, thresh, shrinkType, beta$j0, beta$deg))
 }
 
 
@@ -486,7 +505,6 @@ waveletThresh <- function(beta, thresh, shrinkType = 'hard'){
 #' summary(mWaveDObj)
 #' 
 #' @seealso \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
-#' 
 #' @export
 multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
                        j0 = 3L, j1 = NA_integer_, resolution = resolutionMethod(detectBlur(G)), eta = NA_real_,
@@ -507,7 +525,7 @@ multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y)))
   shrinkType <- tolower(shrinkType)
   feasibleShrinkage(shrinkType)
   # Pass to C code
-  return(.Call('mwaved_multiWaveD', Y, G, alpha, resolution, blur, jvals$j0, jvals$j1, eta, thresh, shrinkType, deg))
+  return(.Call(`_mwaved_multiWaveD`, Y, G, alpha, resolution, blur, jvals$j0, jvals$j1, eta, thresh, shrinkType, deg))
 }
 
 #' @title Wavelet deconvolution signal estimate from the noisy multichannel convoluted signal
@@ -553,7 +571,6 @@ multiWaveD <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y)))
 #' matplot(x, Y, type = 'l', main = 'Noisy multichannel signal')
 #' plot(x, signal, type = 'l', lty = 2, main = 'True Doppler signal and estimate', col = 'red')
 #' lines(x, dopplerEstimate)
-#' 
 #' @export
 multiEstimate <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]), 
                           resolution = resolutionMethod(detectBlur(G)), sigma = as.numeric(c()), j0 = 3L, j1 = NA_integer_, 
@@ -575,7 +592,7 @@ multiEstimate <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y
   shrinkType <- tolower(shrinkType)
   feasibleShrinkage(shrinkType)
   # Pass to C code
-  .Call('mwaved_multiEstimate', Y, G, alpha, resolution, blur, sigma, jvals$j0, jvals$j1, eta, thresh, shrinkType, deg)
+  .Call(`_mwaved_multiEstimate`, Y, G, alpha, resolution, blur, sigma, jvals$j0, jvals$j1, eta, thresh, shrinkType, deg)
 }
 
 #' @title Find optimal theoretical Eta
@@ -599,7 +616,7 @@ theoreticalEta <- function(alpha, blur, G, sigma) {
     eta = 4 * sqrt(min(alpha))
   } else {
     G <- as.matrix(G)
-    eta <- .Call('mwaved_theoreticalEta', alpha, blur, mvfft(G), sigma)
+    eta <- .Call(`_mwaved_theoreticalEta`, alpha, blur, mvfft(G), sigma)
   }
   eta
 }

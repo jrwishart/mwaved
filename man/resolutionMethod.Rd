@@ -16,4 +16,3 @@ resolutionMethod(blur)
 \description{
 Simple function that maps the blur type to the appropriate resolution selection method
 }
-

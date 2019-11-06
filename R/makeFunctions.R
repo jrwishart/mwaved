@@ -76,7 +76,6 @@ gammaBlur <- function(n, shape, scale) {
 #' blurredSignal <- blurSignal(signal, blurMat)
 #' matplot(x, blurredSignal, type = 'l', main = 'Box car blurred LIDAR test signals')
 #' @seealso \code{\link{gammaBlur}}, \code{\link{blurSignal}}
-#' 
 #' @export
 boxcarBlur <- function(n, width) {
   m <- length(width)
@@ -208,7 +207,6 @@ makeHeaviSine <- function(n) {
 #' matplot(x, indirectSignal, type = 'l', main = 'Set of blurred LIDAR signals')
 #' 
 #' @seealso \code{\link{gammaBlur}}, \code{\link{boxcarBlur}}
-#' 
 #' @export
 blurSignal <- function(signal, G) {
   n <- length(signal)
@@ -254,7 +252,7 @@ multiNoise <- function(n, sigma = 1, alpha = length(sigma), ...) {
         alpha <- rep(alpha, m)
       }
       if ( length(sigma) != length(alpha) ){
-        warning("Dimension mismatch: length of sigma should equal length of alpha")
+        stop("Dimension mismatch: length of sigma should equal length of alpha")
       }
       d <- (1 - alpha)/2
       noise <- sapply(1:m, function(x,y) y[x] * fracdiff::fracdiff.sim(n, d = d[x], ...)$series, y = sigma)

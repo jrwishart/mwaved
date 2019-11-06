@@ -1,0 +1,20 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+language: R
+warnings_are_errors: true
+sudo: required
+addons:
+  apt:
+    packages:
+      - libfftw3-dev	
+
+env:
+  global:
+    - CRAN: https://cran.rstudio.com
+
+cache: packages
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change

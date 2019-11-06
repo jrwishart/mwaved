@@ -1,12 +1,12 @@
 # The version set here will propagate to other files from here
-AC_INIT([mwaved], 1.0.0)
+AC_INIT(mwaved, 1.1.6, justin.wishart@mq.edu.au)
 
 # Checks for common programs using default macros
 
 ## Use Rscript to query Rcpp for compiler and linker flags
 ##
 ## look for Rscript, but use the one found via R_HOME to allow for multiple installations
-AC_DEFUN(AC_PROG_RSCRIPT, [AC_CHECK_PROG(RSCRIPT,Rscript,yes)])
+AC_DEFUN([AC_PROG_RSCRIPT], [AC_CHECK_PROG(RSCRIPT, Rscript, yes)])
 AC_PROG_RSCRIPT
 if test x"${RSCRIPT}" == x"yes" ; then
      : ${R_HOME=`R RHOME`}
@@ -24,7 +24,7 @@ fi
 # Check if the FFTW Library exists on the system
 AC_MSG_NOTICE([Checking if FFTW3 library is available using pkg-config])
 ## --- FFTW 3 ----------------------------------------------------------------
-PKG_CHECK_MODULES(FFTW, fftw3, [HAVE_FFTW=TRUE], [HAVE_FFTW=FALSE])
+PKG_CHECK_MODULES([FFTW], [fftw3], [HAVE_FFTW=TRUE], [HAVE_FFTW=FALSE])
 
 if test "$HAVE_FFTW" == TRUE
 then
@@ -39,6 +39,9 @@ then
 	AC_CHECK_LIB([m], [sin])
 	AC_CHECK_LIB([m], [sqrt])
 	AC_CHECK_LIB([m], [floor])
+	AC_CHECK_LIB([m], [pow])
+	AC_CHECK_LIB([m], [floor])
+	AC_CHECK_HEADER_STDBOOL
 	# FFTW library checks.
 	AC_CHECK_LIB([fftw3], [fftw_malloc])
 	AC_CHECK_LIB([fftw3], [fftw_free])

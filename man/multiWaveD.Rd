@@ -71,4 +71,3 @@ summary(mWaveDObj)
 \seealso{
 \code{\link{plot.mWaveD}} and \code{\link{summary.mWaveD}}
 }
-

@@ -38,4 +38,3 @@ matplot(x, blurredSignal, type = 'l', main = 'Box car blurred LIDAR test signals
 \seealso{
 \code{\link{gammaBlur}}, \code{\link{blurSignal}}
 }
-

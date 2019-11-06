@@ -44,4 +44,3 @@ legend("bottomright", legend = c("Signal", paste('j1 =', j)), col = lcols, lty =
 \seealso{
 \code{\link{multiCoef}}
 }
-

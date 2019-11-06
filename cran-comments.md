@@ -1,11 +1,13 @@
-# mwaved v1.1.3 update candidate from v1.1.2 package. 
+# mwaved v1.1.6 update candidate from v1.1.5 package. 
 
-* Update to facilitate syntax changes in the `testthat` dependency. Otherwise errors are thrown during the `testthat` checks.
+* Fixed 
 
 ## Test environments
-* locally Windows 10, R 3.2.4
-* win-builder (3.3.0 beta (2016-04-06 r70434) and release)
+
+* locally Windows 10 using R 3.5.3
+* win-builder (devel and release)
+* rocker devel debian
 
 ## R CMD check results
 
-* There were no ERRORs or WARNINGs. 
+* There were no NOTEs, ERRORs, or WARNINGs. 

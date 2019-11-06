@@ -4,8 +4,8 @@
 \alias{plot.waveletCoef}
 \title{Multi-Resolution Analysis plot of wavelet coefficients}
 \usage{
-\method{plot}{waveletCoef}(x, y = NULL, labels = NULL, ..., lowest = NULL,
-  highest = NULL, scaling = 1, ggplot = TRUE)
+\method{plot}{waveletCoef}(x, y = NULL, labels = NULL, ...,
+  lowest = NULL, highest = NULL, scaling = 1, ggplot = TRUE)
 }
 \arguments{
 \item{x}{A list of class waveletCoef.}
@@ -30,4 +30,3 @@ Plots the wavelet coefficient object in the multiresolution analysis
 \seealso{
 \code{\link{multiCoef}} for generating a list of class `waveletCoef`
 }
-

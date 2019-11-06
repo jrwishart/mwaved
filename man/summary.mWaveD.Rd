@@ -48,4 +48,3 @@ summary(mWaveDObject)
 \seealso{
 \code{\link{multiWaveD}}
 }
-

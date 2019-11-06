@@ -67,4 +67,3 @@ beta <- multiCoef(Y, G)
 betaShrunk <- waveletThresh(beta, thresh)
 plot(beta, betaShrunk)
 }
-

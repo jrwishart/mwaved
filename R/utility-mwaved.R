@@ -99,7 +99,6 @@ summary.mWaveD <- function(object, ...){
 #' @param ggplot A logical value to specify if the user wants to use base graphics (FALSE) or ggplot2  graphics (TRUE).
 #' 
 #' @seealso \code{\link{multiCoef}} for generating a list of class `waveletCoef`
-#' 
 #' @export
 plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, highest = NULL, scaling = 1, ggplot = TRUE){
   stopifnot(class(x) == "waveletCoef")
@@ -225,7 +224,6 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 #' 
 #' Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 #' @seealso \code{\link{multiWaveD}}
-#' @importFrom grid grid.newpage pushViewport viewport grid.layout
 #' @export
 plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singlePlot, ggplot = TRUE){
   # Check if ggplot is available if requested
@@ -318,7 +316,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
     }
     if (show[3L]) {
       if (resolution != 'block') {
-        fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m],each=n), m = m)
+        fourierData <- data.frame(Y = as.vector(blur), x = rep(xw,m), Ycut = as.vector(cut), Channel=rep(LETTERS[1:m], each = length(xw)), m = m)
         resolutionPlot <- ggplot2::ggplot(fourierData) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Y', colour = 'Channel', group = 'Channel'),size = 1) + ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'Ycut', colour = 'Channel'), linetype='dashed', size = 1) + ggplot2::ggtitle(fourierTitle) + ggplot2::labs(x = fourierLabel, y = '') + ggplot2::coord_cartesian(xlim = xlim)
         if (resolution == 'smooth' && x$blurDetected != 'direct') {
           rightLine <- ggplot2::geom_line(ggplot2::aes_string(x = 'x', y = 'y'), linetype = 'dotted', data = data.frame(x = rep(xbest,2), y = c(ybest, -Inf)))
@@ -450,7 +448,6 @@ fourierWindow <- function(n) {
 #' @name mWaveDDemo
 #' @title Interactive Demonstration
 #' @description Interactive Demonstration
-#' @importFrom shiny runApp
 #' @export
 mWaveDDemo <- function (){
   runApp(system.file('mWaveDDemo', package = 'mwaved'))

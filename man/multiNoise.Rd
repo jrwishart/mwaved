@@ -35,4 +35,3 @@ matplot(X + E, type = 'l')
 \seealso{
 \code{\link{sigmaSNR}}
 }
-

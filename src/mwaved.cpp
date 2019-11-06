@@ -2733,7 +2733,7 @@ bool directDetect(NumericMatrix x){
   
   for (j = 0; j < m; ++j) {
     for (i = 0; i < n2; ++i) {
-      if ( fabs(x_m_out[i + j * n2][0] - 1.0) > DBL_EPSILON || fabs(x_m_out[i + j * n2][1]) > DBL_EPSILON) {
+      if ( fabs(x_m_out[i + j * n2][0] - 1.0) > DBL_EPSILON  || fabs(x_m_out[i + j * n2][1]) > DBL_EPSILON ) {
         checkFlag = false;
         //  break out of both loops
         j = m;

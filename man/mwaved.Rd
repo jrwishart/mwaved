@@ -21,4 +21,3 @@ Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet dec
 Raimondo, M. and Stewart, M. (2007) \emph{The WaveD Transform in R: Performs Fast Translation-Invariant Wavelet Deconvolution}, Journal of Statistical Software \bold{21}, 1--28
 \url{http://www.jstatsoft.org/v21/i02}
 }
-

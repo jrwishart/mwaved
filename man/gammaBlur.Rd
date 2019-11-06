@@ -44,4 +44,3 @@ matplot(x, blurredSignal, type = 'l', main = 'Smooth blurred LIDAR test signals'
 
 \code{\link{boxcarBlur}}, \code{\link{blurSignal}}
 }
-
