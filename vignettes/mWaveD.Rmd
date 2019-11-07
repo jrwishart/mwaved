@@ -352,7 +352,7 @@ Then an estimate of the wavelet coefficients is possible by taking a weighted av
 \]
 The weights take the form, $\gamma_{\omega,\ell} = n^{\alpha}\widehat \sigma_\ell^{-2}|\omega|^{1 - \alpha_\ell}$. This weighted average has shown to be somewhat optimal as it obtains upper bounds on the risk as detailed in [@KSW2014]. To obtain a reliable estimate the error process $E_{j,k}$ in the above needs to be controlled which is typically done via thresholding the coefficients.
 
-Further, the complete inhomogeneous expansion at all resolution levels is not possible due to the deconvolution problem inflating variance of the noise variables. This requires that expansion must be truncated at an appropriate level $j_1$ which is estimated and the details of which are covered in the [Finest resolution selection]($resolution) section. 
+Further, the complete inhomogeneous expansion at all resolution levels is not possible due to the deconvolution problem inflating variance of the noise variables. This requires that expansion must be truncated at an appropriate level $j_1$ which is estimated and the details of which are covered in the [Finest resolution selection](#resolution) section. 
 
 Then an estimate of $f$ is produced by the thresholding of the estimated coefficients, $\widehat b_{j,k}$, at the appropriate truncation finest resolution with,
 \[
