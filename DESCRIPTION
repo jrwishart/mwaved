@@ -3,11 +3,10 @@ Type: Package
 Title: Multichannel Wavelet Deconvolution with Additive Long Memory Noise
 Version: 1.1.7
 Date: 2019-11-06
-Author: Justin Rory Wishart
-Maintainer: Justin Rory Wishart <justin.r.wishart@gmail.com>
+Authors@R: c(person(given = "Justin Rory", family = "Wishart", role = c("aut", "cre"), email = "justin.r.wishart@gmail.com", comment = c(ORCID = "0000-0002-8235-1845")))
 Description: Computes the Wavelet deconvolution estimate of a common signal
     present in multiple channels that have possible different levels of blur
-    and long memory additive error.
+    and long memory additive error, see Kulik, Sapatinas and Wishart (2015), <doi:10.1016/j.acha.2014.04.004>.
 Encoding: UTF-8
 License: GPL
 LinkingTo: Rcpp
