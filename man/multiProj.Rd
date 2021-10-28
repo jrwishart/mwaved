@@ -18,9 +18,9 @@ A numeric vector of size n giving the wavelet function expansion.
 Reconstructs a function using wavelet coefficients (\code{waveletCoef} object) as input.
 }
 \details{
-Function that takes an input of wavelet coefficients in the form of a \code{waveletCoef} object (see \code{\link{multiCoef}} for details) and optionally a desired maximum resolution level, \code{j1}, to create an inhomogeneous wavelet expansion starting from resolution \code{j0} up to resolution \code{j1}. 
+Function that takes an input of wavelet coefficients in the form of a \code{waveletCoef} object (see \code{\link{multiCoef}} for details) and optionally a desired maximum resolution level, \code{j1}, to create an inhomogeneous wavelet expansion starting from resolution \code{j0} up to resolution \code{j1}.
 Namely, it creates the wavelet expansion, \deqn{\sum_{k = 0}^{2^{j_0} - 1} \beta_k \phi_{j_0,k} + \sum_{j = j_0}^{j_1} \sum_{k = 0}^{2^j - 1} \beta_{j,k} \psi_{j,k}.}
-where \eqn{(\phi,\psi)} denote the father and mother periodised Meyer wavelet functions and \eqn{\beta_{j,k}} denotes the mother wavelet coefficient at resolution j and location k and \eqn{\beta_{k}} denotes the father wavelet coefficients at resolution \eqn{j=j0} and location \eqn{k}. 
+where \eqn{(\phi,\psi)} denote the father and mother periodised Meyer wavelet functions and \eqn{\beta_{j,k}} denotes the mother wavelet coefficient at resolution j and location k and \eqn{\beta_{k}} denotes the father wavelet coefficients at resolution \eqn{j=j0} and location \eqn{k}.
 The coefficients \code{beta} need to be ordered so that the first \eqn{2^\code{j0}} elements correspond to father wavelet coefficients at resolution \eqn{j=\code{j0}} and the remaining elements correspond to the mother wavelet coefficients from resolution \eqn{j=\code{j0}} to \eqn{j = log_2 n - 1}. If the maximum resolution level \emph{j1} is not specified, the full wavelet expansion will be given.
 }
 \examples{

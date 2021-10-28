@@ -5,7 +5,7 @@ note <- sprintf("R package version %s", meta$Version)
 
 bibentry(bibtype = "Manual",
          title = "{mwaved}: Multichannel wavelet deconvolution with additive long memory noise",
-         author = c(person(given = "Justin", family = "Wishart", middle = "Rory", email = "justin.wishart@mq.edu.au")),
+         author = c(person(given = "Justin", family = "Wishart", middle = "Rory", email = "justin.wishart@gmail.com")),
          year = year,
          note = note,
          url = "https://CRAN.R-project.org/package=mwaved")

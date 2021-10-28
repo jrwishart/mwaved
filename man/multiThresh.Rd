@@ -4,10 +4,16 @@
 \alias{multiThresh}
 \title{Resolution level thresholds for hard thresholded wavelet deconvolution estimator}
 \usage{
-multiThresh(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
+multiThresh(
+  Y,
+  G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
   alpha = rep(1, dim(as.matrix(Y))[2]),
-  resolution = resolutionMethod(detectBlur(G)), j0 = 3L,
-  j1 = NA_integer_, eta = NA_real_, deg = 3L)
+  resolution = resolutionMethod(detectBlur(G)),
+  j0 = 3L,
+  j1 = NA_integer_,
+  eta = NA_real_,
+  deg = 3L
+)
 }
 \arguments{
 \item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
@@ -65,5 +71,5 @@ thresh <- multiThresh(Y, G)
 }
 \references{
 Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
-\url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+\doi{10.1016/j.acha.2014.04.004}
 }
