@@ -30,5 +30,5 @@ The theory (see Kulik, Sapatinas and Wishart (2014)) suggests that the optimal s
 }
 \references{
 Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
-\url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+\doi{10.1016/j.acha.2014.04.004}
 }

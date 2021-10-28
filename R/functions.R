@@ -298,7 +298,7 @@ multiProj <- function(beta, j1 = log2(length(beta$coef)) - 1) {
 #' @return A numeric vector of the resolution level thresholds for the hard-thresholding nonlinear wavelet estimator from the multichannel model.
 #' @references
 #' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
-#' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+#' \doi{10.1016/j.acha.2014.04.004}
 #' @export
 multiThresh <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))), alpha = rep(1,dim(as.matrix(Y))[2]),
                         resolution = resolutionMethod(detectBlur(G)), j0 = 3L, j1 = NA_integer_, eta = NA_real_, deg = 3L) {
@@ -608,7 +608,7 @@ multiEstimate <- function(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y
 #'
 #' @references
 #' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
-#' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+#' \doi{10.1016/j.acha.2014.04.004}
 #' @export
 theoreticalEta <- function(alpha, blur, G, sigma) {
   feasibleBlur(blur)
