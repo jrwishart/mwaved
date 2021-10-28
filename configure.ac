@@ -1,5 +1,5 @@
 # The version set here will propagate to other files from here
-AC_INIT(mwaved, 1.1.6, justin.wishart@mq.edu.au)
+AC_INIT([mwaved],[1.1.8],[justin.r.wishart@gmail.com])
 
 # Checks for common programs using default macros
 
@@ -14,9 +14,9 @@ if test x"${RSCRIPT}" == x"yes" ; then
          AC_MSG_ERROR([Could not determine R_HOME.])
      fi
      ## Rcpp compile flag providing header directory containing Rcpp.h
-     RCPP_CXXFLAGS=`${R_HOME}/bin/R -e 'Rcpp:::CxxFlags()'`
+     RCPP_CXXFLAGS=`${R_HOME}/bin/Rscript -e 'Rcpp:::CxxFlags()'`
      ## link flag providing libary as well as path to library, and optionally rpath
-     RCPP_LDFLAGS=`${R_HOME}/bin/R -e 'Rcpp:::LdFlags()'`
+     RCPP_LDFLAGS=`${R_HOME}/bin/Rscript -e 'Rcpp:::LdFlags()'`
 else
     AC_MSG_ERROR([Rscript not found, is R installed?])
 fi
@@ -67,4 +67,5 @@ AC_SUBST(RCPP_CXXFLAGS)
 
 AC_SUBST(RCPP_LDFLAGS)
 
-AC_OUTPUT(src/Makevars)
+AC_CONFIG_FILES([src/Makevars])
+AC_OUTPUT

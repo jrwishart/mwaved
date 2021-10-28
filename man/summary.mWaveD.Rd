@@ -7,7 +7,7 @@
 \method{summary}{mWaveD}(object, ...)
 }
 \arguments{
-\item{object}{A mWaveD object which is a list containing all the information for a multichannel 
+\item{object}{A mWaveD object which is a list containing all the information for a multichannel
 deconvolution analysis produced by the \code{\link{multiWaveD}} function.}
 
 \item{...}{Arguments to be passed to methods.}

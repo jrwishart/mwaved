@@ -1,13 +1,13 @@
-# mwaved v1.1.6 update candidate from v1.1.5 package. 
+# mwaved v1.1.8 update candidate from v1.1.7 package.
 
-* Fixed 
+* Fixed the autoconf warnings.
+* Updated URLs in documentation to use DOIs instead.
 
 ## Test environments
 
-* locally Windows 10 using R 3.5.3
+* Linux Arch LTS 5.10.74-1
 * win-builder (devel and release)
-* rocker devel debian
 
 ## R CMD check results
 
-* There were no NOTEs, ERRORs, or WARNINGs. 
+* There were no NOTEs, ERRORs, or WARNINGs.

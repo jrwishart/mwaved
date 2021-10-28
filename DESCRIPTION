@@ -1,7 +1,7 @@
 Package: mwaved
 Type: Package
 Title: Multichannel Wavelet Deconvolution with Additive Long Memory Noise
-Version: 1.1.7
+Version: 1.1.8
 Date: 2019-11-06
 Authors@R: c(person(given = "Justin Rory", family = "Wishart", role = c("aut", "cre"), email = "justin.r.wishart@gmail.com", comment = c(ORCID = "0000-0002-8235-1845")))
 Description: Computes the Wavelet deconvolution estimate of a common signal
@@ -25,4 +25,4 @@ Suggests:
 URL: https://github.com/jrwishart/mwaved
 BugReports: https://github.com/jrwishart/mwaved/issues
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.2

@@ -4,10 +4,18 @@
 \alias{multiWaveD}
 \title{Full mWaveD analysis}
 \usage{
-multiWaveD(Y, G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
-  alpha = rep(1, dim(as.matrix(Y))[2]), j0 = 3L, j1 = NA_integer_,
-  resolution = resolutionMethod(detectBlur(G)), eta = NA_real_,
-  thresh = as.numeric(c()), shrinkType = "hard", deg = 3L)
+multiWaveD(
+  Y,
+  G = directBlur(nrow(as.matrix(Y)), ncol(as.matrix(Y))),
+  alpha = rep(1, dim(as.matrix(Y))[2]),
+  j0 = 3L,
+  j1 = NA_integer_,
+  resolution = resolutionMethod(detectBlur(G)),
+  eta = NA_real_,
+  thresh = as.numeric(c()),
+  shrinkType = "hard",
+  deg = 3L
+)
 }
 \arguments{
 \item{Y}{An input signal either an n by m matrix containing the multichannel signal to be analysed or single vector of n elements for the single channel. In the multichannel case, each of the m columns represents a channel of n observations.}
@@ -29,7 +37,7 @@ The default choice uses the detectBlur function to identify what type of blur ma
 
 \item{thresh}{A numeric vector of resolution level thresholds to use in the wavelet thresholded estimator of the true signal. It should have enough elements to construct the required expansion with all resolutions. That is, have \code{j1} - \code{j0} + 2 elements. If a single element is input, it is repeated to be the universal threshold across all resolutions.}
 
-\item{shrinkType}{A character string that specifies which thresholding regime to use. 
+\item{shrinkType}{A character string that specifies which thresholding regime to use.
 Available choices are the 'hard', 'soft' or 'garrote'.}
 
 \item{deg}{The degree of the auxiliary polynomial used in the Meyer wavelet.}

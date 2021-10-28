@@ -1,7 +1,7 @@
 #' @name summary.mWaveD
 #' @title Summary Output for the mWaveD object
 #'
-#' @param object A mWaveD object which is a list containing all the information for a multichannel 
+#' @param object A mWaveD object which is a list containing all the information for a multichannel
 #' deconvolution analysis produced by the \code{\link{multiWaveD}} function.
 #' @param ... Arguments to be passed to methods.
 #' @description Gives some numerical summaries of a \code{mWaveD} object.
@@ -14,7 +14,7 @@
 #' \item Summaries of the severity of the thresholding applied amongst the resolutions.
 #' }
 #' @seealso \code{\link{multiWaveD}}
-#' 
+#'
 #' @examples
 #' library(mwaved)
 #' # Simulate the multichannel doppler signal.
@@ -46,7 +46,7 @@ summary.mWaveD <- function(object, ...){
   cat('Detected Blur Type:',detectBlur(object$G), '\n\n')
   cat('Resolution selection method: ',object$resolution,'\n\n')
   cat("Estimated Channel information:\n\n")
-  
+
   if (object$blurDetected == "direct" && object$resolution == "smooth") {
     mat <- cbind(round(object$sigma, 3), round(object$alpha, 3), object$blurInfo$freq, rep(object$j1, m))
     colnames(mat) <- c("Sigma.hat", "Alpha", "Fourier number cutoff", "Highest resolution")
@@ -60,7 +60,7 @@ summary.mWaveD <- function(object, ...){
       rownames(mat) <- paste("Channel ", 1:m,':', sep='')
       print(mat, ...)
       cat("\n")
-      cat("Estimated best channel = Channel", object$blurInfo$bestChannel)      
+      cat("Estimated best channel = Channel", object$blurInfo$bestChannel)
     } else {
       if (object$resolution == "block"){
         mat <- cbind(round(object$sigma, 3), round(object$alpha, 3))
@@ -70,34 +70,34 @@ summary.mWaveD <- function(object, ...){
       } else {
         warning('Unrecognised resolution selection method.')
       }
-    } 
+    }
   }
   cat("\n\n")
   cat("mWaveD optimal finest resolution level j1 =", object$j1)
 
   cat("\n\n")
   cat("Thresholding method:", object$shrinkType, "   Tuning parameter: eta =", object$eta,'\n\n')
-  
+
   threshMatrix <- cbind(round(object$levelMax,4), round(object$thresh,4), object$percent)
   rownames(threshMatrix) <- paste("Level", object$j0:object$j1,":" )
   colnames(threshMatrix) <- c("Max|w|", "Threshold", "% Shrinkage" )
   print(threshMatrix, ...)
-} 
+}
 
 #' @name plot.waveletCoef
 #' @title Multi-Resolution Analysis plot of wavelet coefficients
 #'
 #' @description Plots the wavelet coefficient object in the multiresolution analysis
-#' 
+#'
 #' @param x A list of class waveletCoef.
-#' @param y An optional numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the \code{x} wavelet coefficients. 
+#' @param y An optional numeric vector of trimmed wavelet coefficients to be overlayed on top of the plot for comparison with the \code{x} wavelet coefficients.
 #' @param labels Optional character vector with two elements to give name labels to \code{x} and \code{y} respectively.
 #' @param ... Arguments to be passed to methods.
 #' @param lowest Specifies the coarsest resolution to display in the Multi-resolution plot.
 #' @param highest Specifies the finest resolution to display in the Multi-resolution plot.
 #' @param scaling A numeric value that acts as a graphical scaling parameter to rescale the wavelet coefficients in the plot. A larger scaling value will reduce the size of the coefficients in the plot.
 #' @param ggplot A logical value to specify if the user wants to use base graphics (FALSE) or ggplot2  graphics (TRUE).
-#' 
+#'
 #' @seealso \code{\link{multiCoef}} for generating a list of class `waveletCoef`
 #' @export
 plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, highest = NULL, scaling = 1, ggplot = TRUE){
@@ -114,7 +114,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   } else if (lowest < x$j0 ) {
       warning("lowest level shouldn't be smaller than j0 specified in wavelet coefficient object.")
   }
-  
+
   # Check resolution levels aren't empty.
   ind <- which.max(rev(x$coef) != 0)
   lastres <- floor(log2(n - ind + 1)) - 1
@@ -126,7 +126,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
       warning('highest level must be higher than the lowest level.')
       highest <- lowest
   }
-  
+
   js <- rep(lowest:highest, 2^(lowest:highest))
   ks <- unlist(lapply(lowest:highest, function(i) 0:(2^i-1)/2^i))
   wi <- (2^lowest + 1):2^(highest + 1)
@@ -135,7 +135,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   wf <- 2.05 * max(abs(w))/scaling
   w  <- w/wf
   ws <- w + js
-  
+
   # check shrink input is a waveletCoef object
   if (!is.null(y)) {
     if (length(x$coef) != length(y$coef)) {
@@ -155,7 +155,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
   } else {
     ns <- 1
   }
-  
+
   mraTitle <- 'MRA'
   mraLabels <- c("Location", "Resolution Level")
   if (!is.null(labels)) {
@@ -172,7 +172,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
       ggplot = FALSE
     }
   }
-  
+
   if (ggplot) {
     if (ns == 2) {
       nData <- data.frame(w = c(ws,wss), js = c(js, jss), ks = c(ks, kss), col = rep(labels, c(nw, nss)))
@@ -183,7 +183,7 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
       nData <- data.frame(w = ws, js = js, ks = ks)
       mraPlot <- ggplot2::ggplot(nData) + ggplot2::geom_segment(ggplot2::aes(x = ks, xend = ks, y = js, yend = w), colour = 'red') + ggplot2::ggtitle(mraTitle)
     }
-    mraPlot + ggplot2::labs(x = mraLabels[1], y = mraLabels[2]) + ggplot2::scale_y_continuous(breaks = lowest:highest) 
+    mraPlot + ggplot2::labs(x = mraLabels[1], y = mraLabels[2]) + ggplot2::scale_y_continuous(breaks = lowest:highest)
   } else {
     buf <- 0.5
     plot(0, type = "n", xlim = c(0,1), ylim = c(lowest - buf, highest + buf), yaxt = 'n', xlab = mraLabels[1], ylab = mraLabels[2], main = mraTitle)
@@ -203,16 +203,16 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 
 #' @name plot.mWaveD
 #' @title Plot Output for the mWaveD object
-#' 
-#' @description Creates plot output that summarises the \code{mWaveD} object produced by the \code{\link{multiWaveD}} function. 
-#'  
+#'
+#' @description Creates plot output that summarises the \code{mWaveD} object produced by the \code{\link{multiWaveD}} function.
+#'
 #' @param x A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})
 #' @param ... Arguments to be passed to methods.
 #' @param which A numeric vector that specifies which plots to output. Default value is \code{1:4} which  specifies that all four plots are to be displayed.
 #' @param ask A logical value that specifies whether the user is \emph{ask}ed before each plot output.
 #' @param singlePlot A logical value that controls whether all plots should appear on a single window. The plot window is resized depending on the value of \code{which}.
 #' @param ggplot A logical value to specify if the user wants to use base graphics (FALSE) or ggplot2 graphics (TRUE).
-#' 
+#'
 #' @details Four plots are output that summarise the multichannel input, a visualisation of the characteristics of the channels and the output estimate and a multi-resolution analysis plot.\itemize{
 #' \item Plot 1: Multichannel input signal overlayed.
 #' \item Plot 2: Estimated output signal using the mWaveD approach.
@@ -220,8 +220,8 @@ plot.waveletCoef <- function(x, y = NULL, labels = NULL,  ..., lowest = NULL, hi
 #' \item Plot 4: Multi-resolution plot of the raw wavelet coefficients and the trimmed wavelet coefficients}
 #' @references
 #' Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
-#' \url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
-#' 
+#' \doi{10.1016/j.acha.2014.04.004}
+#'
 #' Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 #' @seealso \code{\link{multiWaveD}}
 #' @export
@@ -237,11 +237,11 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       # Initialise list
       ggList <- list(NULL)
       i <- 1
-    } 
+    }
   } else {
     ggAvailable <- FALSE
   }
-  
+
   show <- rep(FALSE, 4)
   # Make sure which argument is numeric
   if (!is.numeric(which)) {
@@ -254,17 +254,17 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
     stop('`which` argument must be a vector containing elements: 1, 2, 3 or 4')
   }
   show[which] <- TRUE
-  
+
   n  <- length(x$estimate)
   n2 <- n/2
   m  <- dim(x$signal)[2]
   t  <- (1:n)/n
-  
+
   blurInfo <- x$blurInfo
   resolution <- x$resolution
   j0 <- x$j0
   j1 <- x$j1
-  
+
   estimateTitle <- 'mWaveD estimate'
   signalTitle <- 'Input Signal'
   fourierLabel <- 'Fourier number'
@@ -272,7 +272,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
   blockTitle <- 'Block wise resolution selection'
   mraLabels <- c('raw',paste(x$shrinkType, ' thresholded', sep = ''))
   mraTitle <- 'Multiresolution Analysis'
-  
+
   if (show[3L]) {
     if (resolution != "block") {
       xw = fourierWindow(n)
@@ -295,12 +295,12 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       ylim <- range(c(blurInfo$blockVar, blurInfo$blockCutoff))
     }
   }
-  
+
   if (ask) {
     oask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(oask))
   }
-  
+
   if (ggplot) {
     if (show[1L]) {
       signalData <- data.frame(Y = as.vector(x$signal), x = rep(t, m), Channel = rep(LETTERS[1:m], each = n))
@@ -334,7 +334,7 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
       ggList[[i]] <- resolutionPlot
       i <- i + 1
     }
-    
+
     if (show[4L]) {
         mraPlot <- plot(x$coef, x$shrinkCoef, highest = j1, labels = c('Raw', paste('Thresholded (', x$shrinkType, ')', sep = '')), ggplot = TRUE)
         ggList[[i]] <- mraPlot
@@ -382,25 +382,25 @@ plot.mWaveD <- function(x, ..., which = 1L:4L, singlePlot = TRUE, ask = !singleP
     } else {
       par(mfrow = c(1,1))
     }
-    
+
     if (show[1L]) {
       matplot(t, x$signal, type = 'l', main = signalTitle, ylab = '', xlab = '', lty = 1, cex = 0.8)
       grid()
     }
-    
+
     if (show[2L]) {
       # Plot mWaveD estimate
       plot(t, x$estimate, type = 'l', main = estimateTitle, ylab = '', xlab = '', ...)
       grid()
     }
-    
+
     if (show[3L]) {
       # Plot resolution analysis
       if (resolution != 'block') {
         iw = fourierWindow(n)
         matplot(iw, blur, type = 'l', lty = 1, xlim = xlim, ylim = ylim, main = fourierTitle, xlab = fourierLabel, ylab = "")
         matlines(iw, cut, lty = 2)
-        grid()      
+        grid()
         if (resolution == 'smooth' && x$blurDetected != "direct") {
           points(xbest, ybest, col='blue')
           points(-xbest, ybest, col = 'blue')

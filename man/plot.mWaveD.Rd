@@ -4,8 +4,14 @@
 \alias{plot.mWaveD}
 \title{Plot Output for the mWaveD object}
 \usage{
-\method{plot}{mWaveD}(x, ..., which = 1L:4L, singlePlot = TRUE,
-  ask = !singlePlot, ggplot = TRUE)
+\method{plot}{mWaveD}(
+  x,
+  ...,
+  which = 1L:4L,
+  singlePlot = TRUE,
+  ask = !singlePlot,
+  ggplot = TRUE
+)
 }
 \arguments{
 \item{x}{A mWaveD object to be plotted (list created by \code{\link{multiWaveD}})}
@@ -32,7 +38,7 @@ Four plots are output that summarise the multichannel input, a visualisation of 
 }
 \references{
 Kulik, R., Sapatinas, T. and Wishart, J.R. (2014) \emph{Multichannel wavelet deconvolution with long range dependence. Upper bounds on the L_p risk}  Appl. Comput. Harmon. Anal. (to appear in).
-\url{http://dx.doi.org/10.1016/j.acha.2014.04.004}
+\doi{10.1016/j.acha.2014.04.004}
 
 Wishart, J.R. (2014) \emph{Data-driven wavelet resolution choice in multichannel box-car deconvolution with long memory}, Proceedings of COMPSTAT 2014, Geneva Switzerland, Physica Verlag, Heidelberg (to appear)
 }
